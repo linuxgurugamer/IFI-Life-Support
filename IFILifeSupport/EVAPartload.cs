@@ -24,7 +24,7 @@ namespace IFILifeSupport
         {
             if (IsON) { IsON = false; } else { IsON = true; }
         }
-        
+
     }
 
     // [KSPAddon(KSPAddon.Startup.MainMenu, true)]
@@ -35,9 +35,9 @@ namespace IFILifeSupport
 
         private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
 
-   
+
         public void Awake()
-                {
+        {
             LoadingScreen screen = FindObjectOfType<LoadingScreen>();
             if (screen == null)
             {
@@ -60,12 +60,12 @@ namespace IFILifeSupport
                 GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel11);
                 GameEvents.onCrewBoardVessel.Add(OnCrewBoardVessel11);
             }
-            
+
 
         }
 
 
-  
+
         private void OnCrewBoardVessel11(GameEvents.FromToAction<Part, Part> action)
         {
             IFIDebug.IFIMess(" IFI DEBUG -- OnCrewBoardVessel fired ----");
@@ -81,7 +81,7 @@ namespace IFILifeSupport
                 }
                 else if (IIResource == "ElectricCharge")
                 {
-                   // IFIResElectric += pr.amount;
+                    // IFIResElectric += pr.amount;
                 }
             }
             IFIDebug.IFIMess(" Electric Found " + Convert.ToString(IFIResElectric));

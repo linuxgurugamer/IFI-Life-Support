@@ -64,7 +64,7 @@ namespace IFILifeSupport
                 this.Fields[1].guiActive = true;
                 Vessel active = this.part.vessel;
                  double LS_RR = LifeSupportRate.GetRate();
-                if (active.mainBody.theName == "Kerbin" && active.altitude <= 12123)
+                if (active.mainBody.name == "Kerbin" && active.altitude <= 12123)
                 {
                     lifeSupportStatus = "Air Intake";
                 }

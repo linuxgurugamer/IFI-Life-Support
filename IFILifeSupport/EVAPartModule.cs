@@ -13,8 +13,8 @@ namespace IFILifeSupport
     {
 
         public bool initialized = false;
-        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate(); 
-        
+        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
+
         // Right Click Info display for Part
         [KSPField(guiActive = true, guiName = "Life Support Pack Status", isPersistant = false)]
         public string lifeSupportStatus;
@@ -26,10 +26,10 @@ namespace IFILifeSupport
         {
             base.OnUpdate();
             Vessel active = this.part.vessel;
-      
+
             if (active.isEVA == true)
             {
-                if (active.mainBody.theName == "Kerbin" && active.altitude <= 3250)
+                if (active.mainBody.name == "Kerbin" && active.altitude <= 3250)
                 {
                     lifeSupportStatus = "Visor";
                 }
@@ -37,26 +37,24 @@ namespace IFILifeSupport
                 {
                     lifeSupportStatus = "Active";
                 }
-                    double ResourceAval = IFIGetAllResources("LifeSupport");
-                    displayRate = (float)((ResourceAval / Rate_Per_Kerbal) / 60 / 60);
-                    if (displayRate >= 0 && displayRate <= 1)
-                    {
-                        lifeSupportStatus = "CAUTION ";
-                    }
-                    else if (displayRate <= 0)
-                    {
-                        lifeSupportStatus = "Warning!";
-                    }
-                    
-                
+                double ResourceAval = IFIGetAllResources("LifeSupport");
+                displayRate = (float)((ResourceAval / Rate_Per_Kerbal) / 60 / 60);
+                if (displayRate >= 0 && displayRate <= 1)
+                {
+                    lifeSupportStatus = "CAUTION ";
+                }
+                else if (displayRate <= 0)
+                {
+                    lifeSupportStatus = "Warning!";
+                }
+
+
             }
 
         }
 
 
-        
 
- 
         private double IFIGetAllResources(string IFIResource)
         {
             double IFIResourceAmt = 0.0;

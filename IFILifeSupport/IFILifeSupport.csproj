@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IFILifeSupport</RootNamespace>
     <AssemblyName>IFILifeSupport</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,31 +35,36 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="KSPAssets">
-      <HintPath>C:\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\KSPAssets.dll</HintPath>
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\KSPAssets.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System">
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\System.Xml.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>C:\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>R:\KSP_1.3.1_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyVersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyVersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="EVAPartUpdate.cs" />
     <Compile Include="PartUpdate.cs" />
     <Compile Include="LifeSupportDisplay.cs" />
@@ -69,21 +75,36 @@
     <Compile Include="EVAPartModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="AssemblyVersion.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyVersion.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug goto :debug
+    <PostBuildEvent>
+start /D D:\Users\jbb\github\IFI-Life-Support /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
 
-:release
-copy "$(TargetPath)" "C:\Steam\SteamApps\common\Kerbal Space Program\GameData\IFILS\Plugin\"
-copy "$(TargetPath)" "E:\Projects        - Releases\IFI LS\IFILS\Plugin\"
-goto :exit
 
-:debug
-"E:\KSPDebug\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"
-xcopy /Y "$(TargetPath)" "E:\KSPDebug\Kerbal Space Program\GameData\IFILS\Plugin\"
-xcopy /Y "$(TargetDir)$(TargetName).pdb" "E:\KSPDebug\Kerbal Space Program\GameData\IFILS\Plugin\"
-xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "E:\KSPDebug\Kerbal Space Program\GameData\IFILS\Plugin\"
-:exit</PostBuildEvent>
+
+if $(ConfigurationName) == Release (
+
+start /D D:\Users\jbb\github\IFI-Life-Support /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+)
+</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+set textTemplatingPath="%25ProgramFiles(x86)%25\Microsoft Visual Studio\2017\Community\Common7\IDE \texttransform.exe"
+
+
+
+%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion.tt"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

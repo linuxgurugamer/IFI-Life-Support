@@ -99,12 +99,12 @@ public class IFI_LIFESUPPORT_TRACKING : UnityEngine.MonoBehaviour
                     {
                         IFI_Crew = vessel.protoVessel.GetVesselCrew().Count;
                         IFI_ALT = vessel.protoVessel.altitude;
-                        IFI_Location = vessel.mainBody.theName;
+                        IFI_Location = vessel.mainBody.name;
                     }
                     else
                     {
                         IFI_Crew = vessel.GetCrewCount();
-                        IFI_Location = vessel.mainBody.theName;
+                        IFI_Location = vessel.mainBody.name;
                         IFI_ALT = vessel.altitude;
                     }
                     if (IFI_Crew > 0.0)
