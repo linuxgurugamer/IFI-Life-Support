@@ -30,7 +30,8 @@ namespace IFILifeSupport
         public static bool WarpCancel = true;
 		public static bool LSDisplayActive = false;
 		public static Rect infoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
-		public static GUILayoutOption[] layoutOptions;
+#pragma warning disable CS0649
+        public static GUILayoutOption[] layoutOptions;
 		public static Vector2 infoScrollPos = Vector2.zero;
 
 	}

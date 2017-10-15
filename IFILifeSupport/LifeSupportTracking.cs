@@ -114,13 +114,27 @@ namespace IFILifeSupport
                                 ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   IFI_ALT: " + IFI_ALT);
 
                             double LS_Use = LifeSupportRate.GetRate();
-                            if (IFI_Location == FlightGlobals.GetHomeBodyName() && IFI_ALT <= 12123) { LS_Use *= 0.20; }
-                            if (IFI_Location == "Laythe" && IFI_ALT <= 6123) { LS_Use *= 0.60; }
+                            LSAval = IFIGetAllResources("LifeSupport", vessel, vessel.loaded);
+
+                            if (vessel.mainBody.atmosphereContainsOxygen)
+                            {
+                                if (vessel.mainBody.name == FlightGlobals.GetHomeBodyName())
+                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableHomeworldAtmoAdjustment; //  0.20;
+                                else
+                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoAdjustment; // 0.60;
+                            }
+                          
+                            //{
+                            //    if (IFI_Location == "Laythe" && IFI_ALT <= 6123) { LS_Use *= 0.60; }
+                            //}
 
                             LS_Use *= IFI_Crew;
                             LS_Use *= Elapesed_Time;
                             // IF No EC use more LS resources
-                            if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1) { LS_Use *= 1.2; }
+                            if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1)
+                            {
+                                LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                            }
                             if (LS_Use > 0.0)
                             {
                                 double rtest = IFIUSEResources("LifeSupport", vessel, vessel.loaded, LS_Use, IFI_Crew);
@@ -128,14 +142,23 @@ namespace IFILifeSupport
                             }
 
 
-                            LSAval = IFIGetAllResources("LifeSupport", vessel, vessel.loaded);
+                            
                             //Debug.Log("Vessel with crew onboard Found: " + TVname + "   Crew=" + IFI_Crew +"    LifeSupport = "+ LSAval +"  Body:"+IFI_Location+"   ALT:"+IFI_ALT);
                             double LS_RR = LifeSupportRate.GetRate();
-                            if (IFI_Location == FlightGlobals.GetHomeBodyName() && IFI_ALT <= 12123) { LS_RR *= 0.20; }
-                            if (IFI_Location == "Laythe" && IFI_ALT <= 6123) { LS_RR *= 0.60; }
 
-                            if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1) { LS_RR *= 1.2; }
-                            double days_rem = LSAval / IFI_Crew / LS_RR / 60 / 60 / HoursPerDay;
+                            if (LifeSupportRate.IntakeAirAvailable(vessel))
+                            {
+                                if (IFI_Location == FlightGlobals.GetHomeBodyName())
+                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableHomeworldAtmoAdjustment; //  0.20; 
+                                else
+                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoAdjustment; // 0.60; 
+                            }
+                            if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1)
+                            {
+                                LS_RR *= LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                            }
+
+                            double days_rem = LSAval / IFI_Crew / LS_RR / 3600 /* 60 / 60 */ / HoursPerDay;
                             LS_Status_Hold[LS_Status_Hold_Count, 0] = TVname;
                             LS_Status_Hold[LS_Status_Hold_Count, 1] = IFI_Location;
                             string H_Crew = Convert.ToString(IFI_Crew);

@@ -39,8 +39,9 @@ Currently there are several Status LS system can be in:
 
            Inactive		- No demand for LS and no resources consumed.  Life Support tag for days / hours of LS remaining will read 0.
            Active       - Demand for LS and resources consumed.  Life Support tag for days / hours of LS remaining will read how long LS will last for whole vessel.
-           Visor        - Kerbal on EVA breathing outside air decreased Resource consumption .  Life Support tag for days / hours of LS remaining will read 0 (fixing).
-           Intake Air	- Pod using air intakes to provide O2 to crew - decreased Resource consumption.
+           Visor        - Kerbal on EVA breathing outside air decreased Resource consumption .  Life Support tag for days / hours of LS remaining will read 0 (fixing). 
+						  Only on Kerbin
+           Intake Air	- Pod using air intakes to provide O2 to crew - decreased Resource consumption.  Requires atmosphere to have Oxygen
            CAUTION		- Less than 2 days pod or 1 hour EVA of LS remaining.  Life Support tag for days / hours of LS remaining will read how long LS will last for whole vessel.
            Warning!		- LS or Electric Charge at 0. Kerbals will start dying if immediate action not taken. Life Support tag for days / hours of LS remaining will read 0.
 

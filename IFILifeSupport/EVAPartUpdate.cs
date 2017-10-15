@@ -12,7 +12,7 @@ namespace IFILifeSupport
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class ADDEVAPARTS : UnityEngine.MonoBehaviour
     {
-        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
+        //private static double Rate_Per_Kerbal_Adj = LifeSupportRate.GetRate();
 
         private void Awake()
         {
@@ -82,13 +82,9 @@ namespace IFILifeSupport
             Part prefabPart = null;
             prefabPart = part11.partPrefab;
             IFIDebug.IFIMess("IFI Attempting to add LS Resource to part: " + part11.name);
-            double MaxLS = MaxLS = Rate_Per_Kerbal * 60 * 60 * 5;
+            double MaxLS = MaxLS = LifeSupportRate.GetRate() * 18000; //  60 * 60 * 5;
 
-
-
-
-
-
+            
 
             //Part prefab = part11.partPrefab; 
 

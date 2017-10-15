@@ -68,7 +68,7 @@ namespace IFILifeSupport
                 IFIDebug.IFIMess("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
                     ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
 
-                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)
+                if (LifeSupportRate.IntakeAirAvailable(active))
                 {
                     lifeSupportStatus = "Air Intake";
                 }
@@ -79,8 +79,11 @@ namespace IFILifeSupport
 
                 double ResourceAval = IFIGetAllResources("LifeSupport");
 
-                if (IFIGetAllResources("ElectricCharge") < 0.1) { LS_RR *= 1.2; }
-                displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 60 / 60);
+                if (IFIGetAllResources("ElectricCharge") < 0.1)
+                {
+                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                }
+                displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 3600); //  60 / 60);
 
             }  //end of if crew > 0
             else if (crewCount == 0)

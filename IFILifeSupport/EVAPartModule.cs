@@ -13,7 +13,7 @@ namespace IFILifeSupport
     {
 
         public bool initialized = false;
-        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
+        //private static double Rate_Per_Kerbal_Adj = LifeSupportRate.GetRate();
 
         // Right Click Info display for Part
         [KSPField(guiActive = true, guiName = "Life Support Pack Status", isPersistant = false)]
@@ -31,7 +31,7 @@ namespace IFILifeSupport
             {
                 IFIDebug.IFIMess("IFILifeSupportEVA.OnUpdate, active.mainBody.name: " + active.mainBody.name +
                     ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
-                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 3250)
+                if (LifeSupportRate.BreathableAtmosphere(active))
                 {
                     lifeSupportStatus = "Visor";
                 }
@@ -40,7 +40,7 @@ namespace IFILifeSupport
                     lifeSupportStatus = "Active";
                 }
                 double ResourceAval = IFIGetAllResources("LifeSupport");
-                displayRate = (float)((ResourceAval / Rate_Per_Kerbal) / 60 / 60);
+                displayRate = (float)((ResourceAval / LifeSupportRate.GetRate()) / 3600); // 60 / 60);
                 if (displayRate >= 0 && displayRate <= 1)
                 {
                     lifeSupportStatus = "CAUTION ";

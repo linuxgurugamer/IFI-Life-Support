@@ -10,3 +10,15 @@
 	Added dependency on the Community Category Kit for the Life support category
 	Removed the extra greenhouses
 	Finalized greenhouses
+
+3.3.0.3
+	Added settings page
+	Added configurable values
+	Removed hard-coding of planet names
+	All settings are now based on planet values
+	Breathable atmosphere is only on the homeworld.
+	Optimized some calculations (consolidated constants)
+	Cleaned up the MM script to be calculated rather than hard-coded
+	Tested to work with DeepFreeze
+
+

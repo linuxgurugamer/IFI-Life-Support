@@ -12,7 +12,6 @@ namespace IFILifeSupport
 {
     public class PartUpdate : LoadingSystem
     {
-        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
         private bool ready;
         public static PartUpdate Instance { get; private set; }
 

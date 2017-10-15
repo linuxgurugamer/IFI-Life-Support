@@ -32,10 +32,6 @@ namespace IFILifeSupport
     [KSPAddon(KSPAddon.Startup.Instantly, false)]
     public class ADDEVAS : UnityEngine.MonoBehaviour
     {
-
-        //private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
-
-
         public void Awake()
         {
             LoadingScreen screen = FindObjectOfType<LoadingScreen>();
@@ -60,8 +56,7 @@ namespace IFILifeSupport
                 GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel11);
                 GameEvents.onCrewBoardVessel.Add(OnCrewBoardVessel11);
             }
-
-
+            
         }
 
 

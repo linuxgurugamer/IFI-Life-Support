@@ -11,7 +11,11 @@ namespace IFILifeSupport
 {
     public static class LifeSupportRate
     {
-        private static double Rate_Per_Kerbal = 0.000046;
+        //private static double Rate_Per_Kerbal = 0.000046;
+
+       // private static double Rate_Per_Kerbal = HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal;
+
+
         public static double GetRate()
         {
             double Hold_Rate = 0.0;
@@ -33,9 +37,52 @@ namespace IFILifeSupport
                 { Adjustment = 1.00; }
             }
 
-            return Rate_Per_Kerbal * Adjustment;
+            return HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal * Adjustment;
         }
-       
- 
+
+
+
+        /// <summary>
+        /// Is there breathable atmosphere where the vessel is
+        /// </summary>
+        /// <param name="active"></param>
+        /// <returns></returns>
+        public static bool BreathableAtmosphere(Vessel active)
+        {
+            if (active.mainBody.ocean && active.altitude < 0.0) 
+                return false;
+
+            Debug.Log("BreathableAtmosphere, active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude: " + active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude));
+
+            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
+                active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoPressure)
+                return true;
+
+//            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 3250)
+//                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether there is enough Oxygen avaliable in the air to supplement the LS
+        /// </summary>
+        /// <param name="active"></param>
+        /// <returns></returns>
+        public static bool IntakeAirAvailable(Vessel active)
+        {
+            if (active.mainBody.atmosphereContainsOxygen)
+            {
+                if (active.mainBody.ocean && active.altitude < 0.0)
+                    return false;
+                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
+                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().intakeAirAtmoPressure)
+                    return true;
+
+                //            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)
+                //                return true;
+            }
+            return false;
+        }
     }
 }
