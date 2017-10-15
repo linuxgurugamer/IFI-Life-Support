@@ -3,3 +3,10 @@
 
 3.3.0.1
 	Fixed nodes on all parts
+
+3.3.0.2
+	Adjusted drag values on all parts
+	Adjusted maxtemp on all parts
+	Added dependency on the Community Category Kit for the Life support category
+	Removed the extra greenhouses
+	Finalized greenhouses

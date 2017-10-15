@@ -19,7 +19,7 @@ namespace IFILifeSupport
         private void Awake()
         {
 
-           
+
             if (Instance != null)
             {
                 DestroyImmediate(this);
@@ -30,7 +30,7 @@ namespace IFILifeSupport
         }
         public override float ProgressFraction()
         {
-            
+
             return 3;
         }
 
@@ -60,7 +60,7 @@ namespace IFILifeSupport
         {
             ready = false;
             Debug.Log(" IFI Preload LifeSupport Install started ++++ ");
-          
+
             // Add Module to Command Parts AND eVA PreFabs
             try
             {
@@ -70,10 +70,10 @@ namespace IFILifeSupport
                     if (CrewHold != null && CrewHold != "0")
                     {
                         AddLSModule(part_node, Int32.Parse(CrewHold));
-                     }
+                    }
                 }
 
-               
+
 
             }
             catch (Exception ex)
@@ -85,31 +85,31 @@ namespace IFILifeSupport
             if (IFIDebug.IsON) { IFIDebug.Toggle(); }
 #endif
             ready = true;
-            
+
         }
 
-       private void AddLSModule(ConfigNode CrewPart, int crewCount)
+        private void AddLSModule(ConfigNode CrewPart, int crewCount)
         {
             var IFIParts = CrewPart.GetNodes("MODULE");// .Where(p => p.category.Equals(1));
             bool HasMod = false;
-               // Debug.Log(IFIParts.Count);
-                foreach (var IFIPart in IFIParts)
-                {
+            // Debug.Log(IFIParts.Count);
+            foreach (var IFIPart in IFIParts)
+            {
                 string ModuleName = IFIPart.GetValue("name");
-                   // Debug.Log("IFI Part Update --" + ModuleName + " -- Found");
-                    if (ModuleName == "IFILifeSupport")
-                    {
+                // Debug.Log("IFI Part Update --" + ModuleName + " -- Found");
+                if (ModuleName == "IFILifeSupport")
+                {
                     HasMod = true;
-                    }
                 }
+            }
             if (!HasMod)
             {
-               // IFIDebug.IFIMess("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
+                // IFIDebug.IFIMess("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("MODULE");
                 IFIMOD.AddValue("name", "IFILifeSupport");
-                CrewPart.AddNode(IFIMOD);   
+                CrewPart.AddNode(IFIMOD);
             }
-             HasMod = false;
+            HasMod = false;
             var IFIParts2 = CrewPart.GetNodes("RESOURCE");// .Where(p => p.category.Equals(1));
             // Debug.Log(IFIParts.Count);
             foreach (var IFIPart in IFIParts2)
@@ -134,7 +134,7 @@ namespace IFILifeSupport
             }
         }
 
-   
-}
 
     }
+
+}

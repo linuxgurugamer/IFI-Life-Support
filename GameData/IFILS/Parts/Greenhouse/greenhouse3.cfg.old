@@ -35,22 +35,27 @@ PART
 	crashTolerance = 6
 	breakingForce = 200
 	breakingTorque = 200
-	maxTemp = 2900
+	maxTemp = 1500 // 2900
 	fuelCrossFeed = True
 	PhysicsSignificance = 1
 
-	RESOURCE
+	MODULE
 	{
-		name = LifeSupport
-		amount = 0
-		maxAmount = 10
+		name = ModuleDeployableSolarPanel
+		animationName = door
+		sunTracking = true
+		raycastTransformName = glass
+		pivotName = glass
+		isBreakable = false
+		resourceName = ElectricCharge
+		chargeRate = 6.4
 	}
 
 	MODULE
 	{
 		name = ModuleGenerator
 		requiresAllInputs = true
-		isAlwaysActive = true
+		isAlwaysActive = false
 
 		INPUT_RESOURCE
 		{
@@ -65,14 +70,11 @@ PART
 		} 
 	}
 
-	MODULE{
-		name = ModuleDeployableSolarPanel
-		animationName = door
-		sunTracking = true
-		raycastTransformName = glass
-		pivotName = glass
-		isBreakable = false
-		resourceName = ElectricCharge
-		chargeRate = 6.4
+	RESOURCE
+	{
+		name = LifeSupport
+		amount = 0
+		maxAmount = 10
 	}
+
 }

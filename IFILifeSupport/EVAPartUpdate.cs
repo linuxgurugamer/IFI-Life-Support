@@ -38,11 +38,8 @@ namespace IFILifeSupport
             }
         }
 
-     private void AddLifeSupport(AvailablePart part11)
+        private void AddLifeSupport(AvailablePart part11)
         {
-
-
-
             Part prefabPart = null;
             prefabPart = part11.partPrefab;
             IFIDebug.IFIMess("IFI Attempting to add LS Module EVA " + part11.name);

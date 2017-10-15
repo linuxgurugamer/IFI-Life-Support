@@ -15,6 +15,7 @@ namespace IFILifeSupport
         public static double GetRate()
         {
             double Hold_Rate = 0.0;
+            
             Hold_Rate = GetTechRate();
             return Hold_Rate;
         }

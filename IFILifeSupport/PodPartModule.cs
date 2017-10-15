@@ -47,24 +47,28 @@ namespace IFILifeSupport
         {
             return "Interstellar Flight Inc. Life Support Systems MK XV Installed";
         }
-    
- 
+
+
         public override void OnUpdate()
         {
-  
-            #if !DEBUG 
+
+#if !DEBUG
             if (IFIDebug.IsON) { DebugStatus = "Active"; } else { DebugStatus = "Inactive"; }
-            #endif
+#endif
 
             base.OnUpdate();
             int crewCount = 0;
             crewCount = this.part.protoModuleCrew.Count;
-            if (crewCount > 0 )
+            if (crewCount > 0)
             {
                 this.Fields[1].guiActive = true;
                 Vessel active = this.part.vessel;
-                 double LS_RR = LifeSupportRate.GetRate();
-                if (active.mainBody.name == "Kerbin" && active.altitude <= 12123)
+                double LS_RR = LifeSupportRate.GetRate();
+
+                IFIDebug.IFIMess("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
+                    ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
+
+                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)
                 {
                     lifeSupportStatus = "Air Intake";
                 }
@@ -72,12 +76,12 @@ namespace IFILifeSupport
                 {
                     lifeSupportStatus = "Active";
                 }
-                
-                    double ResourceAval = IFIGetAllResources("LifeSupport");
-               
+
+                double ResourceAval = IFIGetAllResources("LifeSupport");
+
                 if (IFIGetAllResources("ElectricCharge") < 0.1) { LS_RR *= 1.2; }
                 displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 60 / 60);
-                    
+
             }  //end of if crew > 0
             else if (crewCount == 0)
             {

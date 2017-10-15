@@ -29,7 +29,9 @@ namespace IFILifeSupport
 
             if (active.isEVA == true)
             {
-                if (active.mainBody.name == "Kerbin" && active.altitude <= 3250)
+                IFIDebug.IFIMess("IFILifeSupportEVA.OnUpdate, active.mainBody.name: " + active.mainBody.name +
+                    ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
+                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 3250)
                 {
                     lifeSupportStatus = "Visor";
                 }

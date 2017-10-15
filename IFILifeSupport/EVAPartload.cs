@@ -33,7 +33,7 @@ namespace IFILifeSupport
     public class ADDEVAS : UnityEngine.MonoBehaviour
     {
 
-        private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
+        //private static double Rate_Per_Kerbal = LifeSupportRate.GetRate();
 
 
         public void Awake()
