@@ -77,11 +77,11 @@ namespace IFILifeSupport
                     lifeSupportStatus = "Active";
                 }
 
-                double ResourceAval = IFIGetAllResources("LifeSupport");
+                double ResourceAval = IFIGetAllResources(Constants.LIFESUPPORT);
 
                 if (IFIGetAllResources("ElectricCharge") < 0.1)
                 {
-                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                 }
                 displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 3600); //  60 / 60);
 
@@ -97,6 +97,10 @@ namespace IFILifeSupport
         private double IFIGetAllResources(string IFIResource)
         {
             double IFIResourceAmt = 0.0;
+            double  num2 = 0;
+            int id = PartResourceLibrary.Instance.GetDefinition(IFIResource).id;
+            this.part.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
+#if false
             Vessel active = this.part.vessel;
             foreach (Part p in active.parts)
             {
@@ -111,6 +115,7 @@ namespace IFILifeSupport
                     }
                 }
             }
+#endif
             return IFIResourceAmt;
         }
 

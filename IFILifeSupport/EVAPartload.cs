@@ -70,7 +70,7 @@ namespace IFILifeSupport
             {
                 string IIResource = pr.resourceName;
                 IFIDebug.IFIMess(" Resource Name " + IIResource);
-                if (IIResource == "LifeSupport")
+                if (IIResource == Constants.LIFESUPPORT)
                 {
                     IFIResourceAmt += pr.amount;
                 }
@@ -80,8 +80,8 @@ namespace IFILifeSupport
                 }
             }
             IFIDebug.IFIMess(" Electric Found " + Convert.ToString(IFIResElectric));
-            IFIResourceAmt = action.from.RequestResource("LifeSupport", IFIResourceAmt);
-            IFIResourceAmt = action.to.RequestResource("LifeSupport", 0.0 - IFIResourceAmt);
+            IFIResourceAmt = action.from.RequestResource(Constants.LIFESUPPORT, IFIResourceAmt);
+            IFIResourceAmt = action.to.RequestResource(Constants.LIFESUPPORT, 0.0 - IFIResourceAmt);
             //IFIResElectric = (action.from.RequestResource("ElectricCharge", IFIResElectric)) - 0.001;
             //IFIResElectric = action.to.RequestResource("ElectricCharge", 0.0 - IFIResElectric);
             IFIDebug.IFIMess("IFI Life Support Message: EVA - Ended - " + action.from.name + " Boarded Vessel - LS Return = " + Convert.ToString(IFIResourceAmt) + " and  Electric" + Convert.ToString(IFIResElectric));
@@ -99,7 +99,7 @@ namespace IFILifeSupport
                 foreach (PartResource pr in action.to.Resources)
                 {
 
-                    if (pr.resourceName.Equals("LifeSupport"))
+                    if (pr.resourceName.Equals(Constants.LIFESUPPORT))
                     {
                         pr.amount = pr.maxAmount;
                         resourceRequest += pr.maxAmount;
@@ -115,9 +115,9 @@ namespace IFILifeSupport
             //IFIResElectric = resourceRequest * 1.5;
             //IFIResElectric -= IFIResReturn;
             IFIResReturn = 0.0;
-            IFIResReturn = action.from.RequestResource("LifeSupport", resourceRequest);
+            IFIResReturn = action.from.RequestResource(Constants.LIFESUPPORT , resourceRequest);
             resourceRequest -= IFIResReturn;
-            resourceRequest = action.to.RequestResource("LifeSupport", resourceRequest);
+            resourceRequest = action.to.RequestResource(Constants.LIFESUPPORT, resourceRequest);
             IFIDebug.IFIMess("IFI Life Support Message: EVA - Started - " + action.to.name + " Exited Vessel - Took " + Convert.ToString(IFIResReturn) + " Life Support  and " + Convert.ToString(IFIResElectric) + " Electric Charge ");
         }
     }

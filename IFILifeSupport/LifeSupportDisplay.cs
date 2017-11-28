@@ -25,7 +25,7 @@ namespace IFILifeSupport
 
 		//Properties
 
-		public const float WINDOW_WIDTH_DEFAULT = 460;
+		public const float WINDOW_WIDTH_DEFAULT = 650;
 		public const float WINDOW_HEIGHT = 440;
         public static bool WarpCancel = true;
 		public static bool LSDisplayActive = false;

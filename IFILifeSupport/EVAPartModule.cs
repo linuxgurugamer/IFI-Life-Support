@@ -39,8 +39,8 @@ namespace IFILifeSupport
                 {
                     lifeSupportStatus = "Active";
                 }
-                double ResourceAval = IFIGetAllResources("LifeSupport");
-                displayRate = (float)((ResourceAval / LifeSupportRate.GetRate()) / 3600); // 60 / 60);
+                double ResourceAval = IFIGetAllResources(Constants.LIFESUPPORT);
+                displayRate = (float)((ResourceAval / LifeSupportRate.GetRate())); // / 3600); // 60 / 60);
                 if (displayRate >= 0 && displayRate <= 1)
                 {
                     lifeSupportStatus = "CAUTION ";
@@ -59,6 +59,22 @@ namespace IFILifeSupport
 
         private double IFIGetAllResources(string IFIResource)
         {
+            if (IFIResource == null)
+            {
+                Log.Info("IFIGetAllResources, IFIResource is null");
+                return 0;
+            }
+            if (this.part == null)
+            {
+                Log.Info("IFIGetAllResources, part is null");
+                return 0;
+            }
+            if (this.part.Resources == null)
+            {
+                Log.Info("this.part.Resources is null");
+                return 0;
+            }
+            Log.Info("IFIGetAllResources, resource: " + IFIResource);
             double IFIResourceAmt = 0.0;
             foreach (PartResource pr in this.part.Resources)
             {

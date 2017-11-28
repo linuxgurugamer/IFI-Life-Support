@@ -13,6 +13,8 @@ namespace IFILifeSupport
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class IFI_LIFESUPPORT_TRACKING : UnityEngine.MonoBehaviour
     {
+        internal static int LS_ID;
+
         private int IFITIM = 0;
         // Stock APP Toolbar - Stavell
         private ApplicationLauncherButton IFI_Button = null;
@@ -44,7 +46,9 @@ namespace IFILifeSupport
             }
 
             if (!HighLogic.LoadedSceneIsEditor)
-            { Life_Support_Update(); }
+            {
+                Life_Support_Update();
+            }
         }
 
         private void GUIToggle()
@@ -60,6 +64,7 @@ namespace IFILifeSupport
 
         public void Life_Support_Update()
         {
+            Log.Info("Life_Support_Update 1");
             if (HighLogic.LoadedScene == GameScenes.LOADING || HighLogic.LoadedSceneIsEditor || !HighLogic.LoadedSceneIsGame)
                 return; //Don't do anything while the game is loading or in editor
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
@@ -72,13 +77,16 @@ namespace IFILifeSupport
                 IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
                 Went_to_Main = false;
             }
-            double Elapesed_Time = IFI_Get_Elasped_Time();
-            IFI_Button.SetTexture(IFI_button_grn); int LS_ALERT_LEVEL = 1;
+            Log.Info("Life_Support_Update 2");
+            double Elapsed_Time = IFI_Get_Elasped_Time();
+            IFI_Button.SetTexture(IFI_button_grn);
+
+            int LS_ALERT_LEVEL = 1;
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
-                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), 5];
+                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), 7];
                 LS_Status_Hold_Count = 0;
-                //Debug.Log("######## Looking for Ships ######");
+                Debug.Log("######## Looking for Ships ######");
                 foreach (Vessel vessel in FlightGlobals.Vessels)
                 {
 
@@ -88,7 +96,7 @@ namespace IFILifeSupport
                         vessel.vesselType == VesselType.Base || vessel.vesselType == VesselType.Probe) ||
                         vessel.vesselType == VesselType.EVA)
                     {
-                        //Debug.Log(" Found Vessel");//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
+                        Debug.Log(" Found Vessel");//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
                         string TVname;
                         int IFI_Crew = 0;
                         double LSAval;
@@ -114,55 +122,74 @@ namespace IFILifeSupport
                                 ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   IFI_ALT: " + IFI_ALT);
 
                             double LS_Use = LifeSupportRate.GetRate();
-                            LSAval = IFIGetAllResources("LifeSupport", vessel, vessel.loaded);
 
-                            if (vessel.mainBody.atmosphereContainsOxygen)
+                            LSAval = IFIGetAllResources(Constants.LIFESUPPORT, vessel, vessel.loaded);
+
+                            Log.Info("Initial LS_Use: " + LS_Use + ",  LSAval: " + LSAval);
+
+                            if (LifeSupportRate.IntakeAirAvailable(vessel))
                             {
                                 if (vessel.mainBody.name == FlightGlobals.GetHomeBodyName())
-                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableHomeworldAtmoAdjustment; //  0.20;
+                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment; //  0.20;
                                 else
-                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoAdjustment; // 0.60;
+                                    LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment; // 0.60;
                             }
-                          
+                            Log.Info("After Atmo adjust, LS_Use: " + LS_Use + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time);
+
                             //{
                             //    if (IFI_Location == "Laythe" && IFI_ALT <= 6123) { LS_Use *= 0.60; }
                             //}
 
+                            double days_rem = LSAval / IFI_Crew / LS_Use / 3600 / HoursPerDay;
+                            Log.Info("LSAval: " + LSAval + ", IFI_Crew: " + IFI_Crew + ", LS_Use: " + LS_Use + ", HoursPerDay: " + HoursPerDay);
                             LS_Use *= IFI_Crew;
-                            LS_Use *= Elapesed_Time;
+                            LS_Use *= Elapsed_Time;
                             // IF No EC use more LS resources
                             if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1)
                             {
-                                LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                                LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                             }
+
                             if (LS_Use > 0.0)
                             {
-                                double rtest = IFIUSEResources("LifeSupport", vessel, vessel.loaded, LS_Use, IFI_Crew);
-
+                       
+                                double rtest = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, LS_Use, IFI_Crew);
+                                double stest = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, -rtest, IFI_Crew);
+                                Log.Info("Elapsed_Time: " + Elapsed_Time);
+                                Log.Info("LifeSupport rtest: " + rtest);
+                                Log.Info("Organicslurry stest: " + stest);
                             }
 
+#if false
 
-                            
+// duplicated code, no need to do double duty
                             //Debug.Log("Vessel with crew onboard Found: " + TVname + "   Crew=" + IFI_Crew +"    LifeSupport = "+ LSAval +"  Body:"+IFI_Location+"   ALT:"+IFI_ALT);
                             double LS_RR = LifeSupportRate.GetRate();
-
+                            Log.Info("LS_RR 1: " + LS_RR);
                             if (LifeSupportRate.IntakeAirAvailable(vessel))
                             {
                                 if (IFI_Location == FlightGlobals.GetHomeBodyName())
-                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableHomeworldAtmoAdjustment; //  0.20; 
+                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment; //  0.20; 
                                 else
-                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoAdjustment; // 0.60; 
+                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment; // 0.60; 
                             }
+                            Log.Info("LS_RR 2: " + LS_RR);
                             if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1)
                             {
-                                LS_RR *= LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().lowEcAdjustment; // 1.2;
+                                LS_RR *=  HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                             }
 
-                            double days_rem = LSAval / IFI_Crew / LS_RR / 3600 /* 60 / 60 */ / HoursPerDay;
+                            double days_rem = LSAval / IFI_Crew / LS_RR / 3600 / HoursPerDay;
+                            Log.Info("LS_RR 3: " + LS_RR);
+                            Log.Info("LSAval: " + LSAval + ", IFI_Crew: " + IFI_Crew + ", LS_RR: " + LS_RR + ", HoursPerDay: " + HoursPerDay);
+#endif
                             LS_Status_Hold[LS_Status_Hold_Count, 0] = TVname;
                             LS_Status_Hold[LS_Status_Hold_Count, 1] = IFI_Location;
                             string H_Crew = Convert.ToString(IFI_Crew);
-                            if (vessel.vesselType == VesselType.EVA) { H_Crew = "EVA"; }
+                            if (vessel.vesselType == VesselType.EVA)
+                            {
+                                H_Crew = "EVA";
+                            }
                             LS_Status_Hold[LS_Status_Hold_Count, 2] = H_Crew;
                             if (vessel.vesselType == VesselType.EVA && KerbalEVARescueDetect)
                             {
@@ -176,6 +203,13 @@ namespace IFILifeSupport
                                 LS_Status_Hold[LS_Status_Hold_Count, 3] = Convert.ToString(Math.Round(LSAval, 4));
                                 LS_Status_Hold[LS_Status_Hold_Count, 4] = Convert.ToString(Math.Round(days_rem, 2));
                             }
+
+                            // Need to scan for all greenhouses here
+                            LS_Status_Hold[LS_Status_Hold_Count, 5] = "Slurry"; // Convert.ToString(Math.Round(5.5, 5));
+
+                            // Need to scan for all sludge convertors here
+                            LS_Status_Hold[LS_Status_Hold_Count, 6] = "Sludge"; //  Convert.ToString(Math.Round(6.6, 5));
+
                             LS_Status_Hold_Count += 1;
 
                             if (LS_ALERT_LEVEL < 2 && days_rem < 3)
@@ -200,6 +234,7 @@ namespace IFILifeSupport
             IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
             GameEvents.onGUIApplicationLauncherReady.Add(OnGUIApplicationLauncherReady);
             DontDestroyOnLoad(this);
+
             CancelInvoke();
             InvokeRepeating("display_active", 1, 1);
         }
@@ -221,12 +256,44 @@ namespace IFILifeSupport
                 if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_DAN")) IFI_button_danger = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_DAN", false);
                 IFI_Texture_Load = true;
             }
-
+            LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
         }
 
         private double IFIGetAllResources(string IFIResource, Vessel IV, bool ISLoaded)
         {
             double IFIResourceAmt = 0.0;
+            double num2 = 0;
+            int id = PartResourceLibrary.Instance.GetDefinition(IFIResource).id;
+            if (ISLoaded)
+            {
+                if (IV == null)
+                {
+                    Log.Info("IV is null");
+                    return 0;
+                }
+                if (IV.rootPart == null)
+                {
+                    Log.Info("rootPart is null");
+                    return 0;
+                }
+                IV.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
+                //IV.rootPart.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
+                Log.Info("IFIGetAllResources, IFIResource: " + IFIResource + ",   IFIResourceAmt: " + IFIResourceAmt);
+            }
+            else
+            {
+                foreach (ProtoPartSnapshot p in IV.protoVessel.protoPartSnapshots)
+                {
+                    foreach (ProtoPartResourceSnapshot r in p.resources)
+                    {
+                        if (r.resourceName == IFIResource)
+                        {
+                            IFIResourceAmt += r.amount;
+                        }
+                    }
+                }
+            }
+#if false
             if (ISLoaded)
             {
                 if (IV.vesselType != VesselType.EVA)
@@ -278,7 +345,7 @@ namespace IFILifeSupport
                 }
 
             }
-
+#endif
             return IFIResourceAmt;
         }
 
@@ -289,16 +356,60 @@ namespace IFILifeSupport
             if (ISLoaded)
             {
 
-                double ALL_Resorces = IFIGetAllResources(IFIResource, IV, true);
-                if (ALL_Resorces == 0.0)
+                double ALL_Resources = IFIGetAllResources(IFIResource, IV, true);
+                Log.Info("IFIUSEResources: Vessel: " + IV.vesselName + ",  crewCount: " + IV.rootPart.protoModuleCrew.Count() + ",  IFIResource: " + IFIResource);
+                foreach (var p in IV.Parts)
                 {
-                    IFI_Check_Kerbals(IV, UR_Amount);
-                    return 0.0;
+                    Log.Info("Part: " + p.partInfo.name + ", crewCount: " + p.protoModuleCrew.Count());
                 }
-                if (ALL_Resorces < UR_Amount)
+                if (IFIResource == Constants.LIFESUPPORT)
                 {
-                    double TEST_Mod = (UR_Amount - ALL_Resorces) * 100000;
-                    Temp_Resource = IV.rootPart.RequestResource(IFIResource, ALL_Resorces);
+                    if (ALL_Resources == 0.0)
+                    {
+                        IFI_Check_Kerbals(IV, UR_Amount);
+                        return 0.0;
+                    }
+                    else
+                    {
+                        Log.Info("Vessel: " + IV.vesselName + ",  crewCount: " + IV.rootPart.protoModuleCrew.Count());
+
+                        List<string> toDelete = new List<string>();
+                        // check to see if this kerbal is on the vessel
+                        foreach (var p in IV.Parts)
+                        {
+                            for (int i1 = p.protoModuleCrew.Count(); i1 > 0; i1--)
+                            {
+                                StarvingKerbal sk;
+                                if (starvingKerbals.TryGetValue(p.protoModuleCrew[i1 - 1].name, out sk))
+                                {
+                                    Log.Info("Vessel: " + IV.vesselName + ",   protoModuleCrew: " + p.protoModuleCrew[i1 - 1].name);
+
+
+                                    {
+                                        toDelete.Add(sk.name);
+                                        p.protoModuleCrew[i1 - 1].type = ProtoCrewMember.KerbalType.Crew;
+                                        KerbalRoster.SetExperienceTrait(p.protoModuleCrew[i1 - 1], sk.trait);
+
+                                        IFIDebug.IFIMess(IV.vesselName + " Kerbal returned to crew status due to LS - " + sk.name + ", trait restored to: " + sk.trait);
+                                        string message = ""; message += IV.vesselName + "\n\n"; message += sk.name + "\n Was returned to duty due to ::";
+                                        message += "Life Support Restored";
+                                        message += "::";
+                                        MessageSystem.Message m = new MessageSystem.Message("Kerbal returned to duty from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                                        MessageSystem.Instance.AddMessage(m);
+                                    }
+                                }
+                            }
+                        }
+                        foreach (var s in toDelete)
+                            starvingKerbals.Remove(s);
+                        toDelete.Clear();
+
+                    }
+                }
+                if (ALL_Resources < UR_Amount)
+                {
+                    double TEST_Mod = (UR_Amount - ALL_Resources) * 100000;
+                    Temp_Resource = IV.rootPart.RequestResource(IFIResource, ALL_Resources);
                 }
                 else
                 {
@@ -364,7 +475,19 @@ namespace IFILifeSupport
             }
             return UR_Amount;
         }
+        public class StarvingKerbal
+        {
+            public string name;
+            public string trait;
 
+            public StarvingKerbal(string n, string t)
+            {
+                name = n;
+                trait = t;
+            }
+        }
+
+        static Dictionary<string, StarvingKerbal> starvingKerbals = new Dictionary<string, StarvingKerbal>();
         private void CrewTestEVA(Vessel IV, double l)
         {
 
@@ -378,12 +501,35 @@ namespace IFILifeSupport
                 {
                     Part p = IV.rootPart;
                     ProtoCrewMember iCrew = p.protoModuleCrew[0];
-                    iCrew.rosterStatus = ProtoCrewMember.RosterStatus.Dead;
-                    p.Die();
-                    IFIDebug.IFIMess(" EVA Kerbal Killed due to no LS - " + iCrew.name);
-                    string message = "\n\n\n"; message += iCrew.name + ":\n Was killed for Life Support Failure.";
-                    MessageSystem.Message m = new MessageSystem.Message("Kerbal Death on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
-                    MessageSystem.Instance.AddMessage(m);
+
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().EVAkerbalsCanDie)
+                    {
+                        iCrew.rosterStatus = ProtoCrewMember.RosterStatus.Dead;
+                        p.Die();
+                        IFIDebug.IFIMess(" EVA Kerbal Killed due to no LS - " + iCrew.name);
+                        string message = "\n\n\n";
+                        message += iCrew.name + ":\n Was killed for Life Support Failure.";
+                        MessageSystem.Message m = new MessageSystem.Message("Kerbal Death on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                        MessageSystem.Instance.AddMessage(m);
+                    }
+                    else
+                    {
+                        StarvingKerbal sk;
+                        if (!starvingKerbals.TryGetValue(iCrew.name, out sk))
+                        {
+                            sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+
+                            IFIDebug.IFIMess(" EVA Kerbal turned into tourist due to no LS - " + iCrew.name);
+                            string message = "\n\n\n";
+                            message += iCrew.name + ":\n Was turned into a  tourist for Life Support Failure.";
+                            MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed to Tourist on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                            MessageSystem.Instance.AddMessage(m);
+                            Log.Info("Old experienceTrait: " + iCrew.trait);
+                            starvingKerbals.Add(sk.name, sk);
+                            iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                            KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
+                        }
+                    }
                 }
                 else
                 {
@@ -411,14 +557,36 @@ namespace IFILifeSupport
                 if (CUR_CWLS > rand)
                 {
                     iCrew = p.protoModuleCrew[i];
-                    p.RemoveCrewmember(iCrew);// Remove crew from part
-                    iCrew.Die();  // Kill crew after removal or death will reset to active.
-                    IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
-                    string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                    message += "No Life Support Remaining";
-                    message += "::";
-                    MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
-                    MessageSystem.Instance.AddMessage(m);
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie)
+                    {
+                        p.RemoveCrewmember(iCrew);// Remove crew from part
+                        iCrew.Die();  // Kill crew after removal or death will reset to active.
+                        IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
+                        string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
+                        message += "No Life Support Remaining";
+                        message += "::";
+                        MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                        MessageSystem.Instance.AddMessage(m);
+                    }
+                    else
+                    {
+                        StarvingKerbal sk;
+                        if (!starvingKerbals.TryGetValue(iCrew.name, out sk))
+                        {
+                            sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+                            Log.Info("Old experienceTrait: " + iCrew.trait);
+                            starvingKerbals.Add(sk.name, sk);
+                            iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                            KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
+
+                            IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
+                            string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
+                            message += "No Life Support Remaining";
+                            message += "::";
+                            MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                            MessageSystem.Instance.AddMessage(m);
+                        }
+                    }
                 }
             }
         }
@@ -442,16 +610,37 @@ namespace IFILifeSupport
                 if (CUR_CWLS > rand)
                 {
                     iCrew = p.protoModuleCrew[i];
-                    iCrew.rosterStatus = ProtoCrewMember.RosterStatus.Dead;
-                    p.RemoveCrew(iCrew);
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie)
+                    {
+                        iCrew.rosterStatus = ProtoCrewMember.RosterStatus.Dead;
+                        p.RemoveCrew(iCrew);
 
-                    IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
-                    string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                    message += "No Life Support Remaining";
-                    message += "::";
-                    MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport Failure", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
-                    MessageSystem.Instance.AddMessage(m);
+                        IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
+                        string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
+                        message += "No Life Support Remaining";
+                        message += "::";
+                        MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport Failure", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                        MessageSystem.Instance.AddMessage(m);
+                    }
+                    else
+                    {
+                        StarvingKerbal sk;
+                        if (!starvingKerbals.TryGetValue(iCrew.name, out sk))
+                        {
+                            sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+                            Log.Info("Old experienceTrait: " + iCrew.trait);
+                            starvingKerbals.Add(sk.name, sk);
+                            iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                            KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
 
+                            IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
+                            string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
+                            message += "No Life Support Remaining";
+                            message += "::";
+                            MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                            MessageSystem.Instance.AddMessage(m);
+                        }
+                    }
                 }
             }
         }
@@ -462,7 +651,8 @@ namespace IFILifeSupport
             {
                 try
                 {
-                    // CrewTestEVA(IV , l);
+                    // following was commented out, need to test
+                    CrewTestEVA(IV, l);
                 }
                 catch (Exception ex) { IFIDebug.IFIMess("Vessel IFI Exception ++Finding Kerbals++ eva " + ex.Message); }
             }
@@ -474,7 +664,10 @@ namespace IFILifeSupport
                     {
 
                         int IFIcrew = p.protoModuleCrew.Count;
-                        if (IFIcrew > 0) { CrewTest(0, p, l); }
+                        if (IFIcrew > 0)
+                        {
+                            CrewTest(0, p, l);
+                        }
 
                     }
                 }
@@ -484,23 +677,44 @@ namespace IFILifeSupport
                     {
 
                         int IFIcrew = p.protoModuleCrew.Count;
-                        if (IFIcrew > 0) { CrewTestProto(0, p, l); }
+                        if (IFIcrew > 0)
+                        {
+                            CrewTestProto(0, p, l);
+                        }
 
                     }
                 }
             }
         }
-
+        Vessel lastVesselChecked = null;
         public void display_active()
         {
             IFITIM++;
-            if (!HighLogic.LoadedSceneIsEditor && ((LifeSupportDisplay.LSDisplayActive && IFITIM > 3) || (TimeWarp.CurrentRate > 800) || IFITIM > 100))
+            Log.Info("display_active, IFITIM: " + IFITIM);
+            if (!HighLogic.LoadedSceneIsEditor && ((/* LifeSupportDisplay.LSDisplayActive && */ IFITIM > 3) || (TimeWarp.CurrentRate > 800) || IFITIM > 100))
             {
                 Life_Support_Update();
                 IFITIM = 0;
             }
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
                 Went_to_Main = true;
+
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.basic && HighLogic.LoadedScene == GameScenes.FLIGHT && lastVesselChecked != FlightGlobals.ActiveVessel)
+            {
+                lastVesselChecked = FlightGlobals.ActiveVessel;
+
+                foreach (var p in FlightGlobals.ActiveVessel.Parts)
+                {
+                    foreach (var r in p.Resources)
+                    {
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced && r.resourceName == "Sludge")
+                            r.isVisible = true;
+
+                        if (r.resourceName == "OrganicSlurry")
+                            r.isVisible = true;
+                    }
+                }
+            }
         }
 
         private void OnGUI()
@@ -518,16 +732,21 @@ namespace IFILifeSupport
         {
             float LS_Row = 20;
 
-            GUILayout.BeginHorizontal(GUILayout.Width(400f));
+            GUILayout.BeginHorizontal(GUILayout.Width(630f)); // used to be 400
             GUI.Label(new Rect(5, LS_Row, 132, 40), "VESSEL");
             GUI.Label(new Rect(150, LS_Row, 80, 40), "LOCATION");
             GUI.Label(new Rect(235, LS_Row, 58, 40), "CREW");
             GUI.Label(new Rect(285, LS_Row, 112, 40), "   LIFE \nSUPPORT");
             GUI.Label(new Rect(355, LS_Row, 85, 40), "     DAYS\nREMAINING");
+
+            //GUI.Label(new Rect(450, LS_Row, 85, 40), "   Slurry\nConv Rate");
+            //GUI.Label(new Rect(545, LS_Row, 85, 40), "   Sludge\nConv Rate");
+
             LS_Row += 36; //14
             GUILayout.EndHorizontal();
 
-            LifeSupportDisplay.infoScrollPos = GUI.BeginScrollView(new Rect(5, LS_Row, 452, 350), LifeSupportDisplay.infoScrollPos, new Rect(0, 0, 433, LS_Status_Hold_Count * 22));
+            //            LifeSupportDisplay.infoScrollPos = GUI.BeginScrollView(new Rect(5, LS_Row, 452, 350), LifeSupportDisplay.infoScrollPos, new Rect(0, 0, 433, LS_Status_Hold_Count * 22));
+            LifeSupportDisplay.infoScrollPos = GUI.BeginScrollView(new Rect(5, LS_Row, 632, 350), LifeSupportDisplay.infoScrollPos, new Rect(0, 0, 433, LS_Status_Hold_Count * 22));
             if (LS_Status_Hold_Count > 0)
             {
                 int LLC = 0;
@@ -541,6 +760,12 @@ namespace IFILifeSupport
                     GUI.Label(new Rect(240, LS_Row, 58, 20), LS_Status_Hold[LLC, 2]);
                     GUI.Label(new Rect(285, LS_Row, 112, 20), LS_Status_Hold[LLC, 3]);
                     GUI.Label(new Rect(365, LS_Row, 86, 20), LS_Status_Hold[LLC, 4]);
+
+
+
+                    // GUI.Label(new Rect(450, LS_Row, 86, 20), LS_Status_Hold[LLC, 5]);
+                    // GUI.Label(new Rect(545, LS_Row, 86, 20), LS_Status_Hold[LLC, 6]);
+
                     LS_Row += 22;
 
                     LLC++;

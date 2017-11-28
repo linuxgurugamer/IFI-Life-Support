@@ -36,8 +36,8 @@ namespace IFILifeSupport
                 else if (ResearchAndDevelopment.GetTechnologyState("scienceTech") == RDTech.State.Available)
                 { Adjustment = 1.00; }
             }
-
-            return HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal * Adjustment;
+            Log.Info("GetRate, Rate_Per_Kerbal: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal + ", Adjustment: " + Adjustment);
+            return HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal * Adjustment;
         }
 
 
@@ -55,7 +55,7 @@ namespace IFILifeSupport
             Debug.Log("BreathableAtmosphere, active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude: " + active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude));
 
             if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
-                active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().breathableAtmoPressure)
+                active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoPressure)
                 return true;
 
 //            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 3250)
@@ -76,7 +76,7 @@ namespace IFILifeSupport
                 if (active.mainBody.ocean && active.altitude < 0.0)
                     return false;
                 if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
-                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().intakeAirAtmoPressure)
+                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure) 
                     return true;
 
                 //            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)

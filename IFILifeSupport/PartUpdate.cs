@@ -115,7 +115,7 @@ namespace IFILifeSupport
             {
                 string ModuleName = IFIPart.GetValue("name");
                 //Debug.Log("IFI Part Update --" + ModuleName + " -- Found");
-                if (ModuleName == "LifeSupport")
+                if (ModuleName == Constants.LIFESUPPORT)
                 {
                     HasMod = true;
                 }
@@ -124,12 +124,22 @@ namespace IFILifeSupport
             {
                 //IFIDebug.IFIMess("IFI Attempting to add LS Resorce to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("RESOURCE");
-                IFIMOD.AddValue("name", "LifeSupport");
+                IFIMOD.AddValue("name", Constants.LIFESUPPORT);
                 double MaxLS = 4 * crewCount;
                 IFIMOD.AddValue("amount", MaxLS);
                 IFIMOD.AddValue("maxAmount", MaxLS);
 
                 CrewPart.AddNode(IFIMOD);
+
+                IFIMOD = new ConfigNode("RESOURCE");
+                IFIMOD.AddValue("name", Constants.SLURRY);
+                MaxLS = 4 * crewCount;
+                IFIMOD.AddValue("amount", 0);
+                IFIMOD.AddValue("maxAmount", MaxLS);
+
+                CrewPart.AddNode(IFIMOD);
+
+
             }
         }
 

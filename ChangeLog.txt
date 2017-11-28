@@ -11,7 +11,7 @@
 	Removed the extra greenhouses
 	Finalized greenhouses
 
-3.3.0.3
+3.4.0.0
 	Added settings page
 	Added configurable values
 	Removed hard-coding of planet names
@@ -20,5 +20,7 @@
 	Optimized some calculations (consolidated constants)
 	Cleaned up the MM script to be calculated rather than hard-coded
 	Tested to work with DeepFreeze
-
-
+	Added Logo screen
+	Added CTT support
+	Added hiding of part in the tech tree if they aren't available (based on the level selected in the settings)
+	Hides parts in the editor if they aren't available

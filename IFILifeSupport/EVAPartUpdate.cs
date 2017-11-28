@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace IFILifeSupport
     public class ADDEVAPARTS : UnityEngine.MonoBehaviour
     {
         //private static double Rate_Per_Kerbal_Adj = LifeSupportRate.GetRate();
+
 
         private void Awake()
         {
@@ -46,6 +48,7 @@ namespace IFILifeSupport
             string NAMLSmod = "IFILifeSupportEVA";
             try
             {
+#if false
                 if (NAMLSmod == "IFILifeSupport")
                 {
                     if (!prefabPart.Modules.Contains(NAMLSmod))
@@ -55,6 +58,7 @@ namespace IFILifeSupport
                     }
                 }
                 else
+#endif
                 {
                     IFIDebug.IFIMess(" IFI Preload AddModule EVA Prefab ----");
                     PartModule module11 = part11.partPrefab.AddModule(NAMLSmod);
@@ -89,8 +93,13 @@ namespace IFILifeSupport
             //Part prefab = part11.partPrefab; 
 
             ConfigNode resourceNode = new ConfigNode("RESOURCE");
-            resourceNode.AddValue("name", "LifeSupport");
+            resourceNode.AddValue("name", Constants.LIFESUPPORT);
             resourceNode.AddValue("amount", MaxLS);
+            resourceNode.AddValue("maxAmount", MaxLS);
+
+            resourceNode = new ConfigNode("RESOURCE");
+            resourceNode.AddValue("name", Constants.SLURRY);
+            resourceNode.AddValue("amount", 0);
             resourceNode.AddValue("maxAmount", MaxLS);
 
             try
@@ -125,6 +134,7 @@ namespace IFILifeSupport
 
 
 
-
     }
 }
+
+#endif
