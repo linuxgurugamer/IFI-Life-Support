@@ -84,7 +84,7 @@ namespace IFILifeSupport
             int LS_ALERT_LEVEL = 1;
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
-                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), 7];
+                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), 9];
                 LS_Status_Hold_Count = 0;
                 Debug.Log("######## Looking for Ships ######");
                 foreach (Vessel vessel in FlightGlobals.Vessels)
@@ -100,6 +100,8 @@ namespace IFILifeSupport
                         string TVname;
                         int IFI_Crew = 0;
                         double LSAval;
+                        double SlurryAvail;
+                        double SludgeAvail;
                         string IFI_Location = "";
                         double IFI_ALT = 0.0;
                         TVname = vessel.vesselName; // vessel.name;
@@ -124,7 +126,8 @@ namespace IFILifeSupport
                             double LS_Use = LifeSupportRate.GetRate();
 
                             LSAval = IFIGetAllResources(Constants.LIFESUPPORT, vessel, vessel.loaded);
-
+                            SlurryAvail = IFIGetAllResources(Constants.SLURRY, vessel, vessel.loaded);
+                            SludgeAvail = IFIGetAllResources(Constants.SLUDGE, vessel, vessel.loaded);
                             Log.Info("Initial LS_Use: " + LS_Use + ",  LSAval: " + LSAval);
 
                             if (LifeSupportRate.IntakeAirAvailable(vessel))
@@ -205,11 +208,101 @@ namespace IFILifeSupport
                             }
 
                             // Need to scan for all greenhouses here
-                            LS_Status_Hold[LS_Status_Hold_Count, 5] = "Slurry"; // Convert.ToString(Math.Round(5.5, 5));
+                            //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
+                            LS_Status_Hold[LS_Status_Hold_Count, 5] = SlurryAvail.ToString("N5");
 
                             // Need to scan for all sludge convertors here
-                            LS_Status_Hold[LS_Status_Hold_Count, 6] = "Sludge"; //  Convert.ToString(Math.Round(6.6, 5));
+                            //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
+                            LS_Status_Hold[LS_Status_Hold_Count, 7] = SludgeAvail.ToString("N5");
 
+                            double slurryRate = 0;
+                            double sludgeRate = 0;
+                            Log.Info("vessel: " + vessel.name);
+                            if (vessel.loaded)
+                            {
+                                for (int i = 0; i < vessel.parts.Count; i++)
+                                {
+                                    Log.Info("part: " + vessel.parts[i].partInfo.title);
+                                    for (int m = 0; m < vessel.parts[i].Modules.Count; m++)
+                                    {
+                                        PartModule tmpPM = vessel.parts[i].Modules[m];
+
+                                        if (vessel.parts[i].Modules[m].moduleName == "ModuleResourceConverter")
+                                        {
+                                            ModuleResourceConverter m1 = (ModuleResourceConverter)tmpPM;
+                                            foreach (ResourceRatio inp in m1.inputList)
+                                            {
+                                                if (inp.ResourceName == Constants.SLURRY)
+                                                    slurryRate += inp.Ratio;
+                                                if (inp.ResourceName == Constants.SLUDGE)
+                                                    sludgeRate += inp.Ratio;
+
+                                            }
+                                        }
+                                        if (vessel.parts[i].Modules[m].moduleName == "AnimatedGenerator")
+                                        {
+                                            AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
+                                            
+                                            foreach (ResourceRatio inp in m1.inputList)
+                                            {
+                                                if (inp.ResourceName == Constants.SLURRY)
+                                                    slurryRate += inp.Ratio;
+                                                if (inp.ResourceName == Constants.SLUDGE)
+                                                    sludgeRate += inp.Ratio;
+
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Log.Info("Processing unloaded vessel");
+
+                                foreach (ProtoPartSnapshot p in vessel.protoVessel.protoPartSnapshots)
+                                {
+                                    Part part = p.partPrefab;
+
+                                    Log.Info("part: " + part.partInfo.title);
+                                    for (int m = 0; m < part.Modules.Count; m++)
+                                    {
+                                        PartModule tmpPM = part.Modules[m];
+
+                                        if (part.Modules[m].moduleName == "ModuleResourceConverter")
+                                        {
+                                            ModuleResourceConverter m1 = (ModuleResourceConverter)tmpPM;
+                                            foreach (ResourceRatio inp in m1.inputList)
+                                            {
+                                                if (inp.ResourceName == Constants.SLURRY)
+                                                    slurryRate += inp.Ratio;
+                                                if (inp.ResourceName == Constants.SLUDGE)
+                                                    sludgeRate += inp.Ratio;
+
+                                            }
+                                        }
+                                        if (part.Modules[m].moduleName == "AnimatedGenerator")
+                                        {
+                                            AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
+                                            
+                                            foreach (ResourceRatio inp in m1.inputList)
+                                            {
+                                                if (inp.ResourceName == Constants.SLURRY)
+                                                    slurryRate += inp.Ratio;
+                                                if (inp.ResourceName == Constants.SLUDGE)
+                                                    sludgeRate += inp.Ratio;
+
+                                            }
+                                        }
+
+                                    }
+                                }  
+                            }
+                            double mm = 3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
+                            LS_Status_Hold[LS_Status_Hold_Count, 6] = (mm * slurryRate).ToString("N5");
+                            LS_Status_Hold[LS_Status_Hold_Count, 8] = (mm * sludgeRate).ToString("N5");
+                            Log.Info("slurryRate; " + (mm * slurryRate).ToString());
+                            Log.Info("sludgeRate: " + (mm * sludgeRate).ToString());
                             LS_Status_Hold_Count += 1;
 
                             if (LS_ALERT_LEVEL < 2 && days_rem < 3)
@@ -739,9 +832,12 @@ namespace IFILifeSupport
             GUI.Label(new Rect(285, LS_Row, 112, 40), "   LIFE \nSUPPORT");
             GUI.Label(new Rect(355, LS_Row, 85, 40), "     DAYS\nREMAINING");
 
-            //GUI.Label(new Rect(450, LS_Row, 85, 40), "   Slurry\nConv Rate");
-            //GUI.Label(new Rect(545, LS_Row, 85, 40), "   Sludge\nConv Rate");
-
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+            {
+                GUI.Label(new Rect(450, LS_Row, 85, 40), "   Slurry/Rate");
+                if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
+                    GUI.Label(new Rect(545, LS_Row, 85, 40), "   Sludge/Rate");
+            }
             LS_Row += 36; //14
             GUILayout.EndHorizontal();
 
@@ -762,10 +858,12 @@ namespace IFILifeSupport
                     GUI.Label(new Rect(365, LS_Row, 86, 20), LS_Status_Hold[LLC, 4]);
 
 
-
-                    // GUI.Label(new Rect(450, LS_Row, 86, 20), LS_Status_Hold[LLC, 5]);
-                    // GUI.Label(new Rect(545, LS_Row, 86, 20), LS_Status_Hold[LLC, 6]);
-
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                    {
+                        GUI.Label(new Rect(450, LS_Row, 86, 20), LS_Status_Hold[LLC, 5] + "/" + LS_Status_Hold[LLC, 6]);
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
+                            GUI.Label(new Rect(545, LS_Row, 86, 20), LS_Status_Hold[LLC,7] + "/" + LS_Status_Hold[LLC, 8]);
+                    }
                     LS_Row += 22;
 
                     LLC++;

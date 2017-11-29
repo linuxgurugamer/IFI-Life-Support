@@ -13,73 +13,8 @@ using UnityEngine.SceneManagement;
 
 namespace IFILifeSupport
 {
-#if DEBUG
-    public class IFI_Improved : PartModule
-    {
-        void Start()
-        {
-            Log.Info("IFI_Improved");
-        }
-    }
-    public class IFI_Advanced : PartModule
-    {
-        void Start()
-        {
-            Log.Info("IFI_Advanced");
-        }
-    }
-#endif
 
-    /// <summary>
-    /// Need to keep it around always since going into settings and out doesn't seem to be a new scene
-    /// </summary>
-    [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-    public class PartUpdater : MonoBehaviour
-    {
-        void Awake()
-        {
-            OnGameSettingsApplied();
-            GameEvents.OnGameSettingsApplied.Add(OnGameSettingsApplied);
-            DontDestroyOnLoad(this);
-        }
 
-        void Destroy()
-        {
-            GameEvents.OnGameSettingsApplied.Remove(OnGameSettingsApplied);
-        }
-
-        /// <summary>
-        /// Examine the loaded parts, changing the TechRequired as necessary to hide or show the parts in the tech tree
-        /// Similar code is used in the editor, to hide or show the parts there
-        /// </summary>
-        void OnGameSettingsApplied()
-        {
-            if (PartLoader.LoadedPartsList == null)
-                return;
-            Log.Info("PartUpdater.OnGameSettingsApplied, LoadedPartsList.Count: " + PartLoader.LoadedPartsList.Count);
-            for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
-            {
-                AvailablePart p = PartLoader.LoadedPartsList[i];
-
-                ConfigNode node;
-                if (!Editor.PartShouldBeHidden(p, out node))
-                {                    
-                    Log.Info("Hiding name: " + p.name + ",   " + p.TechRequired);
-                    p.TechRequired = "none";
-                }
-                else
-                {
-                    if (node != null)
-                    {
-                        string techRequired = node.GetValue("TechRequired");
-
-                        p.TechRequired = techRequired;
-                        Log.Info("Restoring name: " + p.name + ",   " + p.TechRequired);
-                    }
-                }
-            }
-        }
-    }
 
 
 #if false
@@ -341,6 +276,11 @@ namespace IFILifeSupport
             return loadedParts;
         }
 
+        static internal bool PartShouldBeHidden(AvailablePart part)
+        {
+            ConfigNode n;
+            return PartShouldBeHidden(part, out n);
+        }
         /// <summary>
         /// Used both in the Editor and in the PartUpdater.
         /// The confignode is only used in the PartUpdater code
@@ -372,25 +312,19 @@ namespace IFILifeSupport
                 }
             n = null;
             return true;
-#if false
-            foreach (var r in part.resourceInfos)
-            {
-                if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level == IFILS1.LifeSupportLevel.improved && r.resourceName == "Sludge")
-                    return false;
-            }
-            return true;
-#endif
         }
 
         void DefineFilters()
         {
             Log.Info("DefineFilters");
+
             if (configs == null)
                 configs = GameDatabase.Instance.GetConfigs("PART");
-            ConfigNode n;
-            EditorPartList.Instance.ExcludeFilters.AddFilter(new EditorPartListFilter<AvailablePart>("Unpurchased Filter", (part => PartShouldBeHidden(part, out n))));
 
+            //ConfigNode n;
+            EditorPartList.Instance.ExcludeFilters.AddFilter(new EditorPartListFilter<AvailablePart>("Unpurchased Filter", (part => PartShouldBeHidden(part))));
             EditorPartList.Instance.Refresh();
+
         }
         void InitData()
         {

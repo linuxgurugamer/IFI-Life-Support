@@ -24,3 +24,15 @@
 	Added CTT support
 	Added hiding of part in the tech tree if they aren't available (based on the level selected in the settings)
 	Hides parts in the editor if they aren't available
+
+3.4.0.1
+	Added the PartModules into the release build to avoid unnecessary warning/errors in the log file
+	Updated the part configs for the tanks to share the textures, reduces memory usage and loading time
+	Replaced textures for the slurry and sludge tanks 
+	Added OrganicSlurry and Sludge to LS display, only displayed if LS mode allows
+	Fixed bug where Slurry and Sludge tanks were launching full
+	Add Slurry rate and Sludge rate (rate/day of processing)
+
+	
+TODO
+	Add time to recyce slurry and sludge to display

@@ -9,5 +9,6 @@ namespace IFILifeSupport
     {
         public const  string LIFESUPPORT = "LifeSupport";
         public const string SLURRY = "OrganicSlurry";
+        public const string SLUDGE = "Sludge";
     }
 }
