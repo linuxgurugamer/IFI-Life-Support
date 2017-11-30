@@ -17,7 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release files", "Release files", "{316BAE93-C0A3-4A70-877F-2089CE0DED4F}"
 	ProjectSection(SolutionItems) = preProject
+		GameData\IFILS\CCT.cfg = GameData\IFILS\CCT.cfg
+		GameData\IFILS\Resources\IFI_TechTree.cfg = GameData\IFILS\Resources\IFI_TechTree.cfg
 		GameData\IFILS\MM_Patches\ModuleManager_ADD_IFI.cfg = GameData\IFILS\MM_Patches\ModuleManager_ADD_IFI.cfg
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{32F42D76-6760-4D20-899D-387A0528643A}"
+	ProjectSection(SolutionItems) = preProject
+		jenkins.txt = jenkins.txt
 	EndProjectSection
 EndProject
 Global
