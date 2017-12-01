@@ -302,7 +302,7 @@ namespace IFILifeSupport
                     {
                         //    Log.Info("Part: " + part.name + ",   node name: " + s);
                         n = node;
-                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.basic && s == "IFI_Improved") // improved
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.classic && s == "IFI_Improved") // improved
                             return false;
                         if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level < IFILS1.LifeSupportLevel.advanced && s == "IFI_Advanced") // advanced
                             return false;

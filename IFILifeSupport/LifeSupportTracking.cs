@@ -32,6 +32,9 @@ namespace IFILifeSupport
         public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } }
         private bool Went_to_Main = false;
 
+        GUIStyle smallScrollBar;
+        GUIStyle hSmallScrollBar;
+
         private void OnGUIApplicationLauncherReady()
         {
             // Create the button in the KSP AppLauncher
@@ -155,7 +158,7 @@ namespace IFILifeSupport
 
                             if (LS_Use > 0.0)
                             {
-                       
+
                                 double rtest = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, LS_Use, IFI_Crew);
                                 double stest = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, -rtest, IFI_Crew);
                                 Log.Info("Elapsed_Time: " + Elapsed_Time);
@@ -186,8 +189,14 @@ namespace IFILifeSupport
                             Log.Info("LS_RR 3: " + LS_RR);
                             Log.Info("LSAval: " + LSAval + ", IFI_Crew: " + IFI_Crew + ", LS_RR: " + LS_RR + ", HoursPerDay: " + HoursPerDay);
 #endif
-                            LS_Status_Hold[LS_Status_Hold_Count, 0] = TVname;
-                            LS_Status_Hold[LS_Status_Hold_Count, 1] = IFI_Location;
+                            var lblGreenColor = "00ff00";
+                            var lblBlueColor = "3DB1FF";
+                            var lblYellowColor = "FFD966";
+                            var lblRedColor = "f90000";
+
+                            LS_Status_Hold[LS_Status_Hold_Count, 0] = String.Format("<color=#{0}>{1}</color>", lblGreenColor, TVname);  //TVname;
+
+                            LS_Status_Hold[LS_Status_Hold_Count, 1] = String.Format("<color=#{0}>{1}</color>", lblBlueColor, IFI_Location); // IFI_Location;
                             string H_Crew = Convert.ToString(IFI_Crew);
                             if (vessel.vesselType == VesselType.EVA)
                             {
@@ -203,17 +212,14 @@ namespace IFILifeSupport
                             }
                             else
                             {
-                                LS_Status_Hold[LS_Status_Hold_Count, 3] = Convert.ToString(Math.Round(LSAval, 4));
-                                LS_Status_Hold[LS_Status_Hold_Count, 4] = Convert.ToString(Math.Round(days_rem, 2));
+                                string color = lblGreenColor;
+                                if (days_rem < 3)
+                                    color = lblYellowColor;
+                                if (days_rem < 1)
+                                    color = lblRedColor;
+                                LS_Status_Hold[LS_Status_Hold_Count, 3] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
+                                LS_Status_Hold[LS_Status_Hold_Count, 4] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
                             }
-
-                            // Need to scan for all greenhouses here
-                            //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
-                            LS_Status_Hold[LS_Status_Hold_Count, 5] = SlurryAvail.ToString("N5");
-
-                            // Need to scan for all sludge convertors here
-                            //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
-                            LS_Status_Hold[LS_Status_Hold_Count, 7] = SludgeAvail.ToString("N5");
 
                             double slurryRate = 0;
                             double sludgeRate = 0;
@@ -242,7 +248,7 @@ namespace IFILifeSupport
                                         if (vessel.parts[i].Modules[m].moduleName == "AnimatedGenerator")
                                         {
                                             AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
-                                            
+
                                             foreach (ResourceRatio inp in m1.inputList)
                                             {
                                                 if (inp.ResourceName == Constants.SLURRY)
@@ -284,7 +290,7 @@ namespace IFILifeSupport
                                         if (part.Modules[m].moduleName == "AnimatedGenerator")
                                         {
                                             AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
-                                            
+
                                             foreach (ResourceRatio inp in m1.inputList)
                                             {
                                                 if (inp.ResourceName == Constants.SLURRY)
@@ -296,24 +302,44 @@ namespace IFILifeSupport
                                         }
 
                                     }
-                                }  
+                                }
                             }
-                            double mm = 3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
-                            LS_Status_Hold[LS_Status_Hold_Count, 6] = (mm * slurryRate).ToString("N5");
-                            LS_Status_Hold[LS_Status_Hold_Count, 8] = (mm * sludgeRate).ToString("N5");
-                            Log.Info("slurryRate; " + (mm * slurryRate).ToString());
-                            Log.Info("sludgeRate: " + (mm * sludgeRate).ToString());
+
+                            // doesn't hurt to do the secsPerDay calc every time, since this only runs once every 3 seconds
+                            double secsPerDay = 3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
+
+                            // Need to scan for all greenhouses here
+                            //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
+                            LS_Status_Hold[LS_Status_Hold_Count, 5] = SlurryAvail.ToString("N2");
+
+                            // Need to scan for all sludge convertors here
+                            //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
+                            LS_Status_Hold[LS_Status_Hold_Count, 7] = SludgeAvail.ToString("N2");
+
+
+                            Log.Info("Slurry: " + SlurryAvail + ",    rate: " + (secsPerDay * slurryRate));
+                            LS_Status_Hold[LS_Status_Hold_Count, 6] = (SlurryAvail / (secsPerDay * slurryRate)).ToString("N1");
+                            LS_Status_Hold[LS_Status_Hold_Count, 8] = (SludgeAvail / (secsPerDay * sludgeRate)).ToString("N1");
+
                             LS_Status_Hold_Count += 1;
 
                             if (LS_ALERT_LEVEL < 2 && days_rem < 3)
                             {
-                                IFI_Button.SetTexture(IFI_button_cau); LS_ALERT_LEVEL = 2;
-                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1) { TimeWarp.SetRate(0, false); }
+                                IFI_Button.SetTexture(IFI_button_cau);
+                                LS_ALERT_LEVEL = 2;
+                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1)
+                                {
+                                    TimeWarp.SetRate(0, false);
+                                }
                             }
                             if (LS_ALERT_LEVEL < 3 && days_rem <= 1)
                             {
-                                IFI_Button.SetTexture(IFI_button_danger); LS_ALERT_LEVEL = 3;
-                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1) { TimeWarp.SetRate(0, false); }
+                                IFI_Button.SetTexture(IFI_button_danger);
+                                LS_ALERT_LEVEL = 3;
+                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1)
+                                {
+                                    TimeWarp.SetRate(0, false);
+                                }
                             }
                         }
                     }
@@ -350,6 +376,12 @@ namespace IFILifeSupport
                 IFI_Texture_Load = true;
             }
             LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
+
+            smallScrollBar = new GUIStyle(GUI.skin.verticalScrollbar);
+            //smallScrollBar.fixedWidth = 8f;
+
+            hSmallScrollBar = new GUIStyle(GUI.skin.horizontalScrollbar);
+            hSmallScrollBar.fixedHeight = 0f;
         }
 
         private double IFIGetAllResources(string IFIResource, Vessel IV, bool ISLoaded)
@@ -572,18 +604,48 @@ namespace IFILifeSupport
         {
             public string name;
             public string trait;
+            public double startTime;
 
             public StarvingKerbal(string n, string t)
             {
                 name = n;
                 trait = t;
+                startTime = Planetarium.GetUniversalTime();
             }
         }
 
         static Dictionary<string, StarvingKerbal> starvingKerbals = new Dictionary<string, StarvingKerbal>();
         private void CrewTestEVA(Vessel IV, double l)
         {
+#if true
+            StarvingKerbal sk;
+            if (starvingKerbals.TryGetValue(IV.rootPart.protoModuleCrew[0].name, out sk))
+            {
+                if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (IV.loaded)
+                {
+                    Part p = IV.rootPart;
+                    ProtoCrewMember iCrew = p.protoModuleCrew[0];
 
+                    sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+                    IFIDebug.IFIMess(" EVA Kerbal turned into tourist due to no LS - " + iCrew.name);
+                    string message = "\n\n\n";
+                    message += iCrew.name + ":\n Was turned into a  tourist for Life Support Failure.";
+                    MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed to Tourist on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                    MessageSystem.Instance.AddMessage(m);
+                    Log.Info("Old experienceTrait: " + iCrew.trait);
+                    starvingKerbals.Add(sk.name, sk);
+                    iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                    KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
+                }
+            }
+#endif
             float rand;
             int CUR_CWLS = IFICWLS;
             CUR_CWLS += (Convert.ToInt16(l) * 10);
@@ -605,6 +667,7 @@ namespace IFILifeSupport
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
                     }
+#if false
                     else
                     {
                         StarvingKerbal sk;
@@ -623,6 +686,7 @@ namespace IFILifeSupport
                             KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                         }
                     }
+#endif
                 }
                 else
                 {
@@ -640,6 +704,31 @@ namespace IFILifeSupport
             ProtoCrewMember iCrew;
             for (int i = 0; i < p.protoModuleCrew.Count; i++)
             {
+#if true
+                iCrew = p.protoModuleCrew[i];
+                StarvingKerbal sk;
+                if (starvingKerbals.TryGetValue(iCrew.name, out sk))
+                {
+                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+                    Log.Info("Old experienceTrait: " + iCrew.trait);
+                    starvingKerbals.Add(sk.name, sk);
+                    iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                    KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
+                    IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
+                    string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
+                    message += "No Life Support Remaining";
+                    message += "::";
+                    MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                    MessageSystem.Instance.AddMessage(m);
+                }
+#endif
                 rand = UnityEngine.Random.Range(0.0f, 100.0f);
                 IFIDebug.IFIMess("!!!!!!!!");
                 IFIDebug.IFIMess("Testing Crew Death Crewmember=" + p.protoModuleCrew[i].name);
@@ -661,6 +750,7 @@ namespace IFILifeSupport
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
                     }
+#if false
                     else
                     {
                         StarvingKerbal sk;
@@ -680,12 +770,14 @@ namespace IFILifeSupport
                             MessageSystem.Instance.AddMessage(m);
                         }
                     }
+#endif
                 }
             }
         }
 
         private void CrewTestProto(int REASON, ProtoPartSnapshot p, double l)
         {
+
             int CUR_CWLS = IFICWLS;
             CUR_CWLS += (Convert.ToInt16(l) * 10);
             float rand;
@@ -693,6 +785,34 @@ namespace IFILifeSupport
             ProtoCrewMember iCrew;
             for (int i = 0; i < p.protoModuleCrew.Count; i++)
             {
+
+#if true
+                iCrew = p.protoModuleCrew[i];
+                StarvingKerbal sk;
+                if (starvingKerbals.TryGetValue(iCrew.name, out sk))
+                {
+                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    sk = new StarvingKerbal(iCrew.name, iCrew.trait);
+                    Log.Info("Old experienceTrait: " + iCrew.trait);
+                    starvingKerbals.Add(sk.name, sk);
+                    iCrew.type = ProtoCrewMember.KerbalType.Tourist;
+                    KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
+                    IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
+                    string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
+                    message += "No Life Support Remaining";
+                    message += "::";
+                    MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
+                    MessageSystem.Instance.AddMessage(m);
+                }
+#endif
+
+
                 rand = UnityEngine.Random.Range(0.0f, 100.0f);
                 IFIDebug.IFIMess("!!!!!!!!");
                 IFIDebug.IFIMess("Testing Crew Death Crewmember=" + p.protoModuleCrew[i].name);
@@ -715,6 +835,7 @@ namespace IFILifeSupport
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport Failure", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
                     }
+#if false
                     else
                     {
                         StarvingKerbal sk;
@@ -734,6 +855,7 @@ namespace IFILifeSupport
                             MessageSystem.Instance.AddMessage(m);
                         }
                     }
+#endif
                 }
             }
         }
@@ -792,7 +914,7 @@ namespace IFILifeSupport
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
                 Went_to_Main = true;
 
-            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.basic && HighLogic.LoadedScene == GameScenes.FLIGHT && lastVesselChecked != FlightGlobals.ActiveVessel)
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic && HighLogic.LoadedScene == GameScenes.FLIGHT && lastVesselChecked != FlightGlobals.ActiveVessel)
             {
                 lastVesselChecked = FlightGlobals.ActiveVessel;
 
@@ -814,7 +936,7 @@ namespace IFILifeSupport
         {
             if (LifeSupportDisplay.LSDisplayActive && !HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame)
             {
-
+                GUI.skin = HighLogic.Skin;
                 string TITLE = "IFI Vessel Life Support Status Display ";
 
                 LifeSupportDisplay.infoWindowPos = GUILayout.Window(99988, LifeSupportDisplay.infoWindowPos, LSInfoWindow, TITLE, LifeSupportDisplay.layoutOptions);
@@ -823,58 +945,64 @@ namespace IFILifeSupport
 
         private void LSInfoWindow(int windowId)
         {
-            float LS_Row = 20;
-
-            GUILayout.BeginHorizontal(GUILayout.Width(630f)); // used to be 400
-            GUI.Label(new Rect(5, LS_Row, 132, 40), "VESSEL");
-            GUI.Label(new Rect(150, LS_Row, 80, 40), "LOCATION");
-            GUI.Label(new Rect(235, LS_Row, 58, 40), "CREW");
-            GUI.Label(new Rect(285, LS_Row, 112, 40), "   LIFE \nSUPPORT");
-            GUI.Label(new Rect(355, LS_Row, 85, 40), "     DAYS\nREMAINING");
+            GUILayout.BeginHorizontal(); // used to be 400
+            GUILayout.Label("Vessel", GUILayout.Width(132));
+            GUILayout.Label("Location", GUILayout.Width(80));
+            GUILayout.Label("Crew", GUILayout.Width(58));
+            GUILayout.Label("   Life\nSupport", GUILayout.Width(100));
+            GUILayout.Label("     Days\nRemaining", GUILayout.Width(85));
 
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
             {
-                GUI.Label(new Rect(450, LS_Row, 85, 40), "   Slurry/Rate");
+                GUILayout.Label("Slurry", GUILayout.Width(50));
+                GUILayout.Label("ProcessTime", GUILayout.Width(90));
                 if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
-                    GUI.Label(new Rect(545, LS_Row, 85, 40), "   Sludge/Rate");
+                {
+                    GUILayout.Label("Sludge", GUILayout.Width(50));
+                    GUILayout.Label("ProcessTime", GUILayout.Width(90));
+                }
             }
-            LS_Row += 36; //14
+            // Following needed to keep horizontal scroll bar from showing up
+            GUILayout.Label(" ", GUILayout.Width(15));
             GUILayout.EndHorizontal();
 
-            //            LifeSupportDisplay.infoScrollPos = GUI.BeginScrollView(new Rect(5, LS_Row, 452, 350), LifeSupportDisplay.infoScrollPos, new Rect(0, 0, 433, LS_Status_Hold_Count * 22));
-            LifeSupportDisplay.infoScrollPos = GUI.BeginScrollView(new Rect(5, LS_Row, 632, 350), LifeSupportDisplay.infoScrollPos, new Rect(0, 0, 433, LS_Status_Hold_Count * 22));
+            //var rightJustify = new GUIStyle(GUI.skin.label);
+            //rightJustify.alignment = TextAnchor.MiddleRight;
+
+
+            LifeSupportDisplay.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplay.infoScrollPos, false, false, hSmallScrollBar, smallScrollBar, GUILayout.Height(345));
             if (LS_Status_Hold_Count > 0)
             {
                 int LLC = 0;
-                LS_Row = 4;
 
                 while (LLC < LS_Status_Hold_Count)
                 {
-
-                    GUI.Label(new Rect(5, LS_Row, 132, 20), LS_Status_Hold[LLC, 0]);
-                    GUI.Label(new Rect(160, LS_Row, 65, 20), LS_Status_Hold[LLC, 1]);
-                    GUI.Label(new Rect(240, LS_Row, 58, 20), LS_Status_Hold[LLC, 2]);
-                    GUI.Label(new Rect(285, LS_Row, 112, 20), LS_Status_Hold[LLC, 3]);
-                    GUI.Label(new Rect(365, LS_Row, 86, 20), LS_Status_Hold[LLC, 4]);
-
+                    GUILayout.BeginHorizontal(); // used to be 400
+                    GUILayout.Label(LS_Status_Hold[LLC, 0], GUILayout.Width(132));
+                    GUILayout.Label(LS_Status_Hold[LLC, 1], GUILayout.Width(80));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, 2], GUILayout.Width(58));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, 3], GUILayout.Width(100));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, 4], GUILayout.Width(85));
 
                     if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
-                        GUI.Label(new Rect(450, LS_Row, 86, 20), LS_Status_Hold[LLC, 5] + "/" + LS_Status_Hold[LLC, 6]);
+                        GUILayout.Label(LS_Status_Hold[LLC, 5], GUILayout.Width(50));
+                        GUILayout.Label(LS_Status_Hold[LLC, 6] + "d",  GUILayout.Width(90));
                         if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
-                            GUI.Label(new Rect(545, LS_Row, 86, 20), LS_Status_Hold[LLC,7] + "/" + LS_Status_Hold[LLC, 8]);
+                        {
+                            GUILayout.Label(LS_Status_Hold[LLC, 7], GUILayout.Width(50));
+                            GUILayout.Label(LS_Status_Hold[LLC, 8] + "d", GUILayout.Width(90));
+                        }
                     }
-                    LS_Row += 22;
 
                     LLC++;
+                    GUILayout.EndHorizontal();
                 }
             }
-            GUI.EndScrollView();
-
+            GUILayout.EndScrollView();
+            GUILayout.FlexibleSpace();
             LifeSupportDisplay.WarpCancel = GUI.Toggle(new Rect(10, 416, 400, 20), LifeSupportDisplay.WarpCancel, "Auto Cancel Warp on Low Life Support");
-            //       GUILayout.BeginHorizontal(GUILayout.Width(400f));
-            //     GuiUtils.SimpleTextBox("Safe Distance", autopilot.overridenSafeDistance, "m");
-            //   GUILayout.EndHorizontal();
+
             GUI.DragWindow();
         }
 

@@ -37,5 +37,13 @@
 3.4.0.2
 	Fixed techRequired for the small radial tank, it was misplaced
 
-TODO
-	Add time to recycle slurry and sludge to display
+3.4.0.3
+	Renamed Basic to Classic life support
+	Added some tooltips to the settings page
+	Rewrite the status page
+	Added color coding matching toobar button
+	Changed gui skin to KSP's skin
+	Changed display of slurry and sludge rate to days to process
+
+
+

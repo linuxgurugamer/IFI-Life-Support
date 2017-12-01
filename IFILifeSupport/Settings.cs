@@ -21,31 +21,33 @@ namespace IFILifeSupport
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return true; } }
 
+        [GameParameters.CustomParameterUI("Classic Life Support",
+            toolTip ="Basic life support, no recycling of any kind.")]
+        public bool classic = false;
+        bool oldClassic = false;
 
 
-        [GameParameters.CustomParameterUI("Basic Life Support")]
-        public bool basic = false;
-        bool oldBasic = false;
-
-
-        [GameParameters.CustomParameterUI("Improved Life Support")]
+        [GameParameters.CustomParameterUI("Improved Life Support",
+            toolTip = "Greenhouses are available with a 90% recycle rate")]
         public bool improved = false;
         bool oldImproved = false;
 
 
-        [GameParameters.CustomParameterUI("Advanced Life Support")]
+        [GameParameters.CustomParameterUI("Advanced Life Support",
+            toolTip = "Microbiome and AlgaeHouse available to recycle sludge ")]
         public bool advanced = false;
         bool oldAdvanced = false;
 
 
-        [GameParameters.CustomParameterUI("Extreme Life Support")]
+        [GameParameters.CustomParameterUI("Extreme Life Support",
+            toolTip = "BioReactor available to create new LifeSupport")]
         public bool extreme = false;
         bool oldExtreme = false;
 
-        public enum LifeSupportLevel { none, basic, improved, advanced, extreme};
+        public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
             {
-                if (basic) return LifeSupportLevel.basic;
+                if (classic) return LifeSupportLevel.classic;
                 if (improved) return LifeSupportLevel.improved;
                 if (advanced) return LifeSupportLevel.advanced;
                 if (extreme) return LifeSupportLevel.extreme;
@@ -55,28 +57,29 @@ namespace IFILifeSupport
 
         void SetLevel(LifeSupportLevel lsl)
         {
+            LifeSupportDisplay.ReinitInfoWindowPos();
             switch (lsl)
             {
-                case LifeSupportLevel.basic:
-                    basic = true;
+                case LifeSupportLevel.classic:
+                    classic = true;
                     improved = false;
                     advanced = false;
                     extreme = false;
                     break;
                 case LifeSupportLevel.improved:
-                    basic = false;
+                    classic = false;
                     improved = true;
                     advanced = false;
                     extreme = false;
                     break;
                 case LifeSupportLevel.advanced:
-                    basic = false;
+                    classic = false;
                     improved = false;
                     advanced = true;
                     extreme = false;
                     break;
                 case LifeSupportLevel.extreme:
-                    basic = false;
+                    classic = false;
                     improved = false;
                     advanced = false;
                     extreme = true;
@@ -84,7 +87,7 @@ namespace IFILifeSupport
             }
             oldAdvanced = advanced;
             oldImproved = improved;
-            oldBasic = basic;
+            oldClassic = classic;
         }
 
         public override void SetDifficultyPreset(GameParameters.Preset preset)
@@ -92,7 +95,7 @@ namespace IFILifeSupport
             switch (preset)
             {
                 case GameParameters.Preset.Easy:
-                    SetLevel(LifeSupportLevel.basic);
+                    SetLevel(LifeSupportLevel.classic);
                     break;
 
                 case GameParameters.Preset.Normal:
@@ -101,7 +104,7 @@ namespace IFILifeSupport
                     break;
 
                 case GameParameters.Preset.Moderate:
-                    basic = false;
+                    classic = false;
 
                     SetLevel(LifeSupportLevel.improved);
                     break;
@@ -119,8 +122,8 @@ namespace IFILifeSupport
         }
         public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
-            if (oldBasic != basic)
-                SetLevel(LifeSupportLevel.basic);
+            if (oldClassic != classic)
+                SetLevel(LifeSupportLevel.classic);
 
             if (oldImproved != improved)
                 SetLevel(LifeSupportLevel.improved);
@@ -166,19 +169,22 @@ namespace IFILifeSupport
         const double BREATHABLE_ATMO_ADJUSTMENT = 0.60;
         const double LOW_EC_ADJUSTMENT = 1.2;
 
-        [GameParameters.CustomParameterUI("Easy")]
+        [GameParameters.CustomParameterUI("Easy", toolTip ="Set all values to the standard Easy level")]
         public bool easy = false;
         bool oldEasy = false;
 
-        [GameParameters.CustomParameterUI("Normal")]
+        [GameParameters.CustomParameterUI("Normal",
+            toolTip = "Set all values to the standard Normal level")]
         public bool normal = false;
         bool oldNormal = false;
 
-        [GameParameters.CustomParameterUI("Moderate")]
+        [GameParameters.CustomParameterUI("Moderate",
+            toolTip = "Set all values to the standard Moderate level")]
         public bool moderate = false;
         bool oldModerate = false;
 
-        [GameParameters.CustomParameterUI("Hard")]
+        [GameParameters.CustomParameterUI("Hard",
+            toolTip = "Set all values to the standard Hard level")]
         public bool hard = false;
         bool oldHard = false;
 
@@ -190,23 +196,29 @@ namespace IFILifeSupport
             }
         }
 
-        [GameParameters.CustomFloatParameterUI("LS rate per Kerbal per day", minValue = 0.5f, maxValue = 2f, stepCount = 100, displayFormat = "N2")]
+        [GameParameters.CustomFloatParameterUI("LS rate per Kerbal per day", minValue = 0.5f, maxValue = 2f, stepCount = 100, displayFormat = "N2",
+            toolTip = "How much LS a kerbal uses a day when in space and with EC available")]
         public double lsRatePerDay = 1.0f;
 
 
-        [GameParameters.CustomFloatParameterUI("Breathable Atmo Pressure", minValue = 46.1f, maxValue = 69.15f, stepCount = 100, displayFormat = "N2")]
+        [GameParameters.CustomFloatParameterUI("Breathable Atmo Pressure", minValue = 46.1f, maxValue = 69.15f, stepCount = 100, displayFormat = "N2",
+            toolTip ="The pressure at which a Kerbal can breath")]
         public double breathableAtmoPressure = BREATHABLE_ATMO_PRESSURE;
 
-        [GameParameters.CustomFloatParameterUI("Min Intake Air Atmo Pressure", minValue = 9.864f, maxValue = 14.796f, stepCount = 100, displayFormat = "N3")]
+        [GameParameters.CustomFloatParameterUI("Min Intake Air Atmo Pressure", minValue = 9.864f, maxValue = 14.796f, stepCount = 100, displayFormat = "N3",
+            toolTip = "Minimum air pressure needed for the Circular Intable to work")]
         public double intakeAirAtmoPressure = INTAKE_AIR_ATMO_PRESSURE;
 
-        [GameParameters.CustomFloatParameterUI("Breathable Homeworld Atmo Adj", minValue = .16f, maxValue = .24f, stepCount = 100, displayFormat = "N2")]
+        [GameParameters.CustomFloatParameterUI("Breathable Homeworld Atmo Adj", minValue = .16f, maxValue = .24f, stepCount = 100, displayFormat = "N2",
+            toolTip ="Adjustment when on the homeworld (multiplier)")]
         public double breathableHomeworldAtmoAdjustment = BREATHABLE_HOMEWORLD_ATMO_ADJUSTMENT;
 
-        [GameParameters.CustomFloatParameterUI("Breathable Atmo Adj", minValue = 0.48f, maxValue = 0.72f, stepCount = 100, displayFormat = "N2")]
+        [GameParameters.CustomFloatParameterUI("Breathable Atmo Adj", minValue = 0.48f, maxValue = 0.72f, stepCount = 100, displayFormat = "N2",
+            toolTip = "Adjustment when on a planet with Oxygen (multiplier)")]
         public double breathableAtmoAdjustment = BREATHABLE_ATMO_ADJUSTMENT;
 
-        [GameParameters.CustomFloatParameterUI("Low EC Adj", minValue = 0.96f, maxValue = 1.44f, stepCount = 100, displayFormat = "N2")]
+        [GameParameters.CustomFloatParameterUI("Low EC Adj", minValue = 0.96f, maxValue = 1.44f, stepCount = 100, displayFormat = "N2",
+            toolTip ="When no EC is available, LS is used at a higher rate, controlled by this value")]
         public double lowEcAdjustment = LOW_EC_ADJUSTMENT;
 
         [GameParameters.CustomParameterUI("Kerbals can die")]
@@ -215,7 +227,7 @@ namespace IFILifeSupport
         [GameParameters.CustomParameterUI("EVA Kerbals can die")]
         public bool EVAkerbalsCanDie = true;
 
-        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying (not yet implemented)", minValue = 0, maxValue = 3600)]
+        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying", minValue = 0, maxValue = 3600)]
         public double inactiveTimeBeforeDeath = 0;
 
 

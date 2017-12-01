@@ -25,7 +25,7 @@ namespace IFILifeSupport
 
 		//Properties
 
-		public const float WINDOW_WIDTH_DEFAULT = 650;
+		public const float WINDOW_WIDTH_DEFAULT = 400;
 		public const float WINDOW_HEIGHT = 440;
         public static bool WarpCancel = true;
 		public static bool LSDisplayActive = false;
@@ -34,5 +34,9 @@ namespace IFILifeSupport
         public static GUILayoutOption[] layoutOptions;
 		public static Vector2 infoScrollPos = Vector2.zero;
 
+        public static void ReinitInfoWindowPos()
+        {
+            infoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
+        }
 	}
 }
