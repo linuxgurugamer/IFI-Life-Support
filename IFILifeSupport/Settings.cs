@@ -196,6 +196,11 @@ namespace IFILifeSupport
             }
         }
 
+        [GameParameters.CustomIntParameterUI("Auto Warp Cancellation lead time (days)", minValue = 0, maxValue = 3,
+            toolTip = "When warping, if LS drops below the warning level (yellow or red), and number of days before it runs out is less than this value")]
+        public int warpCancellationLeadTime = 3;
+
+
         [GameParameters.CustomFloatParameterUI("LS rate per Kerbal per day", minValue = 0.5f, maxValue = 2f, stepCount = 100, displayFormat = "N2",
             toolTip = "How much LS a kerbal uses a day when in space and with EC available")]
         public double lsRatePerDay = 1.0f;

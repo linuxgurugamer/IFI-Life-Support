@@ -41,9 +41,16 @@
 	Renamed Basic to Classic life support
 	Added some tooltips to the settings page
 	Rewrite the status page
-	Added color coding matching toobar button
+	Added color coding matching toolbar button
 	Changed gui skin to KSP's skin
 	Changed display of slurry and sludge rate to days to process
+
+3.4.0.4
+	Updated status page to have columns dynamically sized
+	Added process rate to status display
+	Added Auto Warp Cancellation lead time to settings
+
+
 
 
 

@@ -27,6 +27,7 @@ namespace IFILifeSupport
         private double IFITimer;
         private int IFICWLS = 25;
         private string[,] LS_Status_Hold;
+        private int[] LS_Status_Width;
         private int LS_Status_Hold_Count;
         // Make sure LS remaining Display conforms to Kerbin time setting.
         public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } }
@@ -34,6 +35,22 @@ namespace IFILifeSupport
 
         GUIStyle smallScrollBar;
         GUIStyle hSmallScrollBar;
+
+        const int VESSEL = 0;
+        const int LOCATION = 1;
+        const int CREW = 2;
+        const int LSAVAIL = 3;
+        const int DAYS_REM = 4;
+        const int SLURRYAVAIL = 5;
+        const int SLURRY_DAYS_TO_PROCESS = 6;
+        //const int SLURRYRATE = ???;
+        const int SLUDGEAVAIL = 7;
+        const int SLUDGE_DAYS_TO_PROCESS = 8;
+        const int SLURRYCONVRATE = 9;
+        const int SLUDGECONVRATE = 10;
+        const int MAX_STATUSES = 11;
+
+  
 
         private void OnGUIApplicationLauncherReady()
         {
@@ -87,7 +104,9 @@ namespace IFILifeSupport
             int LS_ALERT_LEVEL = 1;
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
-                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), 9];
+                LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), MAX_STATUSES];
+                LS_Status_Width = new int[MAX_STATUSES];
+
                 LS_Status_Hold_Count = 0;
                 Debug.Log("######## Looking for Ships ######");
                 foreach (Vessel vessel in FlightGlobals.Vessels)
@@ -194,19 +213,19 @@ namespace IFILifeSupport
                             var lblYellowColor = "FFD966";
                             var lblRedColor = "f90000";
 
-                            LS_Status_Hold[LS_Status_Hold_Count, 0] = String.Format("<color=#{0}>{1}</color>", lblGreenColor, TVname);  //TVname;
+                            LS_Status_Hold[LS_Status_Hold_Count, VESSEL] = String.Format("<color=#{0}>{1}</color>", lblGreenColor, TVname);  //TVname;
 
-                            LS_Status_Hold[LS_Status_Hold_Count, 1] = String.Format("<color=#{0}>{1}</color>", lblBlueColor, IFI_Location); // IFI_Location;
+                            LS_Status_Hold[LS_Status_Hold_Count, LOCATION] = String.Format("<color=#{0}>{1}</color>", lblBlueColor, IFI_Location); // IFI_Location;
                             string H_Crew = Convert.ToString(IFI_Crew);
                             if (vessel.vesselType == VesselType.EVA)
                             {
                                 H_Crew = "EVA";
                             }
-                            LS_Status_Hold[LS_Status_Hold_Count, 2] = H_Crew;
+                            LS_Status_Hold[LS_Status_Hold_Count, CREW] = H_Crew;
                             if (vessel.vesselType == VesselType.EVA && KerbalEVARescueDetect)
                             {
-                                LS_Status_Hold[LS_Status_Hold_Count, 3] = "RESCUE";
-                                LS_Status_Hold[LS_Status_Hold_Count, 4] = "RESCUE";
+                                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = "RESCUE";
+                                LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = "RESCUE";
                                 LSAval = 200.0;
                                 days_rem = 10.0;
                             }
@@ -217,8 +236,8 @@ namespace IFILifeSupport
                                     color = lblYellowColor;
                                 if (days_rem < 1)
                                     color = lblRedColor;
-                                LS_Status_Hold[LS_Status_Hold_Count, 3] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
-                                LS_Status_Hold[LS_Status_Hold_Count, 4] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
+                                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
+                                LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
                             }
 
                             double slurryRate = 0;
@@ -310,16 +329,20 @@ namespace IFILifeSupport
 
                             // Need to scan for all greenhouses here
                             //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
-                            LS_Status_Hold[LS_Status_Hold_Count, 5] = SlurryAvail.ToString("N2");
+                            LS_Status_Hold[LS_Status_Hold_Count, SLURRYAVAIL] = SlurryAvail.ToString("N2");
 
                             // Need to scan for all sludge convertors here
                             //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
-                            LS_Status_Hold[LS_Status_Hold_Count, 7] = SludgeAvail.ToString("N2");
+                            LS_Status_Hold[LS_Status_Hold_Count, SLUDGEAVAIL] = SludgeAvail.ToString("N2");
 
 
                             Log.Info("Slurry: " + SlurryAvail + ",    rate: " + (secsPerDay * slurryRate));
-                            LS_Status_Hold[LS_Status_Hold_Count, 6] = (SlurryAvail / (secsPerDay * slurryRate)).ToString("N1");
-                            LS_Status_Hold[LS_Status_Hold_Count, 8] = (SludgeAvail / (secsPerDay * sludgeRate)).ToString("N1");
+                            LS_Status_Hold[LS_Status_Hold_Count, SLURRY_DAYS_TO_PROCESS] = (SlurryAvail / (secsPerDay * slurryRate)).ToString("N1");
+                            LS_Status_Hold[LS_Status_Hold_Count, SLUDGE_DAYS_TO_PROCESS] = (SludgeAvail / (secsPerDay * sludgeRate)).ToString("N1");
+
+                            LS_Status_Hold[LS_Status_Hold_Count, SLURRYCONVRATE] = (secsPerDay * slurryRate).ToString("N1");
+                            LS_Status_Hold[LS_Status_Hold_Count, SLUDGECONVRATE] =  (secsPerDay * sludgeRate).ToString("N1");
+
 
                             LS_Status_Hold_Count += 1;
 
@@ -327,7 +350,7 @@ namespace IFILifeSupport
                             {
                                 IFI_Button.SetTexture(IFI_button_cau);
                                 LS_ALERT_LEVEL = 2;
-                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1)
+                                if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                                 {
                                     TimeWarp.SetRate(0, false);
                                 }
@@ -336,7 +359,7 @@ namespace IFILifeSupport
                             {
                                 IFI_Button.SetTexture(IFI_button_danger);
                                 LS_ALERT_LEVEL = 3;
-                                if (LifeSupportDisplay.WarpCancel && TimeWarp.CurrentRate > 1)
+                                if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                                 {
                                     TimeWarp.SetRate(0, false);
                                 }
@@ -943,23 +966,70 @@ namespace IFILifeSupport
             }
         }
 
+        void GetWidth(string s, int i, bool init = false)
+        {
+            float minWidth, maxWidth;
+            
+            GUI.skin.label.CalcMinMaxWidth(new GUIContent(s), out minWidth, out maxWidth);
+            maxWidth += 10;
+            if (init)
+                LS_Status_Width[i] = (int)maxWidth;
+            else
+                LS_Status_Width[i] = Math.Max(LS_Status_Width[i], (int)maxWidth);
+        }
+
         private void LSInfoWindow(int windowId)
         {
+            GetWidth("Vessel", VESSEL, true);
+            GetWidth("Location", LOCATION, true);
+            GetWidth("Crew", CREW, true);
+            GetWidth("   Life\nSupport", LSAVAIL, true);
+            GetWidth("     Days\nRemaining", DAYS_REM, true);
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+            {
+                GetWidth("Slurry (rate)", SLURRYAVAIL, true);
+                GetWidth("Process\n Time", SLURRY_DAYS_TO_PROCESS, true);
+                if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
+                {
+                    GetWidth("Sludge (rate)", SLUDGEAVAIL, true);
+                    GetWidth("Process\n Time", SLUDGE_DAYS_TO_PROCESS, true);
+                }
+            }
+            for (int LLC = 0; LLC < LS_Status_Hold_Count; LLC++)
+            {
+                GetWidth(LS_Status_Hold[LLC, VESSEL], VESSEL);
+                GetWidth(LS_Status_Hold[LLC, LOCATION], LOCATION);
+                GetWidth("  " + LS_Status_Hold[LLC, CREW], CREW);
+                GetWidth("  " + LS_Status_Hold[LLC, LSAVAIL], LSAVAIL);
+                GetWidth("  " + LS_Status_Hold[LLC, DAYS_REM], DAYS_REM);
+                if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                {
+                    GetWidth(LS_Status_Hold[LLC, SLURRYAVAIL] + "(" + LS_Status_Hold[LLC, SLURRYCONVRATE] + ")", SLURRYAVAIL);
+                    GetWidth(LS_Status_Hold[LLC, SLURRY_DAYS_TO_PROCESS] + "d", SLURRY_DAYS_TO_PROCESS);
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
+                    {
+                        GetWidth(LS_Status_Hold[LLC, SLUDGEAVAIL] + "(" + LS_Status_Hold[LLC, SLUDGECONVRATE] + ")"
+                            , SLUDGEAVAIL);
+                        GetWidth(LS_Status_Hold[LLC, SLUDGE_DAYS_TO_PROCESS] + "d", SLUDGE_DAYS_TO_PROCESS);
+                    }
+                }
+            }
+
             GUILayout.BeginHorizontal(); // used to be 400
-            GUILayout.Label("Vessel", GUILayout.Width(132));
-            GUILayout.Label("Location", GUILayout.Width(80));
-            GUILayout.Label("Crew", GUILayout.Width(58));
-            GUILayout.Label("   Life\nSupport", GUILayout.Width(100));
-            GUILayout.Label("     Days\nRemaining", GUILayout.Width(85));
+            GUILayout.Label("Vessel", GUILayout.Width(LS_Status_Width[VESSEL]));
+            GUILayout.Label("Location", GUILayout.Width(LS_Status_Width[LOCATION]));
+            GUILayout.Label("Crew", GUILayout.Width(LS_Status_Width[CREW]));
+            GUILayout.Label("   Life\nSupport", GUILayout.Width(LS_Status_Width[LSAVAIL]));
+            GUILayout.Label("     Days\nRemaining", GUILayout.Width(LS_Status_Width[DAYS_REM]));
 
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
             {
-                GUILayout.Label("Slurry", GUILayout.Width(50));
-                GUILayout.Label("ProcessTime", GUILayout.Width(90));
+                GUILayout.Label("Slurry (rate)", GUILayout.Width(LS_Status_Width[SLURRYAVAIL]));
+                GUILayout.Label("Process\n Time", GUILayout.Width(LS_Status_Width[SLURRY_DAYS_TO_PROCESS]));
                 if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
                 {
-                    GUILayout.Label("Sludge", GUILayout.Width(50));
-                    GUILayout.Label("ProcessTime", GUILayout.Width(90));
+                    GUILayout.Label("Sludge (rate)", GUILayout.Width(LS_Status_Width[SLUDGEAVAIL]));
+                    GUILayout.Label("Process\n Time", GUILayout.Width(LS_Status_Width[SLUDGE_DAYS_TO_PROCESS]));
                 }
             }
             // Following needed to keep horizontal scroll bar from showing up
@@ -974,24 +1044,27 @@ namespace IFILifeSupport
             if (LS_Status_Hold_Count > 0)
             {
                 int LLC = 0;
-
+                
                 while (LLC < LS_Status_Hold_Count)
                 {
                     GUILayout.BeginHorizontal(); // used to be 400
-                    GUILayout.Label(LS_Status_Hold[LLC, 0], GUILayout.Width(132));
-                    GUILayout.Label(LS_Status_Hold[LLC, 1], GUILayout.Width(80));
-                    GUILayout.Label("  " + LS_Status_Hold[LLC, 2], GUILayout.Width(58));
-                    GUILayout.Label("  " + LS_Status_Hold[LLC, 3], GUILayout.Width(100));
-                    GUILayout.Label("  " + LS_Status_Hold[LLC, 4], GUILayout.Width(85));
+                    GUILayout.Label(LS_Status_Hold[LLC, VESSEL], GUILayout.Width(LS_Status_Width[VESSEL]));
+                    GUILayout.Label(LS_Status_Hold[LLC, LOCATION], GUILayout.Width(LS_Status_Width[LOCATION]));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, CREW], GUILayout.Width(LS_Status_Width[CREW]));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, LSAVAIL], GUILayout.Width(LS_Status_Width[LSAVAIL]));
+                    GUILayout.Label("  " + LS_Status_Hold[LLC, DAYS_REM], GUILayout.Width(LS_Status_Width[DAYS_REM]));
 
                     if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
-                        GUILayout.Label(LS_Status_Hold[LLC, 5], GUILayout.Width(50));
-                        GUILayout.Label(LS_Status_Hold[LLC, 6] + "d",  GUILayout.Width(90));
+                        GUILayout.Label(LS_Status_Hold[LLC, SLURRYAVAIL] + "(" + LS_Status_Hold[LLC, SLURRYCONVRATE] + ")", GUILayout.Width(LS_Status_Width[SLURRYAVAIL]));
+
+                        GUILayout.Label(LS_Status_Hold[LLC, SLURRY_DAYS_TO_PROCESS] + "d",  GUILayout.Width(LS_Status_Width[SLURRY_DAYS_TO_PROCESS]));
+
                         if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
                         {
-                            GUILayout.Label(LS_Status_Hold[LLC, 7], GUILayout.Width(50));
-                            GUILayout.Label(LS_Status_Hold[LLC, 8] + "d", GUILayout.Width(90));
+                            GUILayout.Label(LS_Status_Hold[LLC, SLUDGEAVAIL] + "(" + LS_Status_Hold[LLC, SLUDGECONVRATE] + ")"
+                                , GUILayout.Width(LS_Status_Width[SLUDGEAVAIL]));
+                            GUILayout.Label(LS_Status_Hold[LLC, SLUDGE_DAYS_TO_PROCESS] + "d", GUILayout.Width(LS_Status_Width[SLUDGE_DAYS_TO_PROCESS]));
                         }
                     }
 
