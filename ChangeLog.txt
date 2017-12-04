@@ -49,6 +49,7 @@
 	Updated status page to have columns dynamically sized
 	Added process rate to status display
 	Added Auto Warp Cancellation lead time to settings
+	Updated texture for radial tank
 
 
 
