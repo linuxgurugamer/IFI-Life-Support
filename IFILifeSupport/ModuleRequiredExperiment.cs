@@ -400,6 +400,7 @@ namespace RequiredExperiments
         void DrawIFIDebugWin(int windowID)
         {
             return;
+#if false
             GUILayout.BeginHorizontal(GUILayout.Width(400));
             GUILayout.Label("requiredExperimentID: " + requiredExperimentID);
             GUILayout.EndHorizontal();
@@ -439,10 +440,11 @@ namespace RequiredExperiments
             GUILayout.Label("UnivTime: " + Planetarium.GetUniversalTime().ToString("n0") + ",  available at: " + availableAtTime.ToString("n0"));
             GUILayout.EndHorizontal();
             GUI.DragWindow();
+#endif
         }
 
 #endif
-        void Start()
+            void Start()
         {
             if (requiredExperimentID == "" || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
                 return;

@@ -44,6 +44,11 @@ namespace IFILifeSupport
         public bool extreme = false;
         bool oldExtreme = false;
 
+
+        [GameParameters.CustomParameterUI("Display Organic Slurry & Sludge in resource panel",
+            toolTip = "If enabled, then the Organic Slurry and Sludge (if applicable) will be shown in the resource panels of parts")]
+        public bool showInResourcePanel = false;
+
         public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
             {
@@ -196,7 +201,7 @@ namespace IFILifeSupport
             }
         }
 
-        [GameParameters.CustomIntParameterUI("Auto Warp Cancellation lead time (days)", minValue = 0, maxValue = 3,
+        [GameParameters.CustomIntParameterUI("Auto Warp Cancelation lead time (days)", minValue = 0, maxValue = 3,
             toolTip = "When warping, if LS drops below the warning level (yellow or red), and number of days before it runs out is less than this value")]
         public int warpCancellationLeadTime = 3;
 

@@ -51,7 +51,7 @@
 	Added Auto Warp Cancellation lead time to settings
 	Updated texture for radial tank
 
-
-
-
+3.4.0.5
+	Added resizable status window
+	Added option in Settings to show/hide OrganicSlurry & Sludge in the part resource panel
 

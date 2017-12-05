@@ -925,6 +925,8 @@ namespace IFILifeSupport
             }
         }
         Vessel lastVesselChecked = null;
+        IFILS1.LifeSupportLevel lastLSlevel = IFILS1.LifeSupportLevel.none;
+        bool lastShowInResourcePanel = false;
         public void display_active()
         {
             IFITIM++;
@@ -937,19 +939,40 @@ namespace IFILifeSupport
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
                 Went_to_Main = true;
 
-            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic && HighLogic.LoadedScene == GameScenes.FLIGHT && lastVesselChecked != FlightGlobals.ActiveVessel)
+            
+
+            // HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic && 
+
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT && 
+                (lastVesselChecked != FlightGlobals.ActiveVessel || 
+                lastLSlevel != HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level || 
+                lastShowInResourcePanel != HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().showInResourcePanel))
             {
                 lastVesselChecked = FlightGlobals.ActiveVessel;
+                lastLSlevel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level;
+                lastShowInResourcePanel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().showInResourcePanel;
 
                 foreach (var p in FlightGlobals.ActiveVessel.Parts)
                 {
                     foreach (var r in p.Resources)
                     {
-                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced && r.resourceName == "Sludge")
-                            r.isVisible = true;
-
+                        if (r.resourceName == "Sludge")
+                        {
+                            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().showInResourcePanel &&
+                                HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
+                                r.isVisible = true;
+                            else
+                                r.isVisible = false;
+                            
+                        }
                         if (r.resourceName == "OrganicSlurry")
-                            r.isVisible = true;
+                        {
+                            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().showInResourcePanel &&
+                                HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                                r.isVisible = true;
+                            else
+                                r.isVisible = false;
+                        }
                     }
                 }
             }
@@ -978,14 +1001,17 @@ namespace IFILifeSupport
                 LS_Status_Width[i] = Math.Max(LS_Status_Width[i], (int)maxWidth);
         }
 
+        static bool fullDisplay = false;
+
         private void LSInfoWindow(int windowId)
         {
+            GUILayout.BeginVertical();
             GetWidth("Vessel", VESSEL, true);
             GetWidth("Location", LOCATION, true);
             GetWidth("Crew", CREW, true);
             GetWidth("   Life\nSupport", LSAVAIL, true);
             GetWidth("     Days\nRemaining", DAYS_REM, true);
-            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+            if (fullDisplay && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
             {
                 GetWidth("Slurry (rate)", SLURRYAVAIL, true);
                 GetWidth("Process\n Time", SLURRY_DAYS_TO_PROCESS, true);
@@ -1002,7 +1028,7 @@ namespace IFILifeSupport
                 GetWidth("  " + LS_Status_Hold[LLC, CREW], CREW);
                 GetWidth("  " + LS_Status_Hold[LLC, LSAVAIL], LSAVAIL);
                 GetWidth("  " + LS_Status_Hold[LLC, DAYS_REM], DAYS_REM);
-                if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                if (fullDisplay && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                 {
                     GetWidth(LS_Status_Hold[LLC, SLURRYAVAIL] + "(" + LS_Status_Hold[LLC, SLURRYCONVRATE] + ")", SLURRYAVAIL);
                     GetWidth(LS_Status_Hold[LLC, SLURRY_DAYS_TO_PROCESS] + "d", SLURRY_DAYS_TO_PROCESS);
@@ -1022,7 +1048,7 @@ namespace IFILifeSupport
             GUILayout.Label("   Life\nSupport", GUILayout.Width(LS_Status_Width[LSAVAIL]));
             GUILayout.Label("     Days\nRemaining", GUILayout.Width(LS_Status_Width[DAYS_REM]));
 
-            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+            if (fullDisplay && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
             {
                 GUILayout.Label("Slurry (rate)", GUILayout.Width(LS_Status_Width[SLURRYAVAIL]));
                 GUILayout.Label("Process\n Time", GUILayout.Width(LS_Status_Width[SLURRY_DAYS_TO_PROCESS]));
@@ -1039,7 +1065,7 @@ namespace IFILifeSupport
             //var rightJustify = new GUIStyle(GUI.skin.label);
             //rightJustify.alignment = TextAnchor.MiddleRight;
 
-
+            GUILayout.BeginHorizontal();
             LifeSupportDisplay.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplay.infoScrollPos, false, false, hSmallScrollBar, smallScrollBar, GUILayout.Height(345));
             if (LS_Status_Hold_Count > 0)
             {
@@ -1054,7 +1080,7 @@ namespace IFILifeSupport
                     GUILayout.Label("  " + LS_Status_Hold[LLC, LSAVAIL], GUILayout.Width(LS_Status_Width[LSAVAIL]));
                     GUILayout.Label("  " + LS_Status_Hold[LLC, DAYS_REM], GUILayout.Width(LS_Status_Width[DAYS_REM]));
 
-                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                    if (fullDisplay && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
                         GUILayout.Label(LS_Status_Hold[LLC, SLURRYAVAIL] + "(" + LS_Status_Hold[LLC, SLURRYCONVRATE] + ")", GUILayout.Width(LS_Status_Width[SLURRYAVAIL]));
 
@@ -1073,9 +1099,30 @@ namespace IFILifeSupport
                 }
             }
             GUILayout.EndScrollView();
+            GUILayout.EndHorizontal();
             GUILayout.FlexibleSpace();
-            LifeSupportDisplay.WarpCancel = GUI.Toggle(new Rect(10, 416, 400, 20), LifeSupportDisplay.WarpCancel, "Auto Cancel Warp on Low Life Support");
+            GUILayout.BeginHorizontal();
+            LifeSupportDisplay.WarpCancel = GUILayout.Toggle(LifeSupportDisplay.WarpCancel, "Auto Cancel Warp on Low Life Support");
+            GUILayout.FlexibleSpace();
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.classic)
+            {
 
+                if (fullDisplay)
+                {
+                    if (GUILayout.Button("<<", GUILayout.Width(22), GUILayout.Height(22)))
+                    {
+                        fullDisplay = false;
+                        LifeSupportDisplay.ReinitInfoWindowPos();
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button(">>", GUILayout.Width(22), GUILayout.Height(22)))
+                        fullDisplay = true;
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
             GUI.DragWindow();
         }
 
