@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,7 +104,7 @@ namespace IFILifeSupport
             }
             if (!HasMod)
             {
-                // IFIDebug.IFIMess("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
+                 IFIDebug.IFIMess("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("MODULE");
                 IFIMOD.AddValue("name", "IFILifeSupport");
                 CrewPart.AddNode(IFIMOD);
@@ -122,7 +123,7 @@ namespace IFILifeSupport
             }
             if (!HasMod)
             {
-                //IFIDebug.IFIMess("IFI Attempting to add LS Resorce to part: " + CrewPart.GetValue("name"));
+                IFIDebug.IFIMess("IFI Attempting to add LS Resorce to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("RESOURCE");
                 IFIMOD.AddValue("name", Constants.LIFESUPPORT);
                 double MaxLS = 4 * crewCount;
@@ -147,3 +148,4 @@ namespace IFILifeSupport
     }
 
 }
+#endif

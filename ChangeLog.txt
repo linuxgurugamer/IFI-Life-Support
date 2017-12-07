@@ -55,3 +55,23 @@
 	Added resizable status window
 	Added option in Settings to show/hide OrganicSlurry & Sludge in the part resource panel
 
+3.4.0.6
+	Updated right-click display of LS values
+		Changed Caution to 1-3 days for pod, 0.5-1 for EVA
+		Changed Warning! to 0-1 day for pod, 0-0.5 for EVA
+		Added Danger! status for LS = 0
+	Removed PartUpdate class, replaced with MM script
+	Optimization pass
+		Replaced about half the "foreach" statements with the "for (int i < ...)"
+
+	Removed Slurry capacity from command pods
+	Added Vessel Info screen for the editor
+	Updated Slurry and Sludge texture for IFITank
+
+TODO
+
+	Continue optimizations:
+		search for "foreach"
+		Start at ModuleRequiredExperiment
+	Final optimization step:
+		Rescan for "foreach" verify proper vars are used

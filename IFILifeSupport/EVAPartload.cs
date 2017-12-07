@@ -44,11 +44,11 @@ namespace IFILifeSupport
 
             if (list != null)
             {
-                GameObject IFIObject = new GameObject("PartUpdate");
-                PartUpdate loader = IFIObject.AddComponent<PartUpdate>();
+                //GameObject IFIObject = new GameObject("PartUpdate");
+                //PartUpdate loader = IFIObject.AddComponent<PartUpdate>();
 
-                IFIDebug.IFIMess(string.Format("Adding PartUpdate to the loading screen {0}", list.Count));
-                list.Insert(1, loader);
+                //IFIDebug.IFIMess(string.Format("Adding PartUpdate to the loading screen {0}", list.Count));
+                //list.Insert(1, loader);
 
                 Debug.Log(" IFI Preload LS EVA Actions Set ++++ ");
                 GameEvents.onCrewOnEva.Remove(OnCrewOnEva11);
@@ -66,8 +66,10 @@ namespace IFILifeSupport
             IFIDebug.IFIMess(" IFI DEBUG -- OnCrewBoardVessel fired ----");
             double IFIResourceAmt = 0.0;
             double IFIResElectric = 0.0;
-            foreach (PartResource pr in action.from.Resources)
+            for (int i = 0; i < action.from.Resources.Count; i++)
+            //foreach (PartResource pr in action.from.Resources)
             {
+                PartResource pr = action.from.Resources[i];
                 string IIResource = pr.resourceName;
                 IFIDebug.IFIMess(" Resource Name " + IIResource);
                 if (IIResource == Constants.LIFESUPPORT)
@@ -96,9 +98,10 @@ namespace IFILifeSupport
             double IFIResReturn = 0.0;
             try
             {
-                foreach (PartResource pr in action.to.Resources)
+                for (int i = 0; i < action.to.Resources.Count; i++)
+                //foreach (PartResource pr in action.to.Resources)
                 {
-
+                    PartResource pr = action.to.Resources[i];
                     if (pr.resourceName.Equals(Constants.LIFESUPPORT))
                     {
                         pr.amount = pr.maxAmount;

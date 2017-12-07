@@ -78,7 +78,6 @@
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="Editor.cs" />
-    <Compile Include="EVAPartUpdate.cs" />
     <Compile Include="Greenhouse.cs" />
     <Compile Include="LoadScreen.cs" />
     <Compile Include="Log.cs" />

@@ -113,8 +113,10 @@ namespace RequiredExperiments
             string[] sp = s.Split(new char[] { '@' });
             ce.name = sp[0];
             int i = 0;
-            foreach (CelestialBody cb in FlightGlobals.Bodies)
+            for (int idx = 0; idx < FlightGlobals.Bodies.Count; idx++)
+            //foreach (CelestialBody cb in FlightGlobals.Bodies)
             {
+                CelestialBody cb = FlightGlobals.Bodies[idx];
                 if (cb.name.Length <= sp[1].Length)
                     if (sp[1].Substring(0, cb.name.Length) == cb.name)
                     {
@@ -123,6 +125,7 @@ namespace RequiredExperiments
                         i = cb.name.Length;
 
                         var esv = Enum.GetValues(typeof(ExperimentSituations));
+                        
                         foreach (var es in esv)
                         {
                             //Log.Info("es: " + es + ",   es.Length: " + es.ToString().Length + ",   sp[1]: " + sp[1] + "   len: " + sp[1].Length + "    i: " + i);
@@ -149,8 +152,10 @@ namespace RequiredExperiments
                     {
                         //Log.Info("Body found, checking biomes");
                         ce.biome = ce.location; // If no biome found, then uses the location as the biome
-                        foreach (var b in bbv.biomes)
+                        for (int idx2 = 0; idx2 < bbv.biomes.Count(); idx2++)
+                        //foreach (var b in bbv.biomes)
                         {
+                            string b = bbv.biomes[idx2];
                             //Log.Info("Checking biome: " + b);
                             if (b.Length < title.Length)
                             {
@@ -217,8 +222,11 @@ namespace RequiredExperiments
             ConfigNode rnd = HighLogic.CurrentGame.config.GetNodes("SCENARIO").FirstOrDefault(n => n.GetValue("name") == "ResearchAndDevelopment");
             if (rnd != null)
             {
-                foreach (var node in rnd.GetNodes("Science"))
+                ConfigNode[] nodes = rnd.GetNodes("Science");
+                for (int idx = 0; idx < nodes.Count(); idx++)
+               // foreach (var node in rnd.GetNodes("Science"))
                 {
+                    var node = nodes[idx];
                     var s = node.GetValue("id");
                     if (s != null)
                     {
@@ -240,8 +248,10 @@ namespace RequiredExperiments
         void DisplayTotalCompletedScience()
         {
             Log.Info("Total science items found: " + completedExps.Count());
-            foreach (var ce in completedExps)
+            for (int idx = 0; idx < completedExps.Count; idx++)
+            //foreach (var ce in completedExps)
             {
+                CompletedExperiment ce = completedExps[idx];
                 Log.Info("Science found: name: " + ce.name +
                     ", body: " + ce.body +
                     ", situation: " + ce.situation +
@@ -474,8 +484,10 @@ namespace RequiredExperiments
             biomeAr = biomes.Split(splitString);
 
             bool updated = false;
-            foreach (var s in part.partInfo.moduleInfos)
+            for (int idx = 0; idx < part.partInfo.moduleInfos.Count; idx++)
+            //foreach (var s in part.partInfo.moduleInfos)
             {
+                var s = part.partInfo.moduleInfos[idx];
                 Log.Info("ModuleInfo, name: " + s.moduleName);
                 Log.Info("s: " + s.ToString());
                 if (s.moduleName == MODTITLE)
@@ -645,8 +657,10 @@ namespace RequiredExperiments
                 else //if over 50 parts, only raycast the 30 parts closest to ground. difference between 30 and 50 parts to make the sort worth the processing cost, no point in running the sort on 31 parts as the sort costs more processor power then 1 raycast
                 {
                     List<partDist> partHeights = new List<partDist>(); //only used above 50 parts, links part to distance to ground
-                    foreach (Part p in vessel.Parts)
+                    for (int idx = 0; idx < vessel.Parts.Count; idx++)
+                    //foreach (Part p in vessel.Parts)
                     {
+                        Part p = vessel.Parts[idx];
                         partHeights.Add(new partDist() { prt = p, dist = Vector3.Distance(p.transform.position, vessel.mainBody.position) }); //create list of parts and their distance to ground
                                                                                                                                               //print("a: " + Vector3.Distance(p.transform.position, FlightGlobals.ActiveVessel.mainBody.position));
                     }

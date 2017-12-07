@@ -18,11 +18,14 @@ namespace IFILifeSupport
         // Right Click Info display for Part
         [KSPField(guiActive = true, guiName = "Life Support Status", isPersistant = false)]
         public string lifeSupportStatus;
+
         [KSPField(guiActive = true, guiName = "Life Support", guiUnits = " Days ", guiFormat = "F2", isPersistant = false)]
         public float displayRate;
+
         [KSPField(guiActive = false, isPersistant = true)]
         public bool RescueFlag;
-#if !DEBUG
+
+#if true
         // Debug Button for right click info - TO BE removed after testing.
         [KSPField(guiActive = true, guiName = "Debug Logging", isPersistant = false)]
         public string DebugStatus = "Disabled";
@@ -85,6 +88,21 @@ namespace IFILifeSupport
                 }
                 displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 3600); //  60 / 60);
 
+
+                if (displayRate > 1 && displayRate <= 3)
+                {
+                    lifeSupportStatus = "CAUTION ";
+                }
+                if (displayRate > 0 && displayRate < 1)
+                {
+                    lifeSupportStatus = "Warning!";
+                }
+                else if (displayRate <= 0)
+                {
+                    lifeSupportStatus = "Danger!";
+                }
+
+
             }  //end of if crew > 0
             else if (crewCount == 0)
             {
@@ -97,7 +115,7 @@ namespace IFILifeSupport
         private double IFIGetAllResources(string IFIResource)
         {
             double IFIResourceAmt = 0.0;
-            double  num2 = 0;
+            double num2 = 0;
             int id = PartResourceLibrary.Instance.GetDefinition(IFIResource).id;
             this.part.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
 #if false
@@ -125,8 +143,10 @@ namespace IFILifeSupport
             Vessel active = this.part.vessel;
             try
             {
-                foreach (Part p in active.parts)
+                for (int idx = 0; idx < active.parts.Count; idx++)
+                //foreach (Part p in active.parts)
                 {
+                    Part p = active.parts[idx];
                     int IFIcrew = p.protoModuleCrew.Count;
                     if (IFIcrew > 0) KerbalCount += IFIcrew;
                 }
