@@ -69,6 +69,9 @@
 	Updated Slurry and Sludge texture for IFITank
 
 3.4.2
+	Full release
+
+3.4.3
 	Fixed greenhouses not activating after experiments were done
 	Improved status display of reasons greenhouse is not active
 	Reduced refresh interval from 15 to 3 seconds 
