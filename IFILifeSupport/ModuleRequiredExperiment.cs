@@ -125,7 +125,7 @@ namespace RequiredExperiments
                         i = cb.name.Length;
 
                         var esv = Enum.GetValues(typeof(ExperimentSituations));
-                        
+
                         foreach (var es in esv)
                         {
                             //Log.Info("es: " + es + ",   es.Length: " + es.ToString().Length + ",   sp[1]: " + sp[1] + "   len: " + sp[1].Length + "    i: " + i);
@@ -224,7 +224,7 @@ namespace RequiredExperiments
             {
                 ConfigNode[] nodes = rnd.GetNodes("Science");
                 for (int idx = 0; idx < nodes.Count(); idx++)
-               // foreach (var node in rnd.GetNodes("Science"))
+                // foreach (var node in rnd.GetNodes("Science"))
                 {
                     var node = nodes[idx];
                     var s = node.GetValue("id");
@@ -289,7 +289,7 @@ namespace RequiredExperiments
         public string biomes = ""; // comma seperated field
 
         [KSPField]
-        public float refreshInterval = 15;  // seconds
+        public float refreshInterval = 3;  // seconds
 
         // Required Situation
         // default is all situations, this can be overridden by 
@@ -317,8 +317,23 @@ namespace RequiredExperiments
         [KSPField]
         public bool InSpaceHigh = false;
 
-        [KSPField(guiActive = true, guiName = "Status:")]
-        public string statusReason = "";
+       // [KSPField(guiActive = true, guiName = "Status:")]
+        string statusReason = "";
+
+        public int statuscount = 0;
+
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status01 = "";
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status02 = "";
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status03 = "";
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status04 = "";
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status05 = "";
+        [KSPField(guiActive = false, guiActiveEditor = false)]
+        public string status06 = "";
 
         [KSPField]
         public bool uniqueBodies = true;      // If true, then the experiment must have been completed in the planet's soi the vessel is in.
@@ -332,14 +347,90 @@ namespace RequiredExperiments
         [Persistent]
         double availableAtTime = -1; // used to know when modules should be enabled
 
-        void SetStatusReason(string s)
+        void SetStatusReason(string value)
         {
-            if (statusReason != "")
-                statusReason += ", ";
-            statusReason += s;
-            Fields["statusReason"].guiActive = (statusReason != "");
-            if (s != "")
-                Log.Info(s);
+            //if (statusReason != "")
+            //    statusReason += ", ";
+            statusReason += value;
+            //Fields["statusReason"].guiActive = (statusReason != "");
+            if (value != "")
+                Log.Info(value);
+
+            switch (statuscount)
+            {
+                case 0:
+                    {
+                        Fields["status01"].guiActive = true;
+                        Fields["status01"].guiActiveEditor = true;
+                        Fields["status01"].guiName = name;
+                        Fields.SetValue("status01", value);
+                        statuscount++;
+                        break;
+                    }
+                case 1:
+                    {
+                        Fields["status02"].guiActive = true;
+                        Fields["status02"].guiActiveEditor = true;
+                        Fields["status02"].guiName = name;
+                        Fields.SetValue("status02", value);
+                        statuscount++;
+                        break;
+                    }
+                case 2:
+                    {
+                        Fields["status03"].guiActive = true;
+                        Fields["status03"].guiActiveEditor = true;
+                        Fields["status03"].guiName = name;
+                        Fields.SetValue("status03", value);
+                        statuscount++;
+                        break;
+                    }
+                case 3:
+                    {
+                        Fields["status04"].guiActive = true;
+                        Fields["status04"].guiActiveEditor = true;
+                        Fields["status04"].guiName = name;
+                        Fields.SetValue("status04", value);
+                        statuscount++;
+                        break;
+                    }
+                case 4:
+                    {
+                        Fields["status05"].guiActive = true;
+                        Fields["status05"].guiActiveEditor = true;
+                        Fields["status05"].guiName = name;
+                        Fields.SetValue("status05", value);
+                        statuscount++;
+                        break;
+                    }
+                case 5:
+                    {
+                        Fields["status06"].guiActive = true;
+                        Fields["status06"].guiActiveEditor = true;
+                        Fields["status06"].guiName = name;
+                        Fields.SetValue("status06", value);
+                        statuscount++;
+                        break;
+                    }
+            }
+        }
+        public void ClearStatus()
+        {
+            statusReason = "";
+            Fields["status01"].guiActive = false;
+            Fields["status01"].guiActiveEditor = false;
+            Fields["status02"].guiActive = false;
+            Fields["status02"].guiActiveEditor = false;
+            Fields["status03"].guiActive = false;
+            Fields["status03"].guiActiveEditor = false;
+            Fields["status04"].guiActive = false;
+            Fields["status04"].guiActiveEditor = false;
+            Fields["status05"].guiActive = false;
+            Fields["status05"].guiActiveEditor = false;
+            Fields["status06"].guiActive = false;
+            Fields["status06"].guiActiveEditor = false;
+
+            statuscount = 0;
         }
 
         string[] biomeAr = null;
@@ -454,7 +545,7 @@ namespace RequiredExperiments
         }
 
 #endif
-            void Start()
+        void Start()
         {
             if (requiredExperimentID == "" || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
                 return;
@@ -521,9 +612,11 @@ namespace RequiredExperiments
 
             if (HighLogic.LoadedScene == GameScenes.EDITOR)
                 return;
+            Log.Info("Refresh, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
             CheckExperiments();
             CheckExperimentCompletions();
-            if (Planetarium.GetUniversalTime() < availableAtTime)
+            Log.Info("After CheckExperimentCompletions, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
+            if (Planetarium.GetUniversalTime() >= availableAtTime && availableAtTime > 0)
             {
                 EnableModules();
                 availableAtTime = -1;
@@ -558,6 +651,7 @@ namespace RequiredExperiments
         void CheckExperimentCompletions()
         {
 #endif
+            Log.Info("CheckExperimentCompletions");
             if (AllConditionsMet())
             {
                 if (availableAtTime == -1)
@@ -567,7 +661,10 @@ namespace RequiredExperiments
                 }
             }
             else
+            {
+                Log.Info("All conditions NOT met");
                 availableAtTime = -1;
+            }
         }
 
         /// <summary>
@@ -575,6 +672,7 @@ namespace RequiredExperiments
         /// </summary>
         void EnableModules()
         {
+            Log.Info("EnableModules");
             foreach (var dm in disabledModules)
             {
                 foreach (var mod in part.Modules)
@@ -803,6 +901,7 @@ namespace RequiredExperiments
         /// <returns></returns>
         bool AllConditionsMet()
         {
+            Log.Info("AllConditionsMet");
             var currentBiome = CurrentRawBiome(this.vessel);
             var currentSituation = this.vessel.situation;
 
@@ -883,7 +982,7 @@ namespace RequiredExperiments
 
             return false;
 #else
-            statusReason = "";
+            ClearStatus();
 
             if (inCurrentSituation)
             {
@@ -891,7 +990,7 @@ namespace RequiredExperiments
                 bool inCurrentBody = false;
                 bool inCurrentBiome = false;
                 bool inCurrentSit = false;
-                
+
                 for (int c = 0; c < celst.Count(); c++)
                 {
                     inCurrentBody = false;
@@ -929,154 +1028,12 @@ namespace RequiredExperiments
                     {
                         return CheckBiomesAndSituations(celst);
                     }
-                }                
-            } else
+                }
+            }
+            else
             {
                 return CheckBiomesAndSituations(celst);
             }
-
-#if false
-            if (biomes != "")
-            {
-                int biomeCnt = biomeAr.Count();
-                int reqBiomeCnt = celst.Count();
-                Log.Info("biomeCnt: " + biomeCnt);
-
-                for (int i = 0; i < biomeAr.Count(); i++)
-                {
-                    for (int c = 0; c < celst.Count(); c++)
-                    {
-                        if (biomeAr[i] == celst[c].biome)
-                        {
-                            reqBiomeCnt--;
-                        }
-                    }
-                }
-
-
-                if (reqBiomeCnt > 0)
-                {
-                    SetStatusReason("Experiment not completed in a required biomes");
-                    return false;
-                }
-            }
-
-            if (SrfLanded)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                {
-                    Log.Info("situation: " + celst[c].situation.ToString());
-                    if (celst[c].situation == ExperimentSituations.SrfLanded)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-                }
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not SrfLanded yet");
-                    return false;
-                }
-            }
-            if (SrfSplashed)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                    if (celst[c].situation == ExperimentSituations.SrfSplashed)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not SrfSplashed yet");
-                    return false;
-                }
-            }
-            if (FlyingLow)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                    if (celst[c].situation == ExperimentSituations.FlyingLow)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not FlyingLow yet");
-                    return false;
-                }
-            }
-            if (FlyingHigh)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                    if (celst[c].situation == ExperimentSituations.FlyingHigh)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not FlyingHigh yet");
-                    return false;
-                }
-            }
-            if (InSpaceLow)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                    if (celst[c].situation == ExperimentSituations.InSpaceLow)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not InSpaceLow yet");
-                    return false;
-                }
-            }
-            if (InSpaceHigh)
-            {
-                bool b = false;
-                for (int c = 0; c < celst.Count(); c++)
-                    if (celst[c].situation == ExperimentSituations.InSpaceHigh)
-                    {
-                        if (celst[c].science / celst[c].scienceCap >= requiredCompleted)
-                            return true;
-                        else
-                            SetStatusReason("Not enough science completed yet");
-                    }
-
-                if (!b)
-                {
-                    if (statusReason == "")
-                        SetStatusReason("Not InSpaceHigh yet");
-                    return false;
-                }
-            }
-#endif
 
             return true;
 #endif
@@ -1232,12 +1189,13 @@ namespace RequiredExperiments
         /// </summary>
         void CheckExperiments()
         {
-
             if (HighLogic.LoadedScene == GameScenes.EDITOR)
                 return;
+
+            Log.Info("CheckExperiments");
             foreach (var modToDisable in initiallyDisabledModulesAr)
             {
-                //Log.Info("InitiallyDisabled: " + modToDisable);
+                Log.Info("CheckExperiments: " + modToDisable);
                 DisabledModule disabledModule = null;
                 disabledModules.TryGetValue(modToDisable, out disabledModule);
                 if (disabledModule == null)
