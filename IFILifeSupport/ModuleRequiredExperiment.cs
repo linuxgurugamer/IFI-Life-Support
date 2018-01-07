@@ -317,7 +317,7 @@ namespace RequiredExperiments
         [KSPField]
         public bool InSpaceHigh = false;
 
-       // [KSPField(guiActive = true, guiName = "Status:")]
+        // [KSPField(guiActive = true, guiName = "Status:")]
         string statusReason = "";
 
         public int statuscount = 0;
@@ -1260,8 +1260,22 @@ namespace RequiredExperiments
             info = "";
             if (experiment == null)
             {
-                return "";
+                experiment = ResearchAndDevelopment.GetExperiment(requiredExperimentID);
             }
+            if (!HighLogic.LoadedSceneIsFlight)
+            {
+                info = experiment.experimentTitle;
+                  info += " is required to be completed";
+                if (inCurrentSituation)
+                    info += " in the biome";
+                
+                if (uniqueBodies)
+                    info += " at each body";
+                info += " before use";
+
+                return info;
+            }
+
             AddToInfo(experiment.experimentTitle);
             if (SrfLanded)
                 AddToInfo("     Landed on surface");

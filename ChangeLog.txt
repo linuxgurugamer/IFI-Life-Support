@@ -76,6 +76,10 @@
 	Improved status display of reasons greenhouse is not active
 	Reduced refresh interval from 15 to 3 seconds 
 
+3.4.4
+	Fixed technology level of science parts
+	Added info display to tech tree and in editor
+
 TODO
 
 	Continue optimizations:

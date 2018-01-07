@@ -69,7 +69,9 @@ namespace IFILifeSupport
         /// <returns></returns>
         static internal bool PartShouldBeHidden(AvailablePart part, out ConfigNode n)
         {
-            n = null;
+          
+            n = null;            
+
             if (part.partConfig == null)
                 return true;
             ConfigNode partNode = part.partConfig;
