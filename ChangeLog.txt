@@ -115,3 +115,7 @@
 	multiplied internal representation of LS by 21600
 	Added configs to preserve the external representation
 	Updated code to work with the 21600 (SECS_PER_DAY)
+
+3.4.6.1
+	Fixed EVA
+	Added setting to control refresh interval, now defaults to 1
