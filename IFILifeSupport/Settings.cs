@@ -4,7 +4,6 @@ using System.Collections;
 using System.Reflection;
 
 
-
 namespace IFILifeSupport
 {
     // http://forum.kerbalspaceprogram.com/index.php?/topic/147576-modders-notes-for-ksp-12/#comment-2754813
@@ -21,8 +20,27 @@ namespace IFILifeSupport
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return true; } }
 
+
+        [GameParameters.CustomParameterUI("Use Blizzy Toolbar", toolTip = "If available (will require scene change to activate)")]
+        public bool useBlizzy = false;
+
         [GameParameters.CustomParameterUI("Classic Life Support",
             toolTip ="Basic life support, no recycling of any kind.")]
+#if true
+        public bool classic = true;
+        bool oldClassic = false;
+
+        public bool improved = false;
+        bool oldImproved = false;
+
+        public bool advanced = false;
+        bool oldAdvanced = false;
+
+        public bool extreme = false;
+        bool oldExtreme = false;
+
+        public bool showInResourcePanel = false;
+#else
         public bool classic = false;
         bool oldClassic = false;
 
@@ -48,7 +66,7 @@ namespace IFILifeSupport
         [GameParameters.CustomParameterUI("Display Organic Slurry & Sludge in resource panel",
             toolTip = "If enabled, then the Organic Slurry and Sludge (if applicable) will be shown in the resource panels of parts")]
         public bool showInResourcePanel = false;
-
+#endif
         public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
             {
@@ -62,6 +80,7 @@ namespace IFILifeSupport
 
         void SetLevel(LifeSupportLevel lsl)
         {
+            Log.Info("IFILS1.SetLevel, lsl: " + lsl);
             LifeSupportDisplay.ReinitInfoWindowPos();
             switch (lsl)
             {
@@ -90,6 +109,13 @@ namespace IFILifeSupport
                     extreme = true;
                     break;
             }
+
+#if true
+            classic = true;
+            improved = false;
+            advanced = false;
+            extreme = false;
+#endif
             oldAdvanced = advanced;
             oldImproved = improved;
             oldClassic = classic;
@@ -97,6 +123,7 @@ namespace IFILifeSupport
 
         public override void SetDifficultyPreset(GameParameters.Preset preset)
         {
+            Log.Info("IFILS1.SetDifficultyPreset: " + preset);
             switch (preset)
             {
                 case GameParameters.Preset.Easy:
@@ -127,6 +154,7 @@ namespace IFILifeSupport
         }
         public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
+            Log.Info("IFILS1.Interactible");
             if (oldClassic != classic)
                 SetLevel(LifeSupportLevel.classic);
 
@@ -197,7 +225,8 @@ namespace IFILifeSupport
         {
             get
             {
-                return lsRatePerDay / 3600 / (GameSettings.KERBIN_TIME ? 6 : 24);
+                return 1;
+                //return lsRatePerDay / 3600 / (GameSettings.KERBIN_TIME ? 6 : 24);
             }
         }
 
@@ -238,12 +267,13 @@ namespace IFILifeSupport
         public bool EVAkerbalsCanDie = true;
 
         [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying", minValue = 0, maxValue = 3600)]
-        public double inactiveTimeBeforeDeath = 0;
+        public int inactiveTimeBeforeDeath = 0;
 
 
 
         void SetValues(double mult)
         {
+            Log.Info("IFILS2.SetValues, mult: " + mult);
             //Rate_Per_Kerbal = RATE_PER_KERBAL * mult;
             //lsRatePerDay / 3600 / 6 * mult;
             lsRatePerDay = 1 * mult;
@@ -258,6 +288,7 @@ namespace IFILifeSupport
 
         public override void SetDifficultyPreset(GameParameters.Preset preset)
         {
+            Log.Info("IFILS2.SetDifficultyPreset: " + preset);
             switch (preset)
             {
                 case GameParameters.Preset.Easy:

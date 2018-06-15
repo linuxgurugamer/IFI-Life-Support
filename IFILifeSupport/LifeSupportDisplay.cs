@@ -40,6 +40,7 @@ namespace IFILifeSupport
 
         public static void ReinitInfoWindowPos()
         {
+            Log.Info("ReinitInfowindowPos");
             infoWindowPos = new Rect(infoWindowPos.x, infoWindowPos.y, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
         }
         public static void ReinitEditorInfoWindowPos()

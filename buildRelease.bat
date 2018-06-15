@@ -1,4 +1,4 @@
-
+exit
 @echo off
 
 rem Set variables here
@@ -40,11 +40,8 @@ if "%build%" NEQ "0"  set VERSION=%VERSION%.%build%
 
 echo Version:  %VERSION%
 
-
 rem Build the zip FILE
 
 set FILE="%RELEASEDIR%\%GAMEDIR%-%VERSION%.zip"
 IF EXIST %FILE% del /F %FILE%
 %ZIP% a -tzip  %FILE% GameData
-
-pause

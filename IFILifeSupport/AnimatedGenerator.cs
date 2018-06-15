@@ -16,7 +16,7 @@ namespace IFILifeSupport
     /// ModuleResourceConverter w/ Animations
     /// Adds animation functionality to the ModuleResourceConverter for parts that require an animation as well as converter/generator functionality.
     /// </summary>
-    public class AnimatedGenerator : ModuleResourceConverter
+    public class AnimatedGenerator : ModuleIFILifeSupport
     {
         /// The name of the animation.
         [KSPField] // for setting animation name via cfg file
@@ -44,7 +44,7 @@ namespace IFILifeSupport
                 var animationState = animation[animationName];
                 animationState.speed = 0;
                 animationState.enabled = true;
-                animationState.wrapMode = WrapMode.ClampForever;
+                animationState.wrapMode = WrapMode.Loop;
                 animation.Blend(animationName);
                 states.Add(animationState);
             }
@@ -78,29 +78,33 @@ namespace IFILifeSupport
             Log.Info("animStates.Length: " + animStates.Count());
             if (animStates.Count() > 0)
                 useAnimation = true;
- 
+
         }
 
 
         public new void FixedUpdate()
         {
-            if (!useAnimation)
-                return;
-            Log.Info("AnimatedGenerator.FixedUpdate, IsActivated: " + ModuleIsActive() + ",   normalizedTime: " + animStates[0]);
-
-            if (ModuleIsActive() && animStates[0].normalizedTime < 1)
+            if (useAnimation)
             {
-                Log.Info("Artificial Lights Activated");
-                for (int i = 0; i < animStates.Count(); i++)
-                    animStates[i].normalizedTime += animationTicAmount;
-            }
+                Log.Info("AnimatedGenerator.FixedUpdate, IsActivated: " + ModuleIsActive() + ",   normalizedTime: " + animStates[0]);
 
-            if (!ModuleIsActive() && animStates[0].normalizedTime > 0)
-            {
-                Log.Info("Deactivated");
-                for (int i = 0; i < animStates.Count(); i++)
-                    animStates[i].normalizedTime -= animationTicAmount;
+                if (ModuleIsActive() && animStates[0].normalizedTime < 1)
+                {
+                    Log.Info("Artificial Lights Activated");
+                    for (int i = 0; i < animStates.Count(); i++)
+                        animStates[i].normalizedTime += animationTicAmount;
+                }
+                else
+                    animStates[0].normalizedTime = 0;
+                /*
+                if (!ModuleIsActive() && animStates[0].normalizedTime > 0)
+                {
+                    Log.Info("Deactivated");
+                    for (int i = 0; i < animStates.Count(); i++)
+                        animStates[i].normalizedTime -= animationTicAmount;
 
+                }
+                */
             }
             base.FixedUpdate();
         }

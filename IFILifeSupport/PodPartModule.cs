@@ -25,7 +25,9 @@ namespace IFILifeSupport
         [KSPField(guiActive = false, isPersistant = true)]
         public bool RescueFlag;
 
-#if true
+        private int IFITIM = 0;
+
+#if !DEBUG
         // Debug Button for right click info - TO BE removed after testing.
         [KSPField(guiActive = true, guiName = "Debug Logging", isPersistant = false)]
         public string DebugStatus = "Disabled";
@@ -45,16 +47,41 @@ namespace IFILifeSupport
             }
         }
 #endif
+#if false
+        const int SECS_PER_DAY = 21600;
+        public override string GetInfo()
+        {
+            string info = "Interstellar Flight Inc. Life Support Systems MK XV Installed";
+            foreach (PartResource partResource in part.Resources)
+            {
+                if (partResource.resourceName == Constants.LIFESUPPORT)
+                   info += "\nLife Support: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
+                if (partResource.resourceName == Constants.SLURRY)
+                    info += "\nSlurry: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
+                if (partResource.resourceName == Constants.SLUDGE)
+                    info += "\nSludge: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
+            }
+            return info;
+        }
+#endif
 
         public override string GetInfo()
         {
             return "Interstellar Flight Inc. Life Support Systems MK XV Installed";
         }
 
-
         public override void OnUpdate()
         {
-
+            IFITIM++;
+            Log.Info("OnUpdate, IFITIM: " + IFITIM);
+            if (!HighLogic.LoadedSceneIsEditor && (IFITIM > 3 || TimeWarp.CurrentRate > 800))
+            {
+                Life_Support_Update();
+                IFITIM = 0;
+            }
+        }
+        void Life_Support_Update()
+        { 
 #if !DEBUG
             if (IFIDebug.IsON) { DebugStatus = "Active"; } else { DebugStatus = "Inactive"; }
 #endif
@@ -118,22 +145,7 @@ namespace IFILifeSupport
             double num2 = 0;
             int id = PartResourceLibrary.Instance.GetDefinition(IFIResource).id;
             this.part.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
-#if false
-            Vessel active = this.part.vessel;
-            foreach (Part p in active.parts)
-            {
-                foreach (PartResource pr in p.Resources)
-                {
-                    if (pr.resourceName.Equals(IFIResource))
-                    {
-                        if (pr.flowState)
-                        {
-                            IFIResourceAmt += pr.amount;
-                        }
-                    }
-                }
-            }
-#endif
+
             return IFIResourceAmt;
         }
 

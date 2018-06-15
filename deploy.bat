@@ -1,7 +1,8 @@
 
 @echo off
 
-set H=R:\KSP_1.3.1_dev
+set H=R:\KSP_1.4.3_dev
+rem set H=R:\KSP_1.4.3_IFI_Test
 set GAMEDIR=IFILS
 set DEPEND1=CommunityCategoryKit
 set DEPEND2=Squad

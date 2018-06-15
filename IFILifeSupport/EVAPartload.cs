@@ -12,19 +12,22 @@ namespace IFILifeSupport
 {
     public static class IFIDebug
     {
-        public static bool IsON = true;
+        public static bool IsON = false;
         public static void IFIMess(string IFIMessage)
         {
+#if !DEBUG
             if (IsON)
+#endif
             {
-                Debug.Log("*IFI DEBUG--" + IFIMessage);
+                Log.Warning("*IFI DEBUG--" + IFIMessage);
             }
         }
+#if !DEBUG
         public static void Toggle()
         {
             if (IsON) { IsON = false; } else { IsON = true; }
         }
-
+#endif
     }
 
     // [KSPAddon(KSPAddon.Startup.MainMenu, true)]

@@ -6,6 +6,8 @@ using UnityEngine;
 using KSP.IO;
 using KSP;
 using KSP.UI.Screens;
+using ClickThroughFix;
+using ToolbarControl_NS;
 
 namespace IFILifeSupport
 {
@@ -18,10 +20,16 @@ namespace IFILifeSupport
 
         private int IFITIM = 0;
         // Stock APP Toolbar - Stavell
-        private ApplicationLauncherButton IFI_Button = null;
-        private Texture2D IFI_button_grn = null;
-        private Texture2D IFI_button_cau = null;
-        private Texture2D IFI_button_danger = null;
+
+        ToolbarControl toolbarControl;
+
+        //private ApplicationLauncherButton IFI_Button = null;
+        private Texture2D IFI_button_grn38 = null;
+        private Texture2D IFI_button_cau38 = null;
+        private Texture2D IFI_button_danger38 = null;
+        private Texture2D IFI_button_grn24 = null;
+        private Texture2D IFI_button_cau24 = null;
+        private Texture2D IFI_button_danger24 = null;
         private bool IFI_Texture_Load = false;
 
         private bool KerbalEVARescueDetect = false;
@@ -71,20 +79,21 @@ namespace IFILifeSupport
         private void OnGUIApplicationLauncherReady()
         {
             // Create the button in the KSP AppLauncher
-
+#if false
             if (IFI_Button == null)
             {
                 IFI_Button = ApplicationLauncher.Instance.AddModApplication(GUIToggle, GUIToggle,
                                 null, null,
                                 null, null,
                                 ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.MAPVIEW,
-                                IFI_button_grn);
+                                IFI_button_grn38);
             }
 
             if (!HighLogic.LoadedSceneIsEditor)
             {
                 Life_Support_Update();
             }
+#endif
         }
 
         private void GUIToggle()
@@ -101,7 +110,8 @@ namespace IFILifeSupport
 
         private void ResetButton()
         {
-            IFI_Button.SetTexture(IFI_button_grn);
+            //IFI_Button.SetTexture(IFI_button_grn38);
+            toolbarControl.SetTexture("IFILS/Textures/IFI_LS_GRN_38", "IFILS/Textures/IFI_LS_GRN_24");
         }
 
         public void Life_Support_Update()
@@ -120,17 +130,22 @@ namespace IFILifeSupport
             }
 
             double Elapsed_Time = IFI_Get_Elasped_Time();
-            IFI_Button.SetTexture(IFI_button_grn);
+            Log.Info("Elapsed_Time: " + Elapsed_Time);
+
+            //            IFI_Button.SetTexture(IFI_button_grn38);
+            toolbarControl.SetTexture("IFILS/Textures/IFI_LS_GRN_38", "IFILS/Textures/IFI_LS_GRN_24");
 
             int LS_ALERT_LEVEL = 1;
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
                 LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), MAX_STATUSES];
-                LS_Status_Width = new int[MAX_STATUSES];
-                LS_Status_Spacing = new int[MAX_STATUSES];
+                ClearStatusWidths();
+                //LS_Status_Width = new int[MAX_STATUSES];
+                //LS_Status_Spacing = new int[MAX_STATUSES];
 
                 LS_Status_Hold_Count = 0;
                 Debug.Log("######## Looking for Ships ######");
+                int v = 0;
                 for (int idx = 0; idx < FlightGlobals.Vessels.Count; idx++)
                 //foreach (Vessel vessel in FlightGlobals.Vessels)
                 {
@@ -141,7 +156,8 @@ namespace IFILifeSupport
                         vessel.vesselType == VesselType.Base || vessel.vesselType == VesselType.Probe) ||
                         vessel.vesselType == VesselType.EVA)
                     {
-                        Debug.Log(" Found Vessel");//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
+                        v++;
+                        Log.Info(" Found Vessel (" + v + "): " + vessel.vesselName);//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
                         string TVname;
                         int IFI_Crew = 0;
                         double LSAval;
@@ -181,15 +197,10 @@ namespace IFILifeSupport
                                     LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment; //  0.20;
                                 else
                                     LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment; // 0.60;
-                            }
-                            Log.Info("After Atmo adjust, LS_Use: " + LS_Use + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time);
+                            }                           
 
-                            //{
-                            //    if (IFI_Location == "Laythe" && IFI_ALT <= 6123) { LS_Use *= 0.60; }
-                            //}
-
-                            double days_rem = LSAval / IFI_Crew / LS_Use / 3600 / HoursPerDay;
-                            Log.Info("LSAval: " + LSAval + ", IFI_Crew: " + IFI_Crew + ", LS_Use: " + LS_Use + ", HoursPerDay: " + HoursPerDay);
+                            double days_rem = (LSAval / IFI_Resources.SECS_PER_DAY) / IFI_Crew / LS_Use;
+                            Log.Info("After Atmo adjust, LS_Use: " + LS_Use + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time + ", LSAval: " + LSAval + ", HoursPerDay: " + HoursPerDay);
                             LS_Use *= IFI_Crew;
                             LS_Use *= Elapsed_Time;
                             // IF No EC use more LS resources
@@ -200,37 +211,20 @@ namespace IFILifeSupport
 
                             if (LS_Use > 0.0)
                             {
+                                //double rtest = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, LS_Use, IFI_Crew);
+                                
 
-                                double rtest = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, LS_Use, IFI_Crew);
-                                double stest = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, -rtest, IFI_Crew);
-                                Log.Info("Elapsed_Time: " + Elapsed_Time);
-                                Log.Info("LifeSupport rtest: " + rtest);
-                                Log.Info("Organicslurry stest: " + stest);
+                                double leftoverLS = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, LS_Use, IFI_Crew);
+                                double stest = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, -leftoverLS, IFI_Crew);
+                                if (!vessel.loaded)
+                                {
+                                    double slurryRecovered = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, -(LS_Use - leftoverLS), IFI_Crew);
+                                    Log.Info("vessel.loaded: " + vessel.loaded);
+                                    Log.Info("LS_Use: " + LS_Use + ", leftoverLS: " + leftoverLS + ",  slurryRecovered: " + slurryRecovered);
+                                    Log.Info("Elapsed_Time: " + Elapsed_Time);
+                                }
                             }
 
-#if false
-
-// duplicated code, no need to do double duty
-                            //Debug.Log("Vessel with crew onboard Found: " + TVname + "   Crew=" + IFI_Crew +"    LifeSupport = "+ LSAval +"  Body:"+IFI_Location+"   ALT:"+IFI_ALT);
-                            double LS_RR = LifeSupportRate.GetRate();
-                            Log.Info("LS_RR 1: " + LS_RR);
-                            if (LifeSupportRate.IntakeAirAvailable(vessel))
-                            {
-                                if (IFI_Location == FlightGlobals.GetHomeBodyName())
-                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment; //  0.20; 
-                                else
-                                    LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment; // 0.60; 
-                            }
-                            Log.Info("LS_RR 2: " + LS_RR);
-                            if (IFIGetAllResources("ElectricCharge", vessel, vessel.loaded) < 0.1)
-                            {
-                                LS_RR *=  HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
-                            }
-
-                            double days_rem = LSAval / IFI_Crew / LS_RR / 3600 / HoursPerDay;
-                            Log.Info("LS_RR 3: " + LS_RR);
-                            Log.Info("LSAval: " + LSAval + ", IFI_Crew: " + IFI_Crew + ", LS_RR: " + LS_RR + ", HoursPerDay: " + HoursPerDay);
-#endif
 
 
                             //LS_Status_Hold[LS_Status_Hold_Count, VESSEL] = String.Format("<color=#{0}>{1}</color>", lblGreenColor, TVname);  //TVname;
@@ -260,7 +254,8 @@ namespace IFILifeSupport
                                     color = lblRedColor;
                                 //LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
                                 //LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
-                                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
+
+                                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Convert.ToString(Math.Round(LSAval / IFI_Resources.SECS_PER_DAY, 2))); // Convert.ToString(Math.Round(LSAval, 4));
                                 LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = Colorized(color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
                             }
 
@@ -276,34 +271,39 @@ namespace IFILifeSupport
                                     {
                                         PartModule tmpPM = vessel.parts[idx2].Modules[m];
 
-                                        if (vessel.parts[idx2].Modules[m].moduleName == "ModuleResourceConverter")
+                                        if (vessel.parts[idx2].Modules[m].moduleName == "ModuleIFILifeSupport")
                                         {
-                                            ModuleResourceConverter m1 = (ModuleResourceConverter)tmpPM;
-                                            for (int i = 0; i < m1.inputList.Count; i++)
-                                            //foreach (ResourceRatio inp in m1.inputList)
+                                            ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)tmpPM;
+                                            if (m1.IsActivated)
                                             {
-                                                ResourceRatio inp = m1.inputList[i];
-                                                if (inp.ResourceName == Constants.SLURRY)
-                                                    slurryRate += inp.Ratio;
-                                                if (inp.ResourceName == Constants.SLUDGE)
-                                                    sludgeRate += inp.Ratio;
+                                                for (int i = 0; i < m1.inputList.Count; i++)
+                                                //foreach (ResourceRatio inp in m1.inputList)
+                                                {
+                                                    ResourceRatio inp = m1.inputList[i];
+                                                    if (inp.ResourceName == Constants.SLURRY)
+                                                        slurryRate += inp.Ratio;
+                                                    if (inp.ResourceName == Constants.SLUDGE)
+                                                        sludgeRate += inp.Ratio;
 
+                                                }
                                             }
                                         }
                                         if (vessel.parts[idx2].Modules[m].moduleName == "AnimatedGenerator")
                                         {
                                             AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
-
-                                            for (int i = 0; i < m1.inputList.Count; i++)
-                                            //foreach (ResourceRatio inp in m1.inputList)
+                                            if (m1.IsActivated)
                                             {
-                                                ResourceRatio inp = m1.inputList[i];
+                                                for (int i = 0; i < m1.inputList.Count; i++)
+                                                //foreach (ResourceRatio inp in m1.inputList)
+                                                {
+                                                    ResourceRatio inp = m1.inputList[i];
 
-                                                if (inp.ResourceName == Constants.SLURRY)
-                                                    slurryRate += inp.Ratio;
-                                                if (inp.ResourceName == Constants.SLUDGE)
-                                                    sludgeRate += inp.Ratio;
+                                                    if (inp.ResourceName == Constants.SLURRY)
+                                                        slurryRate += inp.Ratio;
+                                                    if (inp.ResourceName == Constants.SLUDGE)
+                                                        sludgeRate += inp.Ratio;
 
+                                                }
                                             }
                                         }
 
@@ -325,39 +325,63 @@ namespace IFILifeSupport
                                     {
                                         PartModule tmpPM = part.Modules[m];
 
-                                        if (part.Modules[m].moduleName == "ModuleResourceConverter")
+                                        if (part.Modules[m].moduleName == "ModuleIFILifeSupport")
                                         {
-                                            ModuleResourceConverter m1 = (ModuleResourceConverter)tmpPM;
-                                            for (int i = 0; i < m1.inputList.Count; i++)
-                                            //foreach (ResourceRatio inp in m1.inputList)
-                                            {
-                                                ResourceRatio inp = m1.inputList[i]; if (inp.ResourceName == Constants.SLURRY)
-                                                    slurryRate += inp.Ratio;
-                                                if (inp.ResourceName == Constants.SLUDGE)
-                                                    sludgeRate += inp.Ratio;
+                                            ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)tmpPM;
 
+                                            if (ResourceConverterActive(p, part, m))
+                                            {
+                                                for (int i = 0; i < m1.inputList.Count; i++)
+                                                //foreach (ResourceRatio inp in m1.inputList)
+                                                {
+                                                    ResourceRatio inp = m1.inputList[i];
+                                                    if (inp.ResourceName == Constants.SLURRY)
+                                                        slurryRate += inp.Ratio;
+                                                    if (inp.ResourceName == Constants.SLUDGE)
+                                                        sludgeRate += inp.Ratio;
+
+                                                }
                                             }
+
                                         }
                                         if (part.Modules[m].moduleName == "AnimatedGenerator")
                                         {
                                             AnimatedGenerator m1 = (AnimatedGenerator)tmpPM;
-
-                                            for (int i = 0; i < m1.inputList.Count; i++)
-                                            //foreach (ResourceRatio inp in m1.inputList)
+                                            if (ResourceConverterActive(p, part, m))
                                             {
-                                                ResourceRatio inp = m1.inputList[i];
-                                                if (inp.ResourceName == Constants.SLURRY)
-                                                    slurryRate += inp.Ratio;
-                                                if (inp.ResourceName == Constants.SLUDGE)
-                                                    sludgeRate += inp.Ratio;
+                                                for (int i = 0; i < m1.inputList.Count; i++)
+                                                //foreach (ResourceRatio inp in m1.inputList)
+                                                {
+                                                    ResourceRatio inp = m1.inputList[i];
+                                                    if (inp.ResourceName == Constants.SLURRY)
+                                                        slurryRate += inp.Ratio;
+                                                    if (inp.ResourceName == Constants.SLUDGE)
+                                                        sludgeRate += inp.Ratio;
 
+                                                }
                                             }
                                         }
-
                                     }
                                 }
                             }
+                            double slurryProcessed = slurryRate * Elapsed_Time;
+                            double sludgeProcessed = sludgeRate * Elapsed_Time;
+                            Log.Info("slurryRate: " + slurryRate + ", slurryProcessed: " + slurryProcessed);
+                            Log.Info("sludgeRate: " + sludgeRate + ", sludgeProcessed: " + sludgeProcessed);
 
+
+                            double sludgeUnprocessed = IFIUSEResources(Constants.SLUDGE, vessel, vessel.loaded, sludgeProcessed, IFI_Crew);
+                            double slurryUnprocessed = IFIUSEResources(Constants.SLURRY, vessel, vessel.loaded, slurryProcessed, IFI_Crew);
+                            double s2test = IFIUSEResources(Constants.SLUDGE, vessel, vessel.loaded, slurryProcessed - slurryUnprocessed, IFI_Crew);
+
+                            Log.Info("line 382: sludgeProcessed: " + sludgeProcessed + ",    slurryProcessed-slurryUnprocessed: " + (slurryProcessed - slurryUnprocessed));
+                            double lsRecovered = (sludgeProcessed - sludgeUnprocessed) + (slurryProcessed - slurryUnprocessed);
+                            double lsLost = IFIUSEResources(Constants.LIFESUPPORT, vessel, vessel.loaded, -lsRecovered, IFI_Crew);
+
+                            Log.Info("sludgeUnprocessed: " + sludgeUnprocessed + ", slurryUnprocessed: " + slurryUnprocessed +
+                                ", lsRecovered: " + lsRecovered + ", lsLost: " + lsLost);
+
+                            
                             if (vessel.vesselType != VesselType.EVA)
                             {
                                 // doesn't hurt to do the secsPerDay calc every time, since this only runs once every 3 seconds
@@ -365,11 +389,11 @@ namespace IFILifeSupport
 
                                 // Need to scan for all greenhouses here
                                 //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
-                                LS_Status_Hold[LS_Status_Hold_Count, SLURRYAVAIL] = SlurryAvail.ToString("N2");
+                                LS_Status_Hold[LS_Status_Hold_Count, SLURRYAVAIL] = (SlurryAvail / IFI_Resources.SECS_PER_DAY).ToString("N2");
 
                                 // Need to scan for all sludge convertors here
                                 //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
-                                LS_Status_Hold[LS_Status_Hold_Count, SLUDGEAVAIL] = SludgeAvail.ToString("N2");
+                                LS_Status_Hold[LS_Status_Hold_Count, SLUDGEAVAIL] = (SludgeAvail / IFI_Resources.SECS_PER_DAY).ToString("N2");
 
 
                                 Log.Info("Slurry: " + SlurryAvail + ",    rate: " + (secsPerDay * slurryRate));
@@ -390,20 +414,25 @@ namespace IFILifeSupport
 
                             if (LS_ALERT_LEVEL < 2 && days_rem < 3)
                             {
-                                IFI_Button.SetTexture(IFI_button_cau);
+                                //IFI_Button.SetTexture(IFI_button_cau38);
+                                toolbarControl.SetTexture("IFILS/Textures/IFI_LS_CAU_38", "IFILS/Textures/IFI_LS_CAU_24");
                                 LS_ALERT_LEVEL = 2;
                                 if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                                 {
                                     TimeWarp.SetRate(0, false);
+                                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 3 days of Life Support remaining", 10f);
+
                                 }
                             }
                             if (LS_ALERT_LEVEL < 3 && days_rem <= 1)
                             {
-                                IFI_Button.SetTexture(IFI_button_danger);
+                                //IFI_Button.SetTexture(IFI_button_danger38);
+                                toolbarControl.SetTexture("IFILS/Textures/IFI_LS_DAN_38", "IFILS/Textures/IFI_LS_DAN_24");
                                 LS_ALERT_LEVEL = 3;
                                 if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                                 {
                                     TimeWarp.SetRate(0, false);
+                                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 1 day of Life Support remaining", 10f);
                                 }
                             }
                         }
@@ -413,38 +442,91 @@ namespace IFILifeSupport
             }
         }
 
+        bool ResourceConverterActive(ProtoPartSnapshot p, Part part, int m)
+        {
+            int j = m;
+            if (j >= part.Modules.Count || part.Modules[j].moduleName != p.modules[m].moduleName)
+            {
+                if (j < part.Modules.Count)
+                {
+                    Log.Warning("Expected " + p.modules[m].moduleName + " at index " + m + ", got " + part.Modules[j].moduleName);
+
+                    for (j = m; j < part.Modules.Count; ++j)
+                    {
+                        if (part.Modules[j].moduleName == p.modules[m].moduleName)
+                        {
+                            Log.Warning("Found " + p.modules[m].moduleName + " at index " + j);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (j < part.Modules.Count)
+            {
+                bool active = false;
+                Boolean.TryParse(p.modules[j].moduleValues.GetValue("IsActivated"), out active);
+                return active;
+            }
+            return false;
+        }
+
         public void Awake()
         {
             IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIApplicationLauncherReady);
+           // GameEvents.onGUIApplicationLauncherReady.Add(OnGUIApplicationLauncherReady);
             DontDestroyOnLoad(this);
 
-            CancelInvoke();
-            InvokeRepeating("display_active", 1, 1);
+           
         }
 
         public void Start()
         {
             Instance = this;
+
             if (!IFI_Texture_Load)
             {
-                if (IFI_button_grn == null)
+                if (IFI_button_grn38 == null)
                 {
-                    IFI_button_grn = new Texture2D(38, 38, TextureFormat.ARGB32, false);
-                    IFI_button_cau = new Texture2D(38, 38, TextureFormat.ARGB32, false);
-                    IFI_button_danger = new Texture2D(38, 38, TextureFormat.ARGB32, false);
+                    IFI_button_grn38 = new Texture2D(38, 38, TextureFormat.ARGB32, false);
+                    IFI_button_cau38 = new Texture2D(38, 38, TextureFormat.ARGB32, false);
+                    IFI_button_danger38 = new Texture2D(38, 38, TextureFormat.ARGB32, false);
+
+                    IFI_button_grn24 = new Texture2D(24, 24, TextureFormat.ARGB32, false);
+                    IFI_button_cau24 = new Texture2D(24, 24, TextureFormat.ARGB32, false);
+                    IFI_button_danger24 = new Texture2D(24, 24, TextureFormat.ARGB32, false);
                 }
                 double IHOLD = IFI_Get_Elasped_Time();
 
-                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_GRN")) IFI_button_grn = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_GRN", false);
-                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_CAU")) IFI_button_cau = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_CAU", false);
-                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_DAN")) IFI_button_danger = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_DAN", false);
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_GRN_38")) IFI_button_grn38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_GRN_38", false);
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_CAU_38")) IFI_button_cau38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_CAU_38", false);
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_DAN_38")) IFI_button_danger38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_DAN_38", false);
+
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_GRN_24")) IFI_button_grn38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_GRN_24", false);
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_CAU_24")) IFI_button_cau38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_CAU_24", false);
+                if (GameDatabase.Instance.ExistsTexture("IFILS/Textures/IFI_LS_DAN_24")) IFI_button_danger38 = GameDatabase.Instance.GetTexture("IFILS/Textures/IFI_LS_DAN_24", false);
+
                 IFI_Texture_Load = true;
+
             }
             LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
 
-        }
+            toolbarControl = gameObject.AddComponent<ToolbarControl>();
+            toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useBlizzy);
+            toolbarControl.AddToAllToolbars(GUIToggle, GUIToggle,
+                 ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.MAPVIEW,
+                 "IFILifeSupport",
+                 "IFILS_Button",
+                 "IFILS/Textures/IFI_LS_GRN_38",
+                 "IFILS/Textures/IFI_LS_GRN_24",
+                 "IFI-LS");
 
+            LS_Status_Width = new int[MAX_STATUSES];
+            LS_Status_Spacing = new int[MAX_STATUSES];
+
+            CancelInvoke();
+            InvokeRepeating("display_active", 1, 1);
+
+        }
 
 
 
@@ -547,6 +629,7 @@ namespace IFILifeSupport
         {
             double Temp_Resource = UR_Amount;
 
+            Log.Info("IFIUSEResources 1, resource: " + IFIResource + ", ISLoaded: " + ISLoaded + "   UR_Amount: " + UR_Amount);
             if (ISLoaded)
             {
 
@@ -556,7 +639,7 @@ namespace IFILifeSupport
 #if DEBUG
                 foreach (var p in IV.Parts)
                 {
-                    Log.Info("Part: " + p.partInfo.name + ", crewCount: " + p.protoModuleCrew.Count());
+                   // Log.Info("Part: " + p.partInfo.name + ", crewCount: " + p.protoModuleCrew.Count());
                 }
 #endif
                 if (IFIResource == Constants.LIFESUPPORT)
@@ -607,7 +690,7 @@ namespace IFILifeSupport
                 }
                 if (ALL_Resources < UR_Amount)
                 {
-                    double TEST_Mod = (UR_Amount - ALL_Resources) * 100000;
+                    //double TEST_Mod = (UR_Amount - ALL_Resources) * 100000;
                     Temp_Resource = IV.rootPart.RequestResource(IFIResource, ALL_Resources);
                 }
                 else
@@ -617,6 +700,8 @@ namespace IFILifeSupport
             }
             else
             {
+                bool giveBack = (UR_Amount < 0);
+                
                 KerbalEVARescueDetect = false;
                 int PartCountForShip = 0;
                 for (int idx = 0; idx < IV.protoVessel.protoPartSnapshots.Count; idx++)
@@ -624,14 +709,18 @@ namespace IFILifeSupport
                 {
                     ProtoPartSnapshot p = IV.protoVessel.protoPartSnapshots[idx];
                     PartCountForShip++;
-
                     for (int idx2 = 0; idx2 < p.resources.Count; idx2++)
                     //foreach (ProtoPartResourceSnapshot r in p.resources)
                     {
                         ProtoPartResourceSnapshot r = p.resources[idx2];
+                        Log.Info("Resource in part: " + p.partInfo.title + ", : " + r.resourceName);
                         if (r.resourceName == IFIResource)
                         {
-                            if (UR_Amount <= 0.0) break;
+                            Log.Info("Resource found");
+                            //if (UR_Amount <= 0.0)
+                            if ((UR_Amount <= 0.0 && !giveBack) ||
+                                (UR_Amount >= 0 && giveBack))
+                                break;
                             double IHold = r.amount;
                             // Fix for Kerbal rescue Missions
                             Int16 RescueTest = -1;
@@ -664,13 +753,19 @@ namespace IFILifeSupport
                             {
                                 r.amount = 0.0;
                             }
-
+                            var r1 = p.resources[idx2];
+                            Log.Info("IFIUSEResources 2, Resource: " + IFIResource + ",  r1.amount: " + r1.amount + ",   r.amount: " + r.amount + ",   UR_Amount: " + UR_Amount + ",  IHold: " + IHold);
+                            
                             Temp_Resource = UR_Amount;
                         }
                     }
                     //
-                    if (UR_Amount <= 0.0) break;
+                    if ((UR_Amount <= 0.0 && !giveBack) ||
+                                 (UR_Amount >= 0 && giveBack))
+                        break;
                 }
+ 
+
                 //if (IV.isEVA && )
                 //{
                 //    IFIDebug.IFIMess("#### IFI LIfeSupport #### Rescue Kerbal Found with No LS Resource TAG Flagging");
@@ -990,7 +1085,7 @@ namespace IFILifeSupport
         {
             IFITIM++;
             Log.Info("display_active, IFITIM: " + IFITIM);
-            if (!HighLogic.LoadedSceneIsEditor && ((/* LifeSupportDisplay.LSDisplayActive && */ IFITIM > 3) || (TimeWarp.CurrentRate > 800) || IFITIM > 100))
+            if (!HighLogic.LoadedSceneIsEditor && (IFITIM > 3 || TimeWarp.CurrentRate > 800 ))
             {
                 Life_Support_Update();
                 IFITIM = 0;
@@ -1045,6 +1140,9 @@ namespace IFILifeSupport
 
         private void OnGUI()
         {
+            if (toolbarControl != null)
+                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useBlizzy);
+
             if (LifeSupportDisplay.LSDisplayActive)
             {
 
@@ -1058,14 +1156,14 @@ namespace IFILifeSupport
                 {
                     string TITLE = "IFI Life Support Vessel Status Display ";
 
-                    LifeSupportDisplay.infoWindowPos = GUILayout.Window(99988, LifeSupportDisplay.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    LifeSupportDisplay.infoWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplay.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                 }
                 else
                     if (HighLogic.LoadedSceneIsEditor)
                 {
                     string TITLE = "IFI Life Support Vessel Info ";
 
-                    LifeSupportDisplay.editorInfoWindowPos = GUILayout.Window(99988, LifeSupportDisplay.editorInfoWindowPos, LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    LifeSupportDisplay.editorInfoWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplay.editorInfoWindowPos, LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
             }
@@ -1115,6 +1213,7 @@ namespace IFILifeSupport
                 LS_Status_Width[i] = Math.Max(LS_Status_Width[i], (int)maxWidth);
             lsStatusRow.data[i] = s;
         }
+
         void AddSpacing(int col, int spacing)
         {
             LS_Status_Spacing[col] += spacing;
@@ -1191,9 +1290,9 @@ namespace IFILifeSupport
                     }
                     for (int m = 0; m < part.Modules.Count; m++)
                     {
-                        if (part.Modules[m].moduleName == "ModuleResourceConverter")
+                        if (part.Modules[m].moduleName == "ModuleIFILifeSupport")
                         {
-                            ModuleResourceConverter m1 = (ModuleResourceConverter)part.Modules[m];
+                            ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)part.Modules[m];
                             for (int i = 0; i < m1.inputList.Count; i++)
                             {
                                 ResourceRatio inp = m1.inputList[i];
@@ -1312,19 +1411,19 @@ namespace IFILifeSupport
 
                     GetWidth(ss.stage.ToString(), LOCATION, false, true);
                     GetWidth(ss.crew.ToString(), CREW);
-                    GetWidth(ss.LifeSupport.ToString(), LSAVAIL);
+                    GetWidth((ss.LifeSupport / IFI_Resources.SECS_PER_DAY).ToString("n2"), LSAVAIL);
                     if (ss.crew > 0)
-                        GetWidth((ss.LifeSupport / ss.crew).ToString("n2"), DAYS_REM);
+                        GetWidth(((ss.LifeSupport / IFI_Resources.SECS_PER_DAY) / ss.crew).ToString("n2"), DAYS_REM);
                     else
                         GetWidth("n/a", DAYS_REM);
                     if (LifeSupportDisplay.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
-                        GetWidth(ss.OrganicSlurry.ToString(), SLURRYAVAIL);
+                        GetWidth((ss.OrganicSlurry / IFI_Resources.SECS_PER_DAY).ToString("n2"), SLURRYAVAIL);
                         GetWidth((secsPerDay * ss.SlurryProcessRate).ToString("n2"), SLURRY_DAYS_TO_PROCESS);
                         if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
                         {
                             GetWidth((secsPerDay * ss.SludgeOutputRate).ToString("n2"), SLUDGE_OUTPUT_RATE);
-                            GetWidth(ss.Sludge.ToString(), SLUDGEAVAIL);
+                            GetWidth((ss.Sludge / IFI_Resources.SECS_PER_DAY).ToString(), SLUDGEAVAIL);
                             if (ss.SludgeProcessRate > 0)
                                 GetWidth((secsPerDay * ss.SludgeProcessRate).ToString("n2"), SLUDGE_PROCESS_RATE);
                             else
@@ -1339,7 +1438,7 @@ namespace IFILifeSupport
 
 
             GUILayout.BeginVertical();
-            Log.Info("Displaying headers");
+            //Log.Info("Displaying headers");
 
             GUILayout.BeginHorizontal();
             for (int i = 0; i < MAX_STATUSES; i++)
@@ -1347,7 +1446,7 @@ namespace IFILifeSupport
                 LS_Status_Width[i] += LS_Status_Spacing[i];
                 if (LS_Status_Cache[0].data[i] != null)
                 {
-                    Log.Info("i: " + LS_Status_Cache[0].data[i]);
+                    //Log.Info("i: " + LS_Status_Cache[0].data[i]);
                     string txt = LS_Status_Cache[0].data[i];
 
                     GetColorized(i, ref txt);
@@ -1388,12 +1487,15 @@ namespace IFILifeSupport
                 GetStageSummary();
             }
             GUILayout.FlexibleSpace();
-            b = GUILayout.Toggle(LifeSupportDisplay.ShowRecyclers, "Show Recyclers");
-            if (b != LifeSupportDisplay.ShowRecyclers)
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
-                LifeSupportDisplay.ShowRecyclers = b;
-                Editor.Instance.DefineFilters();
-                LifeSupportDisplay.ReinitEditorInfoWindowPos();
+                b = GUILayout.Toggle(LifeSupportDisplay.ShowRecyclers, "Show Recyclers");
+                if (b != LifeSupportDisplay.ShowRecyclers)
+                {
+                    LifeSupportDisplay.ShowRecyclers = b;
+                    Editor.Instance.DefineFilters();
+                    LifeSupportDisplay.ReinitEditorInfoWindowPos();
+                }
             }
             //GUILayout.FlexibleSpace();
             //GUILayout.Button(">>", GUILayout.Width(22), GUILayout.Height(22));
@@ -1478,7 +1580,7 @@ namespace IFILifeSupport
             }
 
             GUILayout.BeginVertical();
-            Log.Info("Displaying headers");
+            //Log.Info("Displaying headers");
 
             GUILayout.BeginHorizontal();
             for (int i = 0; i < MAX_STATUSES; i++)
@@ -1486,7 +1588,7 @@ namespace IFILifeSupport
                 LS_Status_Width[i] += LS_Status_Spacing[i];
                 if (LS_Status_Cache[0].data[i] != null)
                 {
-                    Log.Info("i: " + LS_Status_Cache[0].data[i]);
+                    //Log.Info(i + ": " + LS_Status_Cache[0].data[i]);
                     string txt = LS_Status_Cache[0].data[i];
 
                     GetColorized(i, ref txt);
@@ -1539,6 +1641,10 @@ namespace IFILifeSupport
             }
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
+            if (GUI.Button(new Rect(LifeSupportDisplay.infoWindowPos.width - 18, 3f, 15f, 15f), new GUIContent("X")))
+            {
+                toolbarControl.SetFalse(true);
+            }
             GUI.DragWindow();
         }
 

@@ -435,7 +435,7 @@ namespace RequiredExperiments
 
         string[] biomeAr = null;
 
-        const string MODTITLE = "Required Experiments";
+        const string MODULETITLE = "Required Experiments";
 
 
         // private IEnumerator coroutine;
@@ -581,7 +581,7 @@ namespace RequiredExperiments
                 var s = part.partInfo.moduleInfos[idx];
                 Log.Info("ModuleInfo, name: " + s.moduleName);
                 Log.Info("s: " + s.ToString());
-                if (s.moduleName == MODTITLE)
+                if (s.moduleName == MODULETITLE)
                 {
                     Log.Info("Updating info for ModuleRequiredExperiment");
                     s.info = GetInfo();
@@ -594,10 +594,10 @@ namespace RequiredExperiments
                 var s = new AvailablePart.ModuleInfo
                 {
                     info = GetInfo(),
-                    moduleName = MODTITLE,
-                    moduleDisplayName = MODTITLE
+                    moduleName = MODULETITLE,
+                    moduleDisplayName = MODULETITLE
                 };
-                Log.Info("Adding info: " + MODTITLE + ",   " + info);
+                Log.Info("Adding info: " + MODULETITLE + ",   " + info);
                 part.partInfo.moduleInfos.Add(s);
             }
             //CheckExperiments();
@@ -998,7 +998,7 @@ namespace RequiredExperiments
                     {
                         inCurrentBody = true;
                         inCurrentBiome = false;
-                        if (celst[c].biome == currentBiome)
+                        if (celst[c].biome == currentBiome || curExpSituation == ExperimentSituations.InSpaceHigh || curExpSituation == ExperimentSituations.InSpaceLow)
                         {
                             inCurrentBiome = true;
                             inCurrentSit = false;
@@ -1012,7 +1012,7 @@ namespace RequiredExperiments
                 }
                 if (!inCurrentBody)
                     SetStatusReason("Experiment not done in current body");
-                if (!inCurrentBiome)
+                if (!inCurrentBiome && curExpSituation != ExperimentSituations.InSpaceHigh && curExpSituation != ExperimentSituations.InSpaceLow)
                     SetStatusReason("Experiment not done in current Biome");
                 if (!inCurrentSit)
                     SetStatusReason("Experiment not done in current situation");
@@ -1301,7 +1301,7 @@ namespace RequiredExperiments
 
         public string GetModuleTitle()
         {
-            return MODTITLE;
+            return MODULETITLE;
         }
         public Callback<Rect> GetDrawModulePanelCallback()
         {

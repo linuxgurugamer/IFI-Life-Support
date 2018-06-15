@@ -19,12 +19,16 @@ namespace IFILifeSupport
         public static double GetRate()
         {
             double Hold_Rate = 0.0;
-            
-            Hold_Rate = GetTechRate();
+ 
+            Hold_Rate = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal *  GetTechRateAdjustment();
+            Hold_Rate *= 0.975;  // this is to adjust for roundoff errors
+            Log.Info("GetRate, Hold_Rate: " + Hold_Rate);
             return Hold_Rate;
         }
-        private static double GetTechRate()
+
+        private static double GetTechRateAdjustment()
         {
+            return 1;
             double Adjustment = 1.00;
             if (ResearchAndDevelopment.Instance != null)
             {
@@ -36,8 +40,8 @@ namespace IFILifeSupport
                 else if (ResearchAndDevelopment.GetTechnologyState("scienceTech") == RDTech.State.Available)
                 { Adjustment = 1.00; }
             }
-            Log.Info("GetRate, Rate_Per_Kerbal: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal + ", Adjustment: " + Adjustment);
-            return HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal * Adjustment;
+            Log.Info("GetTechRateAdjustment: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal + ", Adjustment: " + Adjustment);
+            return Adjustment;
         }
 
 
@@ -57,9 +61,6 @@ namespace IFILifeSupport
             if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
                 active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoPressure)
                 return true;
-
-//            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 3250)
-//                return true;
 
             return false;
         }

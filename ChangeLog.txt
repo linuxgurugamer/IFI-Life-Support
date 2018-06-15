@@ -80,10 +80,38 @@
 	Fixed technology level of science parts
 	Added info display to tech tree and in editor
 
-TODO
+3.4.5
+	Fixed background processing of resource converters
 
-	Continue optimizations:
-		search for "foreach"
-		Start at ModuleRequiredExperiment
-	Final optimization step:
-		Rescan for "foreach" verify proper vars are used
+3.4.5.1
+	Restored processing of resource converters in the active vessel
+
+3.4.5.2
+	Remove extra line which was causing too many LS to be used
+
+3.4.5.3
+	Added ClickThroughBlocker
+	Added screen message when timewarp is cancelled
+	Fixed bug where biomes were affecting experiments in space.  Now, low or high space ignore biomes
+	Replaced ModuleResourceProcessing with ModuleIFILifeSupport (was losig resources due to floating point errors)
+	Fixed path error in Parts/Storage/tanks_round/*.cfg
+	Updated tech tree icon for Extreme Biosystems Engineering with working transparency
+		*** Users need to delete the following file before updating:
+			GameData/Squad/Resources/RDSimpleIcons/advtank2.jpg
+	Removed unnecessary FOR from tech tree cfg
+	Fixed animation stopping after a single cycle for the Aquatic greenhouse
+	Fixed surface attachment setting for the BSS experiment
+	Added support for ToolbarController & Blizzy Toolbar
+	Added option to use Blizzy to settings
+	Added "X" button to close the window
+
+3.4.6.0
+	Added interval timer to IFILifeSupport part module, now only checks once every 3 seconds
+	Added Life support info to the editor for the greenhouses
+	Fixed Slurry rate in the display of all vessels
+	Fixed LifeSUpportTracking when in flight scene
+
+	Beta 1 for 1.4
+	multiplied internal representation of LS by 21600
+	Added configs to preserve the external representation
+	Updated code to work with the 21600 (SECS_PER_DAY)
