@@ -104,9 +104,15 @@ start /D D:\Users\jbb\github\IFI-Life-Support /WAIT deploy.bat  $(TargetDir) $(T
 
 
 
+
+
 if $(ConfigurationName) == Release (
 
-start /D D:\Users\jbb\github\IFI-Life-Support /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+
+     start /D D:\Users\jbb\github\IFI-Life-Support /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+
 
 )
 </PostBuildEvent>

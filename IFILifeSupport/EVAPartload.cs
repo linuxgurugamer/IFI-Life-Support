@@ -107,8 +107,8 @@ namespace IFILifeSupport
                     PartResource pr = action.to.Resources[i];
                     if (pr.resourceName.Equals(Constants.LIFESUPPORT))
                     {
-                        pr.amount = pr.maxAmount;
-                        resourceRequest += pr.maxAmount;
+                        pr.amount = pr.maxAmount * IFI_Resources.SECS_PER_DAY;
+                        resourceRequest += pr.maxAmount * IFI_Resources.SECS_PER_DAY;
                     }
 
 

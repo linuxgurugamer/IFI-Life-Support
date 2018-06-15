@@ -29,6 +29,7 @@ namespace IFILifeSupport
         private static double GetTechRateAdjustment()
         {
             return 1;
+#if false
             double Adjustment = 1.00;
             if (ResearchAndDevelopment.Instance != null)
             {
@@ -42,6 +43,7 @@ namespace IFILifeSupport
             }
             Log.Info("GetTechRateAdjustment: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal + ", Adjustment: " + Adjustment);
             return Adjustment;
+#endif
         }
 
 

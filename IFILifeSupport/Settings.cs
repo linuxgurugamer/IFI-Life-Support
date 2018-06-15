@@ -67,6 +67,11 @@ namespace IFILifeSupport
             toolTip = "If enabled, then the Organic Slurry and Sludge (if applicable) will be shown in the resource panels of parts")]
         public bool showInResourcePanel = false;
 #endif
+
+        [GameParameters.CustomIntParameterUI("Update Frequency", minValue = 1, maxValue = 5)]
+        public int refreshInterval = 1;
+
+
         public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
             {

@@ -288,8 +288,7 @@ namespace RequiredExperiments
         [KSPField]
         public string biomes = ""; // comma seperated field
 
-        [KSPField]
-        public float refreshInterval = 3;  // seconds
+    
 
         // Required Situation
         // default is all situations, this can be overridden by 
@@ -601,7 +600,7 @@ namespace RequiredExperiments
                 part.partInfo.moduleInfos.Add(s);
             }
             //CheckExperiments();
-            InvokeRepeating("Refresh", 0, refreshInterval);
+            InvokeRepeating("Refresh", 0, HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().refreshInterval);
 
             //GameEvents.OnScienceChanged.Add(onScienceChanged);
             //GameEvents.OnScienceRecieved.Add(onScienceReceived);            
