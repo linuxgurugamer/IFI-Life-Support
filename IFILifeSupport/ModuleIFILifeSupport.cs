@@ -4,64 +4,105 @@ using System.Linq;
 using System.Text;
 using KSP.Localization;
 using UnityEngine;
-using KSP;
-
+using static IFILifeSupport.RegisterToolbar;
 
 namespace IFILifeSupport
 {
-    public class ModuleIFILifeSupport : BaseConverter, IModuleInfo
+    public class ModuleIFILifeSupport :  PartModule , IModuleInfo
     {
-        double IFITimer = 0;
-        int IFITIM = 0;
-        private bool Went_to_Main = false;
+        //double IFITimer = 0;
+        public List<ResourceRatio> inputList;
+        public List<ResourceRatio> outputList;
 
-        // LS values are way too small for the normal resource converter to work with properly
-        // so no recipe, it's handled inside this module
-        // This is really here to avoid annoying warning messages from the BaseConverter
-        //
-        protected override ConversionRecipe PrepareRecipe(double deltatime)
+        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
+        public string ConverterName = "converter";        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
+        public bool requiresAllInputs = true;
+        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
+        public bool isAlwaysActive = false;
+        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
+        public bool AutoShutdown = true;
+
+        public bool IsActivated = false;
+
+        const string INPUT = "INPUT_RESOURCE";
+        const string OUTPUT = "OUTPUT_RESOURCE";
+
+        public bool ModuleIsActive()
         {
-            return null;
+            IsActivated = (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER);
+            return IsActivated;
+        }
+        public override void OnLoad(ConfigNode node)
+        {
+            
+            inputList = new List<ResourceRatio>();
+            outputList = new List<ResourceRatio>();
+
+            if (node.HasNode(INPUT))
+            {
+                foreach (ConfigNode dataNode in node.GetNodes(INPUT))
+                {
+                    ResourceRatio rr = new ResourceRatio();
+                    rr.Load(dataNode);
+                    inputList.Add(rr);
+                }
+            }
+
+            if (node.HasNode(OUTPUT))
+            {
+                foreach (ConfigNode dataNode in node.GetNodes(OUTPUT))
+                {
+                    ResourceRatio rr = new ResourceRatio();
+                    rr.Load(dataNode);
+                    outputList.Add(rr);
+                }
+            }
         }
 
 
         void Start()
         {
             Log.Info("ModuleIFILifeSupport.Start");
-            IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
-            CancelInvoke();
-            InvokeRepeating("calcLS", 1, 1);
+            //IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
+            // CancelInvoke();
+            lastUpdateTime = Planetarium.GetUniversalTime();
+            InvokeRepeating("calcLS", 0, HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().refreshInterval);
         }
 
+        double lastUpdateTime;
+
+#if true
         void calcLS()
         {
-            IFITIM++;
-            if (!HighLogic.LoadedSceneIsEditor && (IFITIM > 3 || TimeWarp.CurrentRate > 800))
+            if (!HighLogic.LoadedSceneIsEditor && 
+                (Planetarium.GetUniversalTime()-lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval || TimeWarp.CurrentRate > 800))
             {
                 Life_Support_Update();
-                IFITIM = 0;
+                lastUpdateTime = Planetarium.GetUniversalTime();
             }
 
         }
-
+#endif
+#if true
         private double IFI_Get_Elasped_Time()
         {
             double CurrTime = Planetarium.GetUniversalTime();
             if (Time.timeSinceLevelLoad < 1f || !FlightGlobals.ready)
             {
-                IFITimer = CurrTime;
+                lastUpdateTime = Planetarium.GetUniversalTime();
             }
 
-            double IHOLD = CurrTime - IFITimer;
+            double IHOLD = CurrTime - lastUpdateTime;
 
-            IFITimer = CurrTime;
+            lastUpdateTime = Planetarium.GetUniversalTime();
             return IHOLD;
         }
+#endif
 
-
-
+#if true
         void Life_Support_Update()
         {
+#if false
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
             {
                 Log.Info("Life_Support_Update, Went_To_Main");
@@ -73,14 +114,15 @@ namespace IFILifeSupport
                 IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
                 Went_to_Main = false;
             }
-
+#endif
             double Elapsed_Time = IFI_Get_Elasped_Time();
 
-            double[] inputResource = new double[10];
-            double[] usedInputResource = new double[10];
-            double[] outputResource = new double[10];
+            
+            double[] inputResource = new double[10];        // How much is needed for ElapsedTime
+            double[] usedInputResource = new double[10];    // How much is available, never more than inputResource
+            double[] outputResource = new double[10];       
 
-            double minPercent = 1;
+            double[] minPercent = new double[10];
             Log.Info("Life_Support_Update, Elapsed_Time: " + Elapsed_Time + ",   lastUpdateTime: " + lastUpdateTime);
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
@@ -93,22 +135,25 @@ namespace IFILifeSupport
                     {
                         inputResource[i] = inputList[i].Ratio * Elapsed_Time;
                         usedInputResource[i] = this.part.RequestResource(inputList[i].ResourceName, inputResource[i]);
-                        minPercent = Math.Min(minPercent, usedInputResource[i] / inputResource[i]);
+                        minPercent[i] = Math.Min(1, usedInputResource[i] / inputResource[i]);
                         Log.Error("Input Resource: " + inputList[i].ResourceName + ",  amount requested: " + inputResource[i] + ", amount unavailable: " + (inputResource[i] - usedInputResource[i]));
+                        Log.Error("minPercent: " + minPercent[i]);
                     }
-                    Log.Error("minPercent: " + minPercent);
+                   
                     for (int i = 0; i < this.outputList.Count; i++)
                     {
-                        outputResource[i] = -1 * outputList[i].Ratio * Elapsed_Time * minPercent;
+                        outputResource[i] = -1 * outputList[i].Ratio * Elapsed_Time * minPercent[i];
                         this.part.RequestResource(outputList[i].ResourceName, outputResource[i]);
                         Log.Error("Output Resource (should be negative): " + outputList[i].ResourceName + ", amount: " + outputResource[i]);
                     }
-                    if (minPercent < 1)
+
+
+                    for (int i = 0; i < this.inputList.Count; i++)
                     {
-                        for (int i = 0; i < this.inputList.Count; i++)
+                        if (minPercent[i] < 1)
                         {
                             double percentUsed = (usedInputResource[i] / inputResource[i]);
-                            double percentToreturn = minPercent - percentUsed;
+                            double percentToreturn = minPercent[i] - percentUsed;
                             this.part.RequestResource(inputList[i].ResourceName, percentToreturn * inputResource[i]);
                             Log.Error("Returning Resource: " + inputList[i].ResourceName + ", amount: " + percentToreturn * inputResource[i]);
                         }
@@ -118,8 +163,10 @@ namespace IFILifeSupport
 
             }
         }
-        #region info
-        const string MODULETITLE = "IFI Life Support";
+#endif
+
+            #region info
+            const string MODULETITLE = "IFI Life Support";
         string info = "";
         void AddToInfo(string s)
         {
@@ -156,14 +203,16 @@ namespace IFILifeSupport
             info = "";
 
             AddToInfo("Inputs:");
+            if (inputList != null)
             for (int i = 0; i < this.inputList.Count; i++)
             {
                 AddToInfo("     " + inputList[i].ResourceName + ": " + ResourceRatioToString(inputList[i].Ratio));
             }
             AddToInfo("Outputs:");
+            if (outputList != null)
             for (int i = 0; i < this.outputList.Count; i++)
             {
-                AddToInfo("     " + outputList[i].ResourceName + ": " + ResourceRatioToString(outputList[i].Ratio));
+                AddToInfo("     " + outputList[i].ResourceName + ": " + ResourceRatioToString(outputList[i].Ratio) + ", DumpExcess : " + outputList[i].DumpExcess);
             }
 
             return info;
@@ -173,7 +222,7 @@ namespace IFILifeSupport
         {
             return MODULETITLE;
         }
-        public override string GetModuleDisplayName()
+        public  override string GetModuleDisplayName()
         {
             return Localizer.Format(MODULETITLE);
         }
@@ -187,6 +236,6 @@ namespace IFILifeSupport
         {
             return "Missing LS";
         }
-        #endregion
+#endregion
     }
 }

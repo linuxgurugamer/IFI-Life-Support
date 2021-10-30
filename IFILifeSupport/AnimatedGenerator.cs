@@ -1,10 +1,10 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using KSP.Localization;
 using UnityEngine;
-using KSP;
+using static IFILifeSupport.RegisterToolbar;
 
 /// <summary>
 /// This was lifted from the BioMass mod to support the parts copied from BioMass
@@ -110,3 +110,5 @@ namespace IFILifeSupport
         }
     }//END AnimatedGenerator
 }
+
+#endif

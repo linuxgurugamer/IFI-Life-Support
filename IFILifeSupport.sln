@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFILifeSupport", "IFILifeSupport\IFILifeSupport.csproj", "{CCB42DBA-0CA5-4EAE-AADA-B574E816FD35}"
 EndProject
@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release files", "Release fi
 		GameData\IFILS\CCT.cfg = GameData\IFILS\CCT.cfg
 		GameData\IFILS\Resources\IFI_TechTree.cfg = GameData\IFILS\Resources\IFI_TechTree.cfg
 		GameData\IFILS\MM_Patches\ModuleManager_ADD_IFI.cfg = GameData\IFILS\MM_Patches\ModuleManager_ADD_IFI.cfg
+		ModuleManager_ADD_IFI.cfg = ModuleManager_ADD_IFI.cfg
 	EndProjectSection
 EndProject
 Global

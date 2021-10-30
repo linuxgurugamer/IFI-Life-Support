@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using KSP.IO;
-using KSP;
+using static IFILifeSupport.RegisterToolbar;
 
 
 namespace IFILifeSupport
@@ -13,6 +12,8 @@ namespace IFILifeSupport
     {
 
         public bool initialized = false;
+        double lastUpdateTime;
+
         public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } } // Make sure LS remaining Display conforms to Kerbin time setting.
 
         // Right Click Info display for Part
@@ -25,7 +26,7 @@ namespace IFILifeSupport
         [KSPField(guiActive = false, isPersistant = true)]
         public bool RescueFlag;
 
-        private int IFITIM = 0;
+        //private int IFITIM = 0;
 
 #if !DEBUG
         // Debug Button for right click info - TO BE removed after testing.
@@ -58,7 +59,7 @@ namespace IFILifeSupport
                    info += "\nLife Support: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
                 if (partResource.resourceName == Constants.SLURRY)
                     info += "\nSlurry: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
-                if (partResource.resourceName == Constants.SLUDGE)
+                if (partResource.resourceName == Constants.SLURRY)
                     info += "\nSludge: " + partResource.amount / SECS_PER_DAY + " / " + partResource.maxAmount / SECS_PER_DAY;
             }
             return info;
@@ -72,14 +73,15 @@ namespace IFILifeSupport
 
         public override void OnUpdate()
         {
-            IFITIM++;
-            Log.Info("OnUpdate, IFITIM: " + IFITIM);
-            if (!HighLogic.LoadedSceneIsEditor && (IFITIM > 3 || TimeWarp.CurrentRate > 800))
+            // Log.Info("OnUpdate, IFITIM: " + IFITIM);
+            if (!HighLogic.LoadedSceneIsEditor &&
+                (Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval  || TimeWarp.CurrentRate > 800))
             {
                 Life_Support_Update();
-                IFITIM = 0;
+                lastUpdateTime = Planetarium.GetUniversalTime();
             }
         }
+
         void Life_Support_Update()
         { 
 #if !DEBUG

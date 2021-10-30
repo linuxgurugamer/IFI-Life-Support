@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 using UnityEngine;
-using KSP.IO;
+using static IFILifeSupport.RegisterToolbar;
 
 
 
@@ -56,15 +56,15 @@ namespace IFILifeSupport
                 Debug.Log(" IFI Preload LS EVA Actions Set ++++ ");
                 GameEvents.onCrewOnEva.Remove(OnCrewOnEva11);
                 GameEvents.onCrewOnEva.Add(OnCrewOnEva11);
-                GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel11);
-                GameEvents.onCrewBoardVessel.Add(OnCrewBoardVessel11);
+                GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel);
+                GameEvents.onCrewBoardVessel.Add(OnCrewBoardVessel);
             }
             
         }
 
 
 
-        private void OnCrewBoardVessel11(GameEvents.FromToAction<Part, Part> action)
+        private void OnCrewBoardVessel(GameEvents.FromToAction<Part, Part> action)
         {
             IFIDebug.IFIMess(" IFI DEBUG -- OnCrewBoardVessel fired ----");
             double IFIResourceAmt = 0.0;
@@ -107,8 +107,8 @@ namespace IFILifeSupport
                     PartResource pr = action.to.Resources[i];
                     if (pr.resourceName.Equals(Constants.LIFESUPPORT))
                     {
-                        pr.amount = pr.maxAmount * IFI_Resources.SECS_PER_DAY;
-                        resourceRequest += pr.maxAmount * IFI_Resources.SECS_PER_DAY;
+                        pr.amount = pr.maxAmount ;
+                        resourceRequest += pr.maxAmount ;
                     }
 
 
@@ -121,7 +121,7 @@ namespace IFILifeSupport
             //IFIResElectric = resourceRequest * 1.5;
             //IFIResElectric -= IFIResReturn;
             IFIResReturn = 0.0;
-            IFIResReturn = action.from.RequestResource(Constants.LIFESUPPORT , resourceRequest);
+            IFIResReturn = action.from.RequestResource(Constants.LIFESUPPORT, resourceRequest);
             resourceRequest -= IFIResReturn;
             resourceRequest = action.to.RequestResource(Constants.LIFESUPPORT, resourceRequest);
             IFIDebug.IFIMess("IFI Life Support Message: EVA - Started - " + action.to.name + " Exited Vessel - Took " + Convert.ToString(IFIResReturn) + " Life Support  and " + Convert.ToString(IFIResElectric) + " Electric Charge ");

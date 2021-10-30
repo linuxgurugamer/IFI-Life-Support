@@ -1,0 +1,75 @@
+Interstellar Flight Inc. Life Support
+
+
+IFI Life Support is designed to provide an enjoyable life support experience without making it complicated. There is one main resource called LifeSupport, and, in the advanced modes, there are two more, OrganicSlurry and Sludge. The only resource you really need to deal with in all modes is the LifeSupport resource, the other resources are there for the mechanics, and, while you can store them in tanks and move them around, there isn’t a lot to do with them.
+
+The mod is designed so that you can switch between the different modes of operation at any time without causing problems. So, you can start off at the Classic mode, and over time change it to Enhanced, Advanced and Extreme. If you feel that the higher modes are too difficult, you can easily change it back to a lower mode. Any existing ships will continue to operate in the mode they were designed in; ie: If you have a ship/colony which is using the Enhanced mode and has greenhouses, and then switch back to Classic, the greenhouses will continue to work, etc.
+
+Requirements
+IFI-LS requires the following mods:
+* Community Category Kit
+* Community Resource Pack
+* ModuleManager
+
+IFI Life Support has 4 modes of operation:
+
+Classic
+Only the LifeSupport resource is available. Each unit of Life-Support should provide 1 Kerbin Day (6 hours) of Life support for 1 Kerbal when in space, see below for details on the operation info
+
+Enhanced
+This introduces the OrganicSlurry resource and greenhouses. When a Kerbal uses LifeSupport, the output is OrganicSlurry, produced at a 1:1 ratio; in other words, if a Kerbal uses 1 unit of LifeSupport, a unit of OrganicSlurry will be produced.
+Greenhouses are able to convert most of the OrganicSlurry back into LifeSupport, at a 90% efficiency. Tanks are also provided which can store Organic Slurry.
+
+Advanced
+This introduces the Sludge resource, and the MicroBiome and AlgaeHouse. The 10% of the
+LifeSupport resource which the greenhouses are unable to recycle create Sludge. The MicroBiome
+and AlgaeHouse are able to take that Sludge and convert it back into LifeSupport. The efficiency is
+100%, although slow. As usual, tanks are provided which can store the Sludge.
+
+Extreme
+This mode doesn’t introduce any new resources, but there are some new parts: the Circular Intake, the Cryogenic Air Separator and the BioReactor. The functionality is described, but the resources they deal with are totally hidden:
+* The Circular Intake pulls in outside atmosphere and filters out everything except Oxygen, and then
+feeds that into the Cryogenic Air Separator.
+* The Cryogenic Air Separator takes that Oxygen and converts it into compressed O2, and then feeds
+that into the BioReactor
+* The BioReactor takes in the compressed O2, Sludge and Ore (stock Ore), and produces more
+* LifeSupport as output than was taken in as Sludge.
+
+All of the active parts also need EC to operate.
+
+Experiments and Parts
+All crewed parts automatically have enough life support for 3 days with a full crew. If you don’t put a full crew on, the life support will last longer.
+The Greenhouses, MicroBiome, AlgaeHouse and BioReactor all need some experiments to be run before they will work. The experiment needs to be run in the biome where the parts are working. So, if you run the Biological systems Study in orbit:
+* The greenhouses need to have the experiment: BSS-1 (Biological Systems Study-1) to be run
+* The AlgaeHouse and BioReactor need the experiment BSS-G (Biological Systems Study-Goo)
+* The BioReactor needs the Biosphere Containment Study experiment run
+
+Operation Info :
+Currently there are several Status LS system can be in:
+* Pod Standby - No demand for LS and no resources consumed. Life Support tag for days / hours of LS remaining is hidden.
+* Active - Demand for LS and resources consumed. Life Support tag for days / hours of LS remaining will read how long LS will last for whole vessel.
+* Visor - Kerbal on EVA breathing outside air decreased Resource consumption. Life Support tag for days / hours of LS remaining will read how much LS remains once active again (fixing).
+* Intake Air - Pod using air intakes to provide O2 to crew - decreased Resource consumption.  Life Support tag for days / hours of LS remaining will read how much LS remains once active again.
+* CAUTION - Less than 2 days pod or 1 hour EVA of LS remaining. Life Support tag for days / hours of LS remaining will read how long LS will last for whole vessel.
+* Warning! - LS at 0. Kerbals will start dying if immediate action not taken. Life Support tag for days / hours of LS remaining will read 0. There is a setting to prevent Kerbals from dying.
+
+Each unit of Life-Support should provide 1 Kerbin Day (6 hours) of Life support for 1 Kerbal. In Career and Science game modes this goes up and down based on Tech tree.
+
+Tech Tree
+
+All parts are included in a new branch of the stock tech tree. This branch appears at the bottom of the screen when you are displaying the tech tree.  The Community Tech Tree is also supported
+
+Settings
+The settings page uses the stock settings page, to get to it, hit Escape, select Settings, click the Difficulty Options button, and then click the IFI Life Support button in the left column.
+There are two columns on the settings page. The first column selects the mode which you want the mod to operate in, one of Basic, Improved, Advanced or Extreme.
+The second column has the various adjustable values for the mod. At the top of the column you will see four toggles: Easy, Normal, Moderate and Hard. Selecting one of these will set all the values below to the defaults for that difficulty level. These levels are automatically set when you create a new game based on the game difficulty, these are here to make it easy to switch the mod between the different levels.
+Below the toggles are sliders for the various multipliers.
+* LS rate per day
+* Breathable Atmo pressure (min allowed)
+* Min. Intake Air Atmo Pressure
+* Breathable Homeworld Atmo adj, reduces the LS usage when on the homeworld
+* Breathable Atmo adj, reduces the LS usage when on a planet with Oxygen
+* Low EC Adj, when not enough EC, LS usage is increased
+
+Mod uses the time as set in settings menu so it will track 6 or 24 hour days depending on setting in main menu. Days remaining on RT click menu are accurate based on this setting. Only change in mod is that if not using kerbin time each Kerbal requires 4 units of LS per day.
+

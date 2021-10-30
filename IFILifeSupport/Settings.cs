@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
+using static IFILifeSupport.RegisterToolbar;
 
 
 namespace IFILifeSupport
@@ -20,13 +21,13 @@ namespace IFILifeSupport
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return true; } }
 
+        [GameParameters.CustomParameterUI("Use KSP skin")]
+        public bool useKSPskin = true;
 
-        [GameParameters.CustomParameterUI("Use Blizzy Toolbar", toolTip = "If available (will require scene change to activate)")]
-        public bool useBlizzy = false;
 
         [GameParameters.CustomParameterUI("Classic Life Support",
             toolTip ="Basic life support, no recycling of any kind.")]
-#if true
+#if false
         public bool classic = true;
         bool oldClassic = false;
 
@@ -68,9 +69,10 @@ namespace IFILifeSupport
         public bool showInResourcePanel = false;
 #endif
 
-        [GameParameters.CustomIntParameterUI("Update Frequency", minValue = 1, maxValue = 5)]
-        public int refreshInterval = 1;
+        [GameParameters.CustomIntParameterUI("Update Frequency (secs)", minValue = 15, maxValue = 300)]
+        public int refreshInterval = 15;
 
+        public float RefreshInterval {  get { return TimeWarp.CurrentRate * refreshInterval; } }
 
         public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
@@ -85,7 +87,6 @@ namespace IFILifeSupport
 
         void SetLevel(LifeSupportLevel lsl)
         {
-            Log.Info("IFILS1.SetLevel, lsl: " + lsl);
             LifeSupportDisplay.ReinitInfoWindowPos();
             switch (lsl)
             {
@@ -115,7 +116,7 @@ namespace IFILifeSupport
                     break;
             }
 
-#if true
+#if false
             classic = true;
             improved = false;
             advanced = false;
@@ -153,8 +154,14 @@ namespace IFILifeSupport
             }
         }
 
+        bool oldUseKspSkin = true;
         public override bool Enabled(MemberInfo member, GameParameters parameters)
         {
+            if (useKSPskin != oldUseKspSkin)
+            {
+                LifeSupportDisplay.infoWindowPos.height = 100;
+                oldUseKspSkin = useKSPskin;
+            }
             return true;
         }
         public override bool Interactible(MemberInfo member, GameParameters parameters)
@@ -230,8 +237,7 @@ namespace IFILifeSupport
         {
             get
             {
-                return 1;
-                //return lsRatePerDay / 3600 / (GameSettings.KERBIN_TIME ? 6 : 24);
+                return lsRatePerDay / (60* (GameSettings.KERBIN_TIME ? 6 : 24));
             }
         }
 
@@ -250,7 +256,7 @@ namespace IFILifeSupport
         public double breathableAtmoPressure = BREATHABLE_ATMO_PRESSURE;
 
         [GameParameters.CustomFloatParameterUI("Min Intake Air Atmo Pressure", minValue = 9.864f, maxValue = 14.796f, stepCount = 100, displayFormat = "N3",
-            toolTip = "Minimum air pressure needed for the Circular Intable to work")]
+            toolTip = "Minimum air pressure needed for the Circular Intake to work")]
         public double intakeAirAtmoPressure = INTAKE_AIR_ATMO_PRESSURE;
 
         [GameParameters.CustomFloatParameterUI("Breathable Homeworld Atmo Adj", minValue = .16f, maxValue = .24f, stepCount = 100, displayFormat = "N2",
@@ -271,7 +277,7 @@ namespace IFILifeSupport
         [GameParameters.CustomParameterUI("EVA Kerbals can die")]
         public bool EVAkerbalsCanDie = true;
 
-        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying", minValue = 0, maxValue = 3600)]
+        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying (seconds)", minValue = 0, maxValue = 3600)]
         public int inactiveTimeBeforeDeath = 0;
 
 

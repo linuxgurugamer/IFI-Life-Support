@@ -1,19 +1,21 @@
 
 @echo off
 
-set H=R:\KSP_1.4.3_dev
-rem set H=R:\KSP_1.4.3_IFI_Test
+set H=%KSPDIR%
 set GAMEDIR=IFILS
-set DEPEND1=CommunityCategoryKit
+set GAMEDATA="GameData"
+
+rem set DEPEND1=CommunityCategoryKit
 set DEPEND2=Squad
-set DEPEND3=CommunityResourcePack
+rem set DEPEND3=CommunityResourcePack
+set VERSIONFILE=%GAMEDIR%.version
 
 echo %H%
 
-copy /Y "%1%2" "GameData\%GAMEDIR%\Plugins"
-copy /Y %GAMEDIR%.version GameData\%GAMEDIR%
+copy /Y "%1%2" "%GAMEDATA%\%GAMEDIR%\Plugins"
+copy /Y "%1%3".pdb "%GAMEDATA%\%GAMEDIR%\Plugins"
+copy /Y %VERSIONFILE% %GAMEDATA%\%GAMEDIR%
 
 xcopy /y /s /I GameData\%GAMEDIR% "%H%\GameData\%GAMEDIR%"
-xcopy /y /s /I GameData\%DEPEND1% "%H%\GameData\%DEPEND1%"
-xcopy /y /s /I GameData\%DEPEND2% "%H%\GameData\%DEPEND2%"
-xcopy /y /s /I GameData\%DEPEND3% "%H%\GameData\%DEPEND3%"
+rem xcopy /y /s /I GameData\%DEPEND2% "%H%\GameData\%DEPEND2%"
+

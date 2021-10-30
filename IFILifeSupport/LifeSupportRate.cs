@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using System.Threading.Tasks;
 using UnityEngine;
-using KSP.IO;
-using KSP;
+using static IFILifeSupport.RegisterToolbar;
 
 namespace IFILifeSupport
 {
@@ -13,15 +11,14 @@ namespace IFILifeSupport
     {
         //private static double Rate_Per_Kerbal = 0.000046;
 
-       // private static double Rate_Per_Kerbal = HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal;
+        // private static double Rate_Per_Kerbal = HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal;
 
-
+       
         public static double GetRate()
         {
             double Hold_Rate = 0.0;
  
             Hold_Rate = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal *  GetTechRateAdjustment();
-            Hold_Rate *= 0.975;  // this is to adjust for roundoff errors
             Log.Info("GetRate, Hold_Rate: " + Hold_Rate);
             return Hold_Rate;
         }

@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using KSP.IO;
-using KSP;
 using KSP.UI.Screens;
-using KSP.UI;
 
 using UnityEngine.SceneManagement;
+using static IFILifeSupport.RegisterToolbar;
 
 
 namespace IFILifeSupport
 {
-
-
-
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     class Editor : MonoBehaviour
     {
@@ -174,8 +169,8 @@ namespace IFILifeSupport
         {
             if (LifeSupportDisplay.LSDisplayActive)
             {
-                IFI_LIFESUPPORT_TRACKING.Instance.ClearStageSummaryList();
-                IFI_LIFESUPPORT_TRACKING.Instance.GetStageSummary();
+                IFILS_Main.lsTracking.ClearStageSummaryList();
+                IFILS_Main.lsTracking.GetStageSummary();
             }
         }
 
@@ -215,8 +210,8 @@ namespace IFILifeSupport
                     a == ConstructionEventType.PartDeleted)
                 {
 
-                    IFI_LIFESUPPORT_TRACKING.Instance.ClearStageSummaryList();
-                    IFI_LIFESUPPORT_TRACKING.Instance.GetStageSummary();
+                    IFILS_Main.lsTracking.ClearStageSummaryList();
+                    IFILS_Main.lsTracking.GetStageSummary();
                 }
             }
         }
