@@ -8,19 +8,18 @@ using static IFILifeSupport.RegisterToolbar;
 
 namespace IFILifeSupport
 {
-    class LifeSupportDisplay
+    class LifeSupportDisplayInfo
     {
 
         //Singleton
+        private static LifeSupportDisplayInfo instance = null;
 
-        private static LifeSupportDisplay instance = null;
-
-        public static LifeSupportDisplay Instance
+        public static LifeSupportDisplayInfo Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new LifeSupportDisplay();
+                    instance = new LifeSupportDisplayInfo();
                 return instance;
             }
         }
@@ -28,7 +27,7 @@ namespace IFILifeSupport
         //Properties
 
         public const float WINDOW_WIDTH_DEFAULT = 100;
-        public const float WINDOW_HEIGHT = 440;
+        public const float WINDOW_HEIGHT = 125;
         public static bool WarpCancel = true;
         public static bool ShowRecyclers = true;
         public static bool LSDisplayActive = false;
@@ -37,9 +36,8 @@ namespace IFILifeSupport
 
         public static Rect statusWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
         public static Rect infoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, 400, 300);
-        public static Rect editorInfoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
-#pragma warning disable CS0649
-        //public static GUILayoutOption[] layoutOptions;
+        public static Rect editorInfoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT / 2);
+
         public static Vector2 infoScrollPos = Vector2.zero;
 
         public static void ReinitInfoWindowPos()

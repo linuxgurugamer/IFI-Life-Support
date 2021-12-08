@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# Default severity for analyzer diagnostics with category 'Minor Code Smell'
+dotnet_analyzer_diagnostic.category-Minor Code Smell.severity = suggestion

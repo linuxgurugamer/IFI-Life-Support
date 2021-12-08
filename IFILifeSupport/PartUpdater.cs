@@ -42,10 +42,11 @@ namespace IFILifeSupport
                 AvailablePart p = PartLoader.LoadedPartsList[i];
 
                 ConfigNode node;
-                if (!Editor.PartShouldBeHidden(p, out node))
+                if (Editor.PartShouldBeHidden(p, out node))
                 {
                     Log.Info("Hiding name: " + p.name + ",   " + p.TechRequired);
                     p.TechRequired = "none";
+                    p.TechHidden = true;
                 }
                 else
                 {
@@ -54,6 +55,7 @@ namespace IFILifeSupport
                         string techRequired = node.GetValue("TechRequired");
 
                         p.TechRequired = techRequired;
+                        p.TechHidden = false;
                         Log.Info("Restoring name: " + p.name + ",   " + p.TechRequired);
                     }
                 }

@@ -64,53 +64,50 @@ namespace IFILifeSupport
         /// <returns></returns>
         static internal bool PartShouldBeHidden(AvailablePart part, out ConfigNode n)
         {
-          
-            n = null;            
+            n = null;
 
             if (part.partConfig == null)
                 return true;
             ConfigNode partNode = part.partConfig;
-            if (partNode != null)
+            var nodes = partNode.GetNodes();
+            for (int i = 0; i < nodes.Count(); i++)
             {
-                var nodes = partNode.GetNodes();
-                for (int i = 0; i < nodes.Count(); i++)
-                //foreach (ConfigNode node in partNode.GetNodes())
+                var node = nodes[i];
+                string s = node.GetValue("name");
+                if (s != null)
                 {
-                    var node = nodes[i];
-                    string s = node.GetValue("name");
-                    if (s != null)
+                    Log.Info("Part: " + part.name + ",   node name: " + s);
+                    n = node;
+
+                    bool b = false;
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.classic && s == "IFI_Improved") // improved
+                        b = true;
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.improved && s == "IFI_Advanced") // advanced
+                        b = true;
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.advanced && s == "IFI_Extreme") // Extreme
+                        b = true;
+
+                    if (HighLogic.LoadedSceneIsEditor && !LifeSupportDisplayInfo.ShowRecyclers &&
+                        (s == "IFI_Improved" || s == "IFI_Advanced" || s == "IFI_Extreme"))
+                        b = true;
+                    if (b)
                     {
-                        //    Log.Info("Part: " + part.name + ",   node name: " + s);
-                        n = node;
+                        Log.Info("Part: " + part.name + " should be hidden, current level: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level +
+                            ", node name: " + s);
 
-
-                        {
-                            bool b = true;
-                            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level <= IFILS1.LifeSupportLevel.classic && s == "IFI_Improved") // improved
-                                b = false;
-                            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level < IFILS1.LifeSupportLevel.advanced && s == "IFI_Advanced") // advanced
-                                b = false;
-                            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level < IFILS1.LifeSupportLevel.extreme && s == "IFI_Extreme") // Extreme
-                                b = false;
-
-                            if (HighLogic.LoadedSceneIsEditor && !LifeSupportDisplay.ShowRecyclers &&
-                                (s == "IFI_Improved" || s == "IFI_Advanced" || s == "IFI_Extreme"))
-                                b = false;
-                            if (!b)
-                                return false;
-                        }
+                        return true;
                     }
                 }
             }
             n = null;
-            return true;
+            return false;
         }
 
         EditorPartListFilter<AvailablePart> filter;
         internal void DefineFilters()
         {
             Log.Info("DefineFilters");
-
+            return;
             if (configs == null)
                 configs = GameDatabase.Instance.GetConfigs("PART");
 
@@ -167,10 +164,10 @@ namespace IFILifeSupport
 
         void UpdateLSDisplay()
         {
-            if (LifeSupportDisplay.LSDisplayActive)
+            if (LifeSupportDisplayInfo.LSDisplayActive)
             {
-                IFILS_Main.lsTracking.ClearStageSummaryList();
-                IFILS_Main.lsTracking.GetStageSummary();
+                IFI_LifeSupportTrackingDisplay.Instance.ClearStageSummaryList();
+                IFI_LifeSupportTrackingDisplay.Instance.GetStageSummary();
             }
         }
 
@@ -188,7 +185,7 @@ namespace IFILifeSupport
         void onEditorShipModified(ShipConstruct sc)
         {
             Log.Info("onEditorShipModified");
-            if (LifeSupportDisplay.LSDisplayActive)
+            if (LifeSupportDisplayInfo.LSDisplayActive)
                 UpdateLSDisplay();
 
         }

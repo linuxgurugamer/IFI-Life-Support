@@ -25,8 +25,9 @@ namespace IFILifeSupport
         public override void OnUpdate()
         {
             base.OnUpdate();
+            if (RegisterToolbar.GamePaused /*("EVAPartModule") */ )
+                return;
             Vessel active = this.part.vessel;
-
             if (active.isEVA == true)
             {
                 IFIDebug.IFIMess("IFILifeSupportEVA.OnUpdate, active.mainBody.name: " + active.mainBody.name +
@@ -40,7 +41,7 @@ namespace IFILifeSupport
                     lifeSupportStatus = "Active";
                 }
                 double ResourceAval = IFIGetAllResources(Constants.LIFESUPPORT);
-                displayRate = (float)((ResourceAval / LifeSupportRate.GetRate())); // / 3600); // 60 / 60);
+                displayRate = (float)((ResourceAval / LifeSupportRate.GetRatePerMinute())); // / 3600); // 60 / 60);
                 if (displayRate >= 0.5 && displayRate <= 1)
                 {
                     lifeSupportStatus = "CAUTION ";

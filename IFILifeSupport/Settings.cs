@@ -42,7 +42,7 @@ namespace IFILifeSupport
 
         public bool showInResourcePanel = false;
 #else
-        public bool classic = false;
+        public bool classic = true;
         bool oldClassic = false;
 
 
@@ -87,7 +87,7 @@ namespace IFILifeSupport
 
         void SetLevel(LifeSupportLevel lsl)
         {
-            LifeSupportDisplay.ReinitInfoWindowPos();
+            LifeSupportDisplayInfo.ReinitInfoWindowPos();
             switch (lsl)
             {
                 case LifeSupportLevel.classic:
@@ -159,7 +159,7 @@ namespace IFILifeSupport
         {
             if (useKSPskin != oldUseKspSkin)
             {
-                LifeSupportDisplay.infoWindowPos.height = 100;
+                LifeSupportDisplayInfo.infoWindowPos.height = 100;
                 oldUseKspSkin = useKSPskin;
             }
             return true;
@@ -233,7 +233,10 @@ namespace IFILifeSupport
         public bool hard = false;
         bool oldHard = false;
 
-        public double Rate_Per_Kerbal
+        //
+        // RatePerKerbalPerMinute returns the amount of LS used in a single minute
+        //
+        public double RatePerKerbalPerMinute
         {
             get
             {
@@ -241,7 +244,7 @@ namespace IFILifeSupport
             }
         }
 
-        [GameParameters.CustomIntParameterUI("Auto Warp Cancelation lead time (days)", minValue = 0, maxValue = 3,
+        [GameParameters.CustomIntParameterUI("Auto Warp Cancellation lead time (days)", minValue = 0, maxValue = 3,
             toolTip = "When warping, if LS drops below the warning level (yellow or red), and number of days before it runs out is less than this value")]
         public int warpCancellationLeadTime = 3;
 
@@ -264,7 +267,7 @@ namespace IFILifeSupport
         public double breathableHomeworldAtmoAdjustment = BREATHABLE_HOMEWORLD_ATMO_ADJUSTMENT;
 
         [GameParameters.CustomFloatParameterUI("Breathable Atmo Adj", minValue = 0.48f, maxValue = 0.72f, stepCount = 100, displayFormat = "N2",
-            toolTip = "Adjustment when on a planet with Oxygen (multiplier)")]
+            toolTip = "Adjustment when on a planet other than the homeworld with Oxygen (multiplier)")]
         public double breathableAtmoAdjustment = BREATHABLE_ATMO_ADJUSTMENT;
 
         [GameParameters.CustomFloatParameterUI("Low EC Adj", minValue = 0.96f, maxValue = 1.44f, stepCount = 100, displayFormat = "N2",
@@ -280,6 +283,9 @@ namespace IFILifeSupport
         [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying (seconds)", minValue = 0, maxValue = 3600)]
         public int inactiveTimeBeforeDeath = 0;
 
+        [GameParameters.CustomParameterUI("Debug mode",
+            toolTip = "Writes reports to the log file ")]
+        public bool Debug = false;
 
 
         void SetValues(double mult)

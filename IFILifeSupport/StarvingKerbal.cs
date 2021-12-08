@@ -32,7 +32,7 @@ namespace IFILifeSupport
         {
 #if true
             StarvingKerbal sk;
-            if (LifeSupportUpdate.starvingKerbals.TryGetValue(IV.rootPart.protoModuleCrew[0].name, out sk))
+            if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(IV.rootPart.protoModuleCrew[0].name, out sk))
             {
                 if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
                 {
@@ -53,7 +53,7 @@ namespace IFILifeSupport
                     MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed to Tourist on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                     MessageSystem.Instance.AddMessage(m);
                     Log.Info("Old experienceTrait: " + iCrew.trait);
-                    LifeSupportUpdate.starvingKerbals.Add(sk.name, sk);
+                    LifeSupportUsageUpdate.starvingKerbals.Add(sk.name, sk);
                     iCrew.type = ProtoCrewMember.KerbalType.Tourist;
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                 }
@@ -120,7 +120,7 @@ namespace IFILifeSupport
 #if true
                 iCrew = p.protoModuleCrew[i];
                 StarvingKerbal sk;
-                if (LifeSupportUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
+                if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
                 {
                     if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
                     {
@@ -131,7 +131,7 @@ namespace IFILifeSupport
                 {
                     sk = new StarvingKerbal(iCrew.name, iCrew.trait);
                     Log.Info("Old experienceTrait: " + iCrew.trait);
-                    LifeSupportUpdate.starvingKerbals.Add(sk.name, sk);
+                    LifeSupportUsageUpdate.starvingKerbals.Add(sk.name, sk);
                     iCrew.type = ProtoCrewMember.KerbalType.Tourist;
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                     IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
@@ -202,7 +202,7 @@ namespace IFILifeSupport
 #if true
                 iCrew = p.protoModuleCrew[i];
                 StarvingKerbal sk;
-                if (LifeSupportUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
+                if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
                 {
                     if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
                     {
@@ -213,7 +213,7 @@ namespace IFILifeSupport
                 {
                     sk = new StarvingKerbal(iCrew.name, iCrew.trait);
                     Log.Info("Old experienceTrait: " + iCrew.trait);
-                    LifeSupportUpdate.starvingKerbals.Add(sk.name, sk);
+                    LifeSupportUsageUpdate.starvingKerbals.Add(sk.name, sk);
                     iCrew.type = ProtoCrewMember.KerbalType.Tourist;
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                     IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);

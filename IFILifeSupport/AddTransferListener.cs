@@ -64,16 +64,15 @@ namespace IFILifeSupport
 
         Part source;
         double maxRequested;
-        string hiddenResource;
         bool transferInProgress = false;
         double lastUT;
 
-        void GetTransferValues(UIPartActionResourceTransfer transfer)
+        void GetTransferValues(UIPartActionResourceTransfer transfer, string resource)
         {
             maxRequested = 0;
             if (t.state == UIPartActionResourceTransfer.FlowState.In)
             {
-                var r = t.Part.Resources[hiddenResource];
+                var r = t.Part.Resources[resource];
                 maxRequested += r.maxAmount;
             }
             if (t.state == UIPartActionResourceTransfer.FlowState.Out)
@@ -84,7 +83,7 @@ namespace IFILifeSupport
             {
                 if (t1.state == UIPartActionResourceTransfer.FlowState.In)
                 {
-                    var r = t1.Part.Resources[hiddenResource];
+                    var r = t1.Part.Resources[resource];
                     maxRequested += r.maxAmount;
                 }
                 if (t1.state == UIPartActionResourceTransfer.FlowState.Out)
@@ -115,9 +114,7 @@ namespace IFILifeSupport
             Log.Info("Transfer.LifesupportResource, res: " + resource);
             if (b)
             {
-                hiddenResource = IFI_Resources.RESOURCES[IFI_Resources.DISPLAY_RESOURCES.IndexOf(resource)];
-                Log.Info("Transfer.LifeSupportResource, hiddenResource: " + hiddenResource);
-                GetTransferValues(t);
+                GetTransferValues(t, resource);
             }
             return b;
         }
@@ -148,7 +145,7 @@ namespace IFILifeSupport
 
         void FixedUpdate()
         {
-            if (transferInProgress && t != null && t.Resource != null && lastUT != t.lastUT && t.state != UIPartActionResourceTransfer.FlowState.None)
+            if (!RegisterToolbar.GamePaused /*("AddTransferListener") */ && transferInProgress && t != null && t.Resource != null && lastUT != t.lastUT && t.state != UIPartActionResourceTransfer.FlowState.None)
             {
                 double timeSlice = t.lastUT - lastUT;
                 Log.Info("timeSlice: " + timeSlice);
@@ -156,18 +153,21 @@ namespace IFILifeSupport
                 double totalTransferred = 0;               
 
                 // Get the available resources for transfer
-                double availResForTransfer = source.RequestResource(hiddenResource, requestAmt, ResourceFlowMode.NO_FLOW);
+                double availResForTransfer = source.RequestResource(t.Resource.resourceName, requestAmt, ResourceFlowMode.NO_FLOW);
+                Log.Info("AddTransferListener.FixedUpdate 1, RequestedResource, part: " + source.partInfo.title + ", availResForTransfer: " + availResForTransfer);
 
                 // now transfer the resources into the new parts.
 
                 if (t.state == UIPartActionResourceTransfer.FlowState.In)
                 { 
-                    double percentageOfTotal = t.Part.Resources[hiddenResource].maxAmount / 20f * timeSlice / requestAmt;
+                    double percentageOfTotal = t.Part.Resources[t.Resource.resourceName].maxAmount / 20f * timeSlice / requestAmt;
                     var amtToTransfer = -1 * availResForTransfer * percentageOfTotal;
                     
-                    var transferredAmt = t.Part.RequestResource(hiddenResource, amtToTransfer, ResourceFlowMode.NO_FLOW);
+                    var transferredAmt = t.Part.RequestResource(t.Resource.resourceName, amtToTransfer, ResourceFlowMode.NO_FLOW);
+                    Log.Info("AddTransferListener.FixedUpdate 2, RequestedResource, part: " + t.Part.partInfo.title + ", transferredAmt: " + transferredAmt);
+
                     totalTransferred += transferredAmt;
-                    //Log.Info("Transfer 1, after: Part: " + t.Part.partInfo.title + ",  amount: " + t.Part.Resources[hiddenResource].amount + ", transferred: " + totalTransferred);
+                    //Log.Info("Transfer 1, after: Part: " + t.Part.partInfo.title + ",  amount: " + t.Part.Resources[t.Resource.resourceName].amount + ", transferred: " + totalTransferred);
                 }
 
 
@@ -176,17 +176,19 @@ namespace IFILifeSupport
                 {
                     if (t1.state == UIPartActionResourceTransfer.FlowState.In)
                     {
-                        double percentageOfTotal = t1.Part.Resources[hiddenResource].maxAmount / 20f * timeSlice / requestAmt;
+                        double percentageOfTotal = t1.Part.Resources[t.Resource.resourceName].maxAmount / 20f * timeSlice / requestAmt;
 
                         var amtToTransfer = -1 * availResForTransfer * percentageOfTotal;
-                        var beforeAmt = t1.Part.Resources[hiddenResource].amount;
+                        var beforeAmt = t1.Part.Resources[t.Resource.resourceName].amount;
 
-                        Log.Info("Transfer 2, before, amount: " + t1.Part.Resources[hiddenResource].amount + ", transferred: " + totalTransferred);
+                        Log.Info("Transfer 2, before, amount: " + t1.Part.Resources[t.Resource.resourceName].amount + ", transferred: " + totalTransferred);
 
-                        var transferredAmt = t1.Part.RequestResource(hiddenResource, amtToTransfer, ResourceFlowMode.NO_FLOW);
+                        var transferredAmt = t1.Part.RequestResource(t.Resource.resourceName, amtToTransfer, ResourceFlowMode.NO_FLOW);
+                        Log.Info("AddTransferListener.FixedUpdate 3, RequestedResource, part: " + t1.Part.partInfo.title + ", transferredAmt: " + transferredAmt);
+
                         totalTransferred += transferredAmt;
-                        //Log.Info("Transfer 2, after:  amount: " + t1.Part.Resources[hiddenResource].amount + ", transferred: " + totalTransferred);
-                        var afterAmt = t1.Part.Resources[hiddenResource].amount;
+                        //Log.Info("Transfer 2, after:  amount: " + t1.Part.Resources[t.Resource.resourceName].amount + ", transferred: " + totalTransferred);
+                        var afterAmt = t1.Part.Resources[t.Resource.resourceName].amount;
                         Log.Info("Transfer 2, after:  amount: " + afterAmt + ", Logged transfer amt: " + transferredAmt + ", actual diff (after - before): " + (afterAmt - beforeAmt));
                         IFI_Resources.UpdatePartInfo(t1.Part);
                     }
@@ -194,9 +196,11 @@ namespace IFILifeSupport
 
                 // Now return the unused resources
                 Log.Info("Transfer Returning, availResources: " + availResForTransfer + ", total transferred: " + totalTransferred + ", returning: " + (availResForTransfer + totalTransferred).ToString());
-                Log.Info("Transfer, before returning avail resources,  amount: " + source.Resources[hiddenResource].amount);
-                source.RequestResource(hiddenResource, -1 * (availResForTransfer + totalTransferred), ResourceFlowMode.NO_FLOW);
-                Log.Info("Transfer, after returning avail resources,  amount: " + source.Resources[hiddenResource].amount);
+                Log.Info("Transfer, before returning avail resources,  amount: " + source.Resources[t.Resource.resourceName].amount);
+                source.RequestResource(t.Resource.resourceName, -1 * (availResForTransfer + totalTransferred), ResourceFlowMode.NO_FLOW);
+                Log.Info("AddTransferListener.FixedUpdate 4, RequestedResource, part: " + source.partInfo.title + ", -1 * (availResForTransfer + totalTransferred): " + -1 * (availResForTransfer + totalTransferred));
+
+                Log.Info("Transfer, after returning avail resources,  amount: " + source.Resources[t.Resource.resourceName].amount);
                 lastUT = t.lastUT;
                
                 if (totalTransferred == 0)

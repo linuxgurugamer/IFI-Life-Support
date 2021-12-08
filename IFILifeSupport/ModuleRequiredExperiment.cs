@@ -245,16 +245,20 @@ namespace RequiredExperiments
 
         void DrawIFIDebugWin(int windowID)
         {
+#if true
             return;
-#if false
+#else
             GUILayout.BeginHorizontal(GUILayout.Width(400));
-            GUILayout.Label("requiredExperimentID: " + requiredExperimentID);
+            if (requiredExperimentID != null)
+                GUILayout.Label("requiredExperimentID: " + requiredExperimentID);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("experiment.title: " + experiment.experimentTitle);
+            if (experiment != null && experiment.experimentTitle != null)
+                GUILayout.Label("experiment.title: " + experiment.experimentTitle);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("biomes: " + biomes);
+            if (biomes != null)
+                GUILayout.Label("biomes: " + biomes);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label("requiredSitMask: " + requiredSitMask);
@@ -273,7 +277,8 @@ namespace RequiredExperiments
                 sit += ExperimentSituations.InSpaceHigh;
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Situations: " + sit);
+            if (sit != null)
+                GUILayout.Label("Situations: " + sit);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label("uniquePlanets: " + uniqueBodies);
@@ -292,7 +297,7 @@ namespace RequiredExperiments
 #endif
         void Start()
         {
-            if (requiredExperimentID == "" || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
+            if (HighLogic.CurrentGame== null || requiredExperimentID == "" || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
                 return;
 
             experiment = ResearchAndDevelopment.GetExperiment(requiredExperimentID);
@@ -321,7 +326,6 @@ namespace RequiredExperiments
 
             bool updated = false;
             for (int idx = 0; idx < part.partInfo.moduleInfos.Count; idx++)
-            //foreach (var s in part.partInfo.moduleInfos)
             {
                 var s = part.partInfo.moduleInfos[idx];
                 Log.Info("ModuleInfo, name: " + s.moduleName);
@@ -346,25 +350,32 @@ namespace RequiredExperiments
                 part.partInfo.moduleInfos.Add(s);
             }
             //CheckExperiments();
-            InvokeRepeating("Refresh", 0, HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().refreshInterval);
+            StartCoroutine(Refresh());
+            //InvokeRepeating("Refresh", 0, HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().refreshInterval);
 
             //GameEvents.OnScienceChanged.Add(onScienceChanged);
             //GameEvents.OnScienceRecieved.Add(onScienceReceived);            
         }
 
-        void Refresh()
+        IEnumerator Refresh()
         {
-
-            if (HighLogic.LoadedScene == GameScenes.EDITOR)
-                return;
-            Log.Info("Refresh, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
-            CheckExperiments();
-            CheckExperimentCompletions();
-            Log.Info("After CheckExperimentCompletions, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
-            if (Planetarium.GetUniversalTime() >= availableAtTime && availableAtTime > 0)
+            while (true)
             {
-                EnableModules();
-                availableAtTime = -1;
+                if (HighLogic.LoadedScene != GameScenes.EDITOR)
+                {
+                    Log.Info("Refresh, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
+                    CheckExperiments();
+                    CheckExperimentCompletions();
+                    Log.Info("After CheckExperimentCompletions, availableAtTime: " + availableAtTime.ToString("n0") + ",   currentUT: " + Planetarium.GetUniversalTime().ToString("n0"));
+                    if (Planetarium.GetUniversalTime() >= availableAtTime && availableAtTime > 0)
+                    {
+                        EnableModules();
+                        availableAtTime = -1;
+                    }
+                    yield return new WaitForSecondsRealtime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
+                }
+                else
+                    yield return new WaitForSecondsRealtime(0.1f);
             }
         }
 
@@ -439,7 +450,8 @@ namespace RequiredExperiments
 
         public string CurrentRawBiome(Vessel vessel)
         {
-            if (vessel.landedAt != string.Empty)
+            Log.Info("CurrentRawBiome");
+            if (vessel != null && vessel.landedAt != null && vessel.landedAt != string.Empty)
                 return Vessel.GetLandedAtString(vessel.landedAt);
             string biome = ScienceUtil.GetExperimentBiome(vessel.mainBody, vessel.latitude, vessel.longitude);
             return "" + biome;
@@ -934,8 +946,7 @@ namespace RequiredExperiments
         /// </summary>
         void CheckExperiments()
         {
-            if (HighLogic.LoadedScene == GameScenes.EDITOR)
-                return;
+            //if (HighLogic.LoadedScene == GameScenes.EDITOR) return;
 
             Log.Info("CheckExperiments");
             foreach (var modToDisable in initiallyDisabledModulesAr)

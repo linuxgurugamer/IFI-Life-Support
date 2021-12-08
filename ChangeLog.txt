@@ -125,3 +125,24 @@
 
 3.4.6.x
 	Added flag to toggle skin
+	Changed name of life support resource to "Kibbles & Bits"
+
+
+
+TODO
+	Add a day/hours/minutes display instead of decimal days
+	possible use goo containers as emergency food supply
+
+		Rename life support containers to Kibbles & Bits containers
+
+
+Dependency
+	CommunityCategoryKit
+
+
+Ideas for names
+
+Kibbles & Bits
+Munchies
+Food
+Logistics

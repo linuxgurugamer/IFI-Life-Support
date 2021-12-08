@@ -41,20 +41,6 @@ namespace IFILifeSupport
                 Start();
         }
 
-        void OnDestroy()
-        {
-            if (initted && HighLogic.LoadedSceneIsEditor)
-            {
-                Log.Info("IFI_Resources.OnDestory");
-                GameEvents.onEditorShipModified.Remove(ShipModified);
-                initted = false;
-            }
-            else
-            {
-                GameEvents.onPartResourceFlowModeChange.Remove(onPartResourceFlowModeChange);
-            }
-        }
-
         public void Start()
         {
             if (HighLogic.LoadedSceneIsEditor)
@@ -68,6 +54,22 @@ namespace IFILifeSupport
 
             ShipModified(new ShipConstruct("initship", "descr", this.part));
             initted = true;
+        }
+
+        void OnDestroy()
+        {
+            if (Log != null)
+            Log.Info("SupportModules.OnDestroy");
+            if (initted && HighLogic.LoadedSceneIsEditor)
+            {
+                Log.Info("IFI_Resources.OnDestory");
+                GameEvents.onEditorShipModified.Remove(ShipModified);
+                initted = false;
+            }
+            else
+            {
+                GameEvents.onPartResourceFlowModeChange.Remove(onPartResourceFlowModeChange);
+            }
         }
 
 

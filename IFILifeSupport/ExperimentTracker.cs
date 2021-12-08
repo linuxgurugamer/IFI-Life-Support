@@ -14,7 +14,7 @@ namespace RequiredExperiments
     {
         string lastGameTitle = "";
         double lastUT = 0;
-        private IEnumerator coroutine;
+        //private IEnumerator coroutine;
         const float WAITTIME = 2f;
 
         public class CompletedExperiment
@@ -71,8 +71,8 @@ namespace RequiredExperiments
 
         void Start()
         {
-            coroutine = MonitorGameTime(WAITTIME);
-            StartCoroutine(coroutine);
+            //coroutine = MonitorGameTime(WAITTIME);
+            StartCoroutine(MonitorGameTime(WAITTIME));
 
             GameEvents.OnScienceChanged.Add(onScienceChanged);
             GameEvents.OnScienceRecieved.Add(onScienceReceived);
@@ -95,6 +95,7 @@ namespace RequiredExperiments
         }
         private void OnDestroy()
         {
+            Log.Info("ExperimentTracker.OnDestroy");
             this.StopAllCoroutines();
             GameEvents.OnScienceChanged.Remove(onScienceChanged);
             GameEvents.OnScienceRecieved.Remove(onScienceReceived);
@@ -179,34 +180,36 @@ namespace RequiredExperiments
             while (true)
             {
                 yield return new WaitForSeconds(waitTime);
-                if (HighLogic.LoadedScene == GameScenes.MAINMENU)
+                if (!HighLogic.LoadedSceneIsGame)
                 {
                     lastGameTitle = "";
                     lastUT = 0;
                 }
                 else
                 {
-                    // for debugging
-                    LoadCompletedExperiments();
-
-                    //Log.Info("MonitorGameTime, lastGameTitle: " + lastGameTitle + ", currentGameTitle: " + HighLogic.CurrentGame.Title + ",  UT: " + Planetarium.GetUniversalTime().ToString() + ", " + lastUT.ToString());
-                    if (lastGameTitle == HighLogic.CurrentGame.Title)
+                    if (HighLogic.CurrentGame != null)
                     {
-                        // Use abs here in case a game is loaded which is LATER than the current time
-                        // Both cases are considered to be "reverted"
-                        if (Math.Abs(Planetarium.GetUniversalTime() - lastUT) > w)
-                            LoadCompletedExperiments();
-                    }
-                    else
-                    {
-                        lastGameTitle = HighLogic.CurrentGame.Title;
+                        // for debugging
                         LoadCompletedExperiments();
+
+                        //Log.Info("MonitorGameTime, lastGameTitle: " + lastGameTitle + ", currentGameTitle: " + HighLogic.CurrentGame.Title + ",  UT: " + Planetarium.GetUniversalTime().ToString() + ", " + lastUT.ToString());
+                        if (lastGameTitle == HighLogic.CurrentGame.Title)
+                        {
+                            // Use abs here in case a game is loaded which is LATER than the current time
+                            // Both cases are considered to be "reverted"
+                            if (Math.Abs(Planetarium.GetUniversalTime() - lastUT) > w)
+                                LoadCompletedExperiments();
+                        }
+                        else
+                        {
+                            lastGameTitle = HighLogic.CurrentGame.Title;
+                            LoadCompletedExperiments();
+                        }
+                        lastUT = Planetarium.GetUniversalTime();
                     }
-                    lastUT = Planetarium.GetUniversalTime();
                 }
             }
         }
-
 
 
         void LoadCompletedExperiments()

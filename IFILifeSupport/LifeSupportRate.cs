@@ -13,14 +13,12 @@ namespace IFILifeSupport
 
         // private static double Rate_Per_Kerbal = HighLogic.CurrentGame.Parameters.CustomParams<IFILS>().Rate_Per_Kerbal;
 
-       
-        public static double GetRate()
+
+        public static double GetRatePerMinute()
         {
-            double Hold_Rate = 0.0;
- 
-            Hold_Rate = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Rate_Per_Kerbal *  GetTechRateAdjustment();
-            Log.Info("GetRate, Hold_Rate: " + Hold_Rate);
-            return Hold_Rate;
+            double ratePerMin = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().RatePerKerbalPerMinute * GetTechRateAdjustment();
+            Log.Info("GetRatePerMinute, ratePerMin: " + ratePerMin);
+            return ratePerMin;
         }
 
         private static double GetTechRateAdjustment()
@@ -52,7 +50,7 @@ namespace IFILifeSupport
         /// <returns></returns>
         public static bool BreathableAtmosphere(Vessel active)
         {
-            if (active.mainBody.ocean && active.altitude < 0.0) 
+            if (active.mainBody.ocean && active.altitude < 0.0)
                 return false;
 
             Debug.Log("BreathableAtmosphere, active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude: " + active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude));
@@ -76,7 +74,7 @@ namespace IFILifeSupport
                 if (active.mainBody.ocean && active.altitude < 0.0)
                     return false;
                 if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
-                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure) 
+                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure)
                     return true;
 
                 //            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)

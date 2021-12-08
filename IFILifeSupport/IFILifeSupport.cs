@@ -71,14 +71,16 @@ namespace IFILifeSupport
             return "Interstellar Flight Inc. Life Support Systems MK XV Installed";
         }
 
+        bool refresh = false;
         public override void OnUpdate()
         {
-            // Log.Info("OnUpdate, IFITIM: " + IFITIM);
-            if (!HighLogic.LoadedSceneIsEditor &&
-                (Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval  || TimeWarp.CurrentRate > 800))
+            base.OnUpdate();
+            if (!RegisterToolbar.GamePaused /*("IFILifeSupport.OnUpdate")*/ && !HighLogic.LoadedSceneIsEditor &&
+                (!refresh || Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval  || TimeWarp.CurrentRate > 800))
             {
                 Life_Support_Update();
                 lastUpdateTime = Planetarium.GetUniversalTime();
+                refresh = true;
             }
         }
 
@@ -88,14 +90,13 @@ namespace IFILifeSupport
             if (IFIDebug.IsON) { DebugStatus = "Active"; } else { DebugStatus = "Inactive"; }
 #endif
 
-            base.OnUpdate();
             int crewCount = 0;
             crewCount = this.part.protoModuleCrew.Count;
             if (crewCount > 0)
             {
                 this.Fields[1].guiActive = true;
                 Vessel active = this.part.vessel;
-                double LS_RR = LifeSupportRate.GetRate();
+                double LS_RR = LifeSupportRate.GetRatePerMinute();
 
                 IFIDebug.IFIMess("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
                     ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
@@ -139,7 +140,6 @@ namespace IFILifeSupport
                 this.Fields[1].guiActive = false;
             }
         }
-
 
         private double IFIGetAllResources(string IFIResource)
         {

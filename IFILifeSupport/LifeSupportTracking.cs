@@ -12,17 +12,18 @@ using static IFILifeSupport.RegisterToolbar;
 namespace IFILifeSupport
 {
 
-// [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-    public class IFI_LIFESUPPORT_TRACKING : MonoBehaviour
+    [KSPAddon(KSPAddon.Startup.FlightEditorAndKSC, false)]
+    public class IFI_LifeSupportTrackingDisplay : MonoBehaviour
     {
-       // public static IFI_LIFESUPPORT_TRACKING Instance;
-        internal static int LS_ID;
+        public static IFI_LifeSupportTrackingDisplay Instance;
+        //internal static int LS_ID;
 
         internal const string MODID = "IFILifeSupport_NS";
         internal const string MODNAME = "IFI Life Support";
-        internal static ToolbarControl toolbarControl;
+        private static ToolbarControl toolbarControl;
+        internal static ToolbarControl Toolbar { get { return toolbarControl; } }
 
-        private bool KerbalEVARescueDetect = false;
+        private const bool KerbalEVARescueDetect = false;
 
         internal string[,] LS_Status_Hold;
 
@@ -30,16 +31,13 @@ namespace IFILifeSupport
         {
             public string[] data = new string[MAX_STATUSES];
         }
+
         private List<LS_Status_Row> LS_Status_Cache;
         private int[] LS_Status_Width;
         private int[] LS_Status_Spacing;
         internal int LS_Status_Hold_Count;
         // Make sure LS remaining Display conforms to Kerbin time setting.
         public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } }
-
-
-        GUIStyle vSmallScrollBar;
-        GUIStyle hSmallScrollBar;
 
         const int VESSEL = 0;
         const int LOCATION = 1;
@@ -70,13 +68,13 @@ namespace IFILifeSupport
         public void Awake()
         {
             Log.Info("IFI_LIFESUPPORT_TRACKING.Awake");
-            DontDestroyOnLoad(this);
+            Instance = this;
         }
 
         public void Start()
         {
             Log.Info("IFI_LIFESUPPORT_TRACKING.Start");
-            LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
+            //LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
             if (toolbarControl == null)
             {
                 toolbarControl = gameObject.AddComponent<ToolbarControl>();
@@ -91,22 +89,16 @@ namespace IFILifeSupport
             LS_Status_Width = new int[MAX_STATUSES];
             LS_Status_Spacing = new int[MAX_STATUSES];
 
-            //CancelInvoke();
-            //InvokeRepeating("display_active", 1, 1);
-
-
             GameEvents.onVesselRecoveryProcessingComplete.Add(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Add(OnVesselRecoveryRequested);
 
             GameEvents.onHideUI.Add(OnHideUI);
             GameEvents.onShowUI.Add(OnShowUI);
-
-        }
-
+                    }
 
         private void GUIToggle()
         {
-            LifeSupportDisplay.LSDisplayActive = !LifeSupportDisplay.LSDisplayActive;
+            LifeSupportDisplayInfo.LSDisplayActive = !LifeSupportDisplayInfo.LSDisplayActive;
             if (HighLogic.LoadedSceneIsEditor)
             {
                 InitStatusCache();
@@ -114,13 +106,6 @@ namespace IFILifeSupport
                 GetStageSummary();
             }
         }
-
-#if false
-        private void ResetButton()
-        {
-            toolbarControl.SetTexture("IFILS/Textures/IFI_LS_GRN_38", "IFILS/Textures/IFI_LS_GRN_24");
-        }
-#endif
 
         internal void SetUpDisplayLines(Vessel vessel, string IFI_Location, int IFI_Crew, double days_rem, double LSAval, double SlurryAvail, double SludgeAvail,
             double slurryRate, double sludgeRate, ref int LS_Status_Hold_Count)
@@ -135,7 +120,7 @@ namespace IFILifeSupport
             }
 
             LS_Status_Hold[LS_Status_Hold_Count, CREW] = H_Crew;
-            if (vessel.vesselType == VesselType.EVA && KerbalEVARescueDetect)
+            if (vessel.vesselType == VesselType.EVA && LifeSupportUsageUpdate. KerbalEVARescueDetect(vessel, IFI_Crew))
             {
                 LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = "RESCUE";
                 LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = "RESCUE";
@@ -147,25 +132,19 @@ namespace IFILifeSupport
                     color = lblYellowColor;
                 if (days_rem < 1)
                     color = lblRedColor;
-                //LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(LSAval, 2))); // Convert.ToString(Math.Round(LSAval, 4));
-                //LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = String.Format("<color=#{0}>{1}</color>", color, Convert.ToString(Math.Round(days_rem, 2))); // Convert.ToString(Math.Round(days_rem, 2));
 
-                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Math.Round(LSAval, 4).ToString("N4"));
-                LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = Colorized(color, Convert.ToString(Math.Round(days_rem, 4).ToString("N4")));
+                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Convert.ToString(Math.Round(LSAval, 1)));
+                LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = Colorized(color, FormatToDateTime(days_rem));
             }
             if (vessel.vesselType != VesselType.EVA)
             {
-                // doesn't hurt to do the secsPerDay calc every time, since this only runs once every 3 seconds
-                double secsPerDay = 3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
-                secsPerDay = 1;
+                double secsPerDay = FlightGlobals.GetHomeBody().solarDayLength;
 
                 // Need to scan for all greenhouses here
-                //LS_Status_Hold[LS_Status_Hold_Count, 5] = Convert.ToString(Math.Round(SlurryAvail, 5));
-                LS_Status_Hold[LS_Status_Hold_Count, SLURRYAVAIL] = SlurryAvail.ToString("N4");
+                LS_Status_Hold[LS_Status_Hold_Count, SLURRYAVAIL] = Math.Round(SlurryAvail, 1).ToString("F1");
 
                 // Need to scan for all sludge convertors here
-                //LS_Status_Hold[LS_Status_Hold_Count, 7] = Convert.ToString(Math.Round(SludgeAvail, 5));
-                LS_Status_Hold[LS_Status_Hold_Count, SLUDGEAVAIL] = SludgeAvail.ToString("N4");
+                LS_Status_Hold[LS_Status_Hold_Count, SLUDGEAVAIL] = Math.Round(SludgeAvail, 1).ToString("F1");
 
 
                 Log.Info("Slurry: " + SlurryAvail + ",    rate: " + (secsPerDay * slurryRate));
@@ -185,14 +164,26 @@ namespace IFILifeSupport
             LS_Status_Hold_Count += 1;
         }
 
+        string FormatToDateTime(double d)
+        {
+            d = d * FlightGlobals.GetHomeBody().solarDayLength;
+            double days = Math.Floor(d / FlightGlobals.GetHomeBody().solarDayLength);
+            double hours = Math.Floor((d - days * FlightGlobals.GetHomeBody().solarDayLength) / 3600f);
+            double minutes = Math.Floor((d - days * FlightGlobals.GetHomeBody().solarDayLength - hours * 3600f) / 60f);
+            double secs = Math.Floor(d - days * FlightGlobals.GetHomeBody().solarDayLength - hours * 3600f - minutes * 60f);
+            return days.ToString("N0") + "d " +
+                string.Format("{0:00.}", hours) + "h " +
+                string.Format("{0:00.}", minutes) + "m " +
+                string.Format("{0:00.}", secs) + "s";
+        }
+
         internal void CheckAlertLevels(double days_rem, ref int LS_ALERT_LEVEL)
         {
             if (LS_ALERT_LEVEL < 2 && days_rem < 3)
             {
-                //IFI_Button.SetTexture(IFI_button_cau38);
                 toolbarControl.SetTexture("IFILS/Textures/IFI_LS_CAU_38", "IFILS/Textures/IFI_LS_CAU_24");
                 LS_ALERT_LEVEL = 2;
-                if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
+                if (LifeSupportDisplayInfo.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                 {
                     TimeWarp.SetRate(0, false);
                     ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 3 days of Life Support remaining", 10f);
@@ -201,10 +192,9 @@ namespace IFILifeSupport
             }
             if (LS_ALERT_LEVEL < 3 && days_rem <= 1)
             {
-                //IFI_Button.SetTexture(IFI_button_danger38);
                 toolbarControl.SetTexture("IFILS/Textures/IFI_LS_DAN_38", "IFILS/Textures/IFI_LS_DAN_24");
                 LS_ALERT_LEVEL = 3;
-                if (LifeSupportDisplay.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
+                if (LifeSupportDisplayInfo.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                 {
                     TimeWarp.SetRate(0, false);
                     ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 1 day of Life Support remaining", 10f);
@@ -217,7 +207,7 @@ namespace IFILifeSupport
         bool hide = false;
         void OnHideUI() { hide = true; }
         void OnShowUI() { hide = false; }
-        bool Hide {  get { return hide; } }
+        bool Hide { get { return hide; } }
 
         void OnVesselRecoveryRequested(Vessel v)
         {
@@ -228,8 +218,10 @@ namespace IFILifeSupport
 
         void OnDestroy()
         {
+            Log.Info("LifeSupportTracking.OnDestroy");
             GameEvents.onVesselRecoveryProcessingComplete.Remove(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Remove(OnVesselRecoveryRequested);
+            Instance = null;
         }
 
         void onVesselRecoveryProcessingComplete(ProtoVessel pv, MissionRecoveryDialog mrd, float f)
@@ -251,7 +243,7 @@ namespace IFILifeSupport
                 foreach (var c in v.GetVesselCrew())
                 {
                     Log.Info("RestoreStarvingcrew, v.crew.name: " + c.name);
-                    if (LifeSupportUpdate.starvingKerbals.TryGetValue(c.name, out sk))
+                    if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(c.name, out sk))
                     {
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + c.name);
@@ -268,7 +260,7 @@ namespace IFILifeSupport
                 foreach (var c in pv.GetVesselCrew())
                 {
                     Log.Info("RestoreStarvingcrew, pv.crew.name: " + c.name);
-                    if (LifeSupportUpdate.starvingKerbals.TryGetValue(c.name, out sk))
+                    if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(c.name, out sk))
                     {
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + c.name);
@@ -292,7 +284,7 @@ namespace IFILifeSupport
                 Log.Info("CrewRoster.Crew kerbal.name: " + kerbal.name + ",  rosterStatus: " + kerbal.rosterStatus + ", type: " + kerbal.type);
                 if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                 {
-                    if (LifeSupportUpdate.starvingKerbals.TryGetValue(kerbal.name, out sk))
+                    if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(kerbal.name, out sk))
                     {
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + kerbal.name);
@@ -305,7 +297,7 @@ namespace IFILifeSupport
                 }
             }
             foreach (var s1 in toDelete)
-                LifeSupportUpdate.starvingKerbals.Remove(s1);
+                LifeSupportUsageUpdate.starvingKerbals.Remove(s1);
             toDelete.Clear();
         }
 
@@ -358,36 +350,29 @@ namespace IFILifeSupport
 
         private void OnGUI()
         {
-
-            if (! Hide && LifeSupportDisplay.LSDisplayActive)
+            if (HighLogic.LoadedSceneIsGame && !Hide && LifeSupportDisplayInfo.LSDisplayActive)
             {
-
-                vSmallScrollBar = new GUIStyle(GUI.skin.verticalScrollbar);
-                vSmallScrollBar.fixedWidth = 8f;
-
-                hSmallScrollBar = new GUIStyle(GUI.skin.horizontalScrollbar);
-                hSmallScrollBar.fixedHeight = 0f;
                 if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useKSPskin)
                     GUI.skin = HighLogic.Skin;
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame)
                 {
                     string TITLE = "IFI Life Support Vessel Status Display ";
 
-                    LifeSupportDisplay.statusWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplay.statusWindowPos, LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    LifeSupportDisplayInfo.statusWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplayInfo.statusWindowPos, LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                 }
                 else
                     if (HighLogic.LoadedSceneIsEditor)
                 {
                     string TITLE = "IFI Life Support Vessel Info ";
 
-                    LifeSupportDisplay.editorInfoWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplay.editorInfoWindowPos, LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    LifeSupportDisplayInfo.editorInfoWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplayInfo.editorInfoWindowPos, LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
-                if (LifeSupportDisplay.LSInfoDisplay)
+                if (LifeSupportDisplayInfo.LSInfoDisplay)
                 {
                     string TITLE = "IFI Life Support Information ";
-                    
-                    LifeSupportDisplay.infoWindowPos = ClickThruBlocker.GUILayoutWindow(99989, LifeSupportDisplay.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+
+                    LifeSupportDisplayInfo.infoWindowPos = ClickThruBlocker.GUILayoutWindow(99989, LifeSupportDisplayInfo.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
             }
@@ -492,7 +477,7 @@ namespace IFILifeSupport
                 {
                     Log.Info("part: " + part.partInfo.name);
                     int stage;
-                    if (LifeSupportDisplay.Summarize)
+                    if (LifeSupportDisplayInfo.Summarize)
                         stage = 0;
                     else
                         stage = part.inverseStage + 1;
@@ -612,7 +597,7 @@ namespace IFILifeSupport
             GetWidth("Crew", CREW, true);
             GetWidth("   Life\nSupport", LSAVAIL, true);
             GetWidth("Days", DAYS_REM, true);
-            if (LifeSupportDisplay.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+            if (LifeSupportDisplayInfo.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
             {
                 AddSpacing(DAYS_REM, SPACING);
                 GetWidth("   Slurry\nCapacity", SLURRYAVAIL, true);
@@ -644,7 +629,7 @@ namespace IFILifeSupport
                         GetWidth((ss.LifeSupport / ss.crew).ToString("N2"), DAYS_REM);
                     else
                         GetWidth("n/a", DAYS_REM);
-                    if (LifeSupportDisplay.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
+                    if (LifeSupportDisplayInfo.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
                         GetWidth(ss.OrganicSlurry.ToString("N2"), SLURRYAVAIL);
                         GetWidth((secsPerDay * ss.SlurryProcessRate).ToString("N2"), SLURRY_DAYS_TO_PROCESS);
@@ -686,7 +671,7 @@ namespace IFILifeSupport
 
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            LifeSupportDisplay.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplay.infoScrollPos, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.Height(345));
+            LifeSupportDisplayInfo.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplayInfo.infoScrollPos, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.MaxHeight(345));
             for (int i1 = 1; i1 < LS_Status_Cache.Count; i1++)
             {
                 GUILayout.BeginHorizontal();
@@ -703,13 +688,13 @@ namespace IFILifeSupport
             }
             GUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-            GUILayout.FlexibleSpace();
+            GUILayout.Space(20);
             GUILayout.BeginHorizontal();
 
-            bool b = GUILayout.Toggle(LifeSupportDisplay.Summarize, "Summarize");
-            if (b != LifeSupportDisplay.Summarize)
+            bool b = GUILayout.Toggle(LifeSupportDisplayInfo.Summarize, "Summarize");
+            if (b != LifeSupportDisplayInfo.Summarize)
             {
-                LifeSupportDisplay.Summarize = b;
+                LifeSupportDisplayInfo.Summarize = b;
                 InitStatusCache();
                 ClearStageSummaryList();
                 GetStageSummary();
@@ -717,16 +702,14 @@ namespace IFILifeSupport
             GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
-                b = GUILayout.Toggle(LifeSupportDisplay.ShowRecyclers, "Show Recyclers");
-                if (b != LifeSupportDisplay.ShowRecyclers)
+                b = GUILayout.Toggle(LifeSupportDisplayInfo.ShowRecyclers, "Show Recyclers");
+                if (b != LifeSupportDisplayInfo.ShowRecyclers)
                 {
-                    LifeSupportDisplay.ShowRecyclers = b;
+                    LifeSupportDisplayInfo.ShowRecyclers = b;
                     Editor.Instance.DefineFilters();
-                    LifeSupportDisplay.ReinitEditorInfoWindowPos();
+                    LifeSupportDisplayInfo.ReinitEditorInfoWindowPos();
                 }
             }
-            //GUILayout.FlexibleSpace();
-            //GUILayout.Button(">>", GUILayout.Width(22), GUILayout.Height(22));
 
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -747,7 +730,7 @@ namespace IFILifeSupport
             var s = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level.ToString();
             AppendLine(ref data, "Level: " + char.ToUpper(s[0]) + s.Substring(1));
             AppendLine(ref data, "Update Frequency (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval.ToString());
-            AppendLine(ref data, "Auto Warp Cancelation lead time (days): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime);
+            AppendLine(ref data, "Auto Warp Cancellation lead time (days): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime);
             AppendLine(ref data, "\nLS rate per Kerbal per day: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lsRatePerDay);
             AppendLine(ref data, "Breathable Atmo Pressure: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoPressure.ToString("N2"));
             AppendLine(ref data, "Min Intake Air Atmo Pressure: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure.ToString("N3"));
@@ -767,7 +750,7 @@ namespace IFILifeSupport
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Close"))
-                LifeSupportDisplay.LSInfoDisplay = false;
+                LifeSupportDisplayInfo.LSInfoDisplay = false;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
@@ -779,9 +762,6 @@ namespace IFILifeSupport
             var bold = new GUIStyle(GUI.skin.label);
             bold.fontStyle = FontStyle.Bold;
             InitStatusCache();
-
-            //var rightJustify = new GUIStyle(GUI.skin.label);
-            //rightJustify.alignment = TextAnchor.MiddleRight;
 
             GetWidth("Vessel", VESSEL, true, true);
             GetWidth("Location", LOCATION, true);
@@ -865,7 +845,7 @@ namespace IFILifeSupport
 
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            LifeSupportDisplay.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplay.infoScrollPos, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.Height(345));
+            LifeSupportDisplayInfo.infoScrollPos = GUILayout.BeginScrollView(LifeSupportDisplayInfo.infoScrollPos, false, false, GUIStyle.none, GUI.skin.verticalScrollbar, GUILayout.MaxHeight(345));
             for (int i1 = 1; i1 < LS_Status_Cache.Count; i1++)
             {
                 GUILayout.BeginHorizontal();
@@ -883,9 +863,10 @@ namespace IFILifeSupport
 
             GUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-            GUILayout.FlexibleSpace();
+            //GUILayout.FlexibleSpace();
+            GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            LifeSupportDisplay.WarpCancel = GUILayout.Toggle(LifeSupportDisplay.WarpCancel, "Auto Cancel Warp on Low Life Support");
+            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "Auto Cancel Warp on Low Life Support");
             GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
@@ -895,7 +876,7 @@ namespace IFILifeSupport
                     if (GUILayout.Button("<<", GUILayout.Width(26), GUILayout.Height(22)))
                     {
                         fullDisplay = false;
-                        LifeSupportDisplay.ReinitInfoWindowPos();
+                        LifeSupportDisplayInfo.ReinitInfoWindowPos();
                     }
                 }
                 else
@@ -908,9 +889,9 @@ namespace IFILifeSupport
             GUILayout.EndVertical();
             if (GUI.Button(new Rect(3, 3f, 20, 15f), new GUIContent("I")))
             {
-                LifeSupportDisplay.LSInfoDisplay = !LifeSupportDisplay.LSInfoDisplay;
+                LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
             }
-            if (GUI.Button(new Rect(LifeSupportDisplay.statusWindowPos.width - 24, 3f, 23, 15f), new GUIContent("X")))
+            if (GUI.Button(new Rect(LifeSupportDisplayInfo.statusWindowPos.width - 24, 3f, 23, 15f), new GUIContent("X")))
             {
                 toolbarControl.SetFalse(true);
             }
