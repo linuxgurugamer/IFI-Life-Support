@@ -1,0 +1,594 @@
+-----
+Folder infos : 
+MBM files count : 0
+TGA files count : 24
+PNG files count : 70
+Backup files count : 0
+-----
+-----
+Starting conversion of 94 files.
+    MBM count : 0.
+    TGA count : 24.
+    PNG count : 70.
+0 files excluded, 0 files without mipmaps. 0 files will skip normal detection.0 files will not be resized.
+-----
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimg11bm_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimg11bm_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 15.3505001068115ms
+SwizzleImage took 45.8839988708496ms
+Image conversion took 147.436401367188ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimgA2.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimgA2.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 14.8319997787476ms
+Image conversion took 329.234405517578ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimgA3.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Spaces\tankimgA3.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.97310018539429ms
+Image conversion took 314.36669921875ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\tankimgA1.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\tankimgA1.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.32959985733032ms
+Image conversion took 299.126007080078ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\tankimgA2.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\tankimgA2.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.99590015411377ms
+Image conversion took 330.052795410156ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\OrganicSlurry\tankimgA1.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\OrganicSlurry\tankimgA1.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.33479976654053ms
+Image conversion took 326.060302734375ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\box_diff_A_C.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\box_diff_A_C.dds
+    Format : Dxt5, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 1.91310000419617ms
+Image conversion took 100.320503234863ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\box_diff_A_C.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\box_diff_A_C.dds
+    Format : Dxt5, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.02169990539551ms
+Image conversion took 113.421699523926ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\box_diff_A_C.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\box_diff_A_C.dds
+    Format : Dxt5, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.04559993743896ms
+Image conversion took 97.2685012817383ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_common\BOX_normals_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_common\BOX_normals_NRM.dds
+    Format : Dxt5, normalmap : True, res: 512x512
+Flipping image...
+FlipImage took 2.04979991912842ms
+SwizzleImage took 10.1421003341675ms
+Image conversion took 46.7840995788574ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\droid-norms_Normal_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\droid-norms_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 6.18219995498657ms
+SwizzleImage took 41.7980003356934ms
+Image conversion took 129.446304321289ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\droid.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\droid.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.25239992141724ms
+Image conversion took 294.62890625ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\glass.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\glass.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 6.88469982147217ms
+SwizzleImage took 13.1246995925903ms
+Image conversion took 101.191596984863ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\sciExp-Emissive.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\sciExp-Emissive.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.43569993972778ms
+Image conversion took 261.59521484375ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\scilayout.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\scilayout.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.5233998298645ms
+Image conversion took 311.796112060547ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\scilayout_Normal_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\PlantRespirationStudy\scilayout_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 7.20489978790283ms
+SwizzleImage took 40.6629981994629ms
+Image conversion took 124.280403137207ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\ends.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\ends.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.4092001914978ms
+Image conversion took 329.076904296875ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\endsEmissive.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\endsEmissive.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.84959983825684ms
+Image conversion took 234.837905883789ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\endsHeight_Normal_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\endsHeight_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 6.59140014648438ms
+SwizzleImage took 39.2896995544434ms
+Image conversion took 115.182601928711ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 10.9469003677368ms
+Image conversion took 328.716888427734ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse_emissive.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse_emissive.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.07119989395142ms
+Image conversion took 280.732391357422ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse_Normal_NRM.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\greenhouse_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 7.27080011367798ms
+SwizzleImage took 41.9334983825684ms
+Image conversion took 120.357498168945ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\ivy_single_small.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\ivy_single_small.dds
+    Format : Dxt5, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.0239999294281ms
+Image conversion took 110.508399963379ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\stem.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\5ExpandingGreenhouse\stem.dds
+    Format : Dxt5, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.911199986934662ms
+Image conversion took 62.8600997924805ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_CAU_24.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_CAU_24.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 24x24
+Flipping image...
+FlipImage took 0.18019999563694ms
+Image conversion took 41.2148017883301ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_CAU_38.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_CAU_38.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 40x40
+Flipping image...
+FlipImage took 0.269899994134903ms
+Image conversion took 43.0425987243652ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_DAN_24.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_DAN_24.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 24x24
+Flipping image...
+FlipImage took 0.221200004220009ms
+Image conversion took 36.9443016052246ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_DAN_38.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_DAN_38.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 40x40
+Flipping image...
+FlipImage took 0.194100007414818ms
+Image conversion took 44.8469009399414ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_GRN_24.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_GRN_24.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 24x24
+Flipping image...
+FlipImage took 0.172600001096725ms
+Image conversion took 34.6800003051758ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_GRN_38.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Textures\IFI_LS_GRN_38.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 40x40
+Flipping image...
+FlipImage took 0.219400003552437ms
+Image conversion took 39.5485000610352ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\advtank2.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\advtank2.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+ERR : Unknown file format P8, skipping conversion for D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\advtank2.png
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassAstrobiology.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassAstrobiology.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.263099998235703ms
+Image conversion took 46.9536018371582ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassBiology.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassBiology.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.26910001039505ms
+Image conversion took 64.1333999633789ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassBioSystems.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassBioSystems.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.281100004911423ms
+Image conversion took 57.6806983947754ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassClosedSystem.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassClosedSystem.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+ERR : Unknown file format A16B16G16R16, skipping conversion for D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassClosedSystem.png
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassRenewables.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassRenewables.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+ERR : Unknown file format A16B16G16R16, skipping conversion for D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassRenewables.png
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassSustainability.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\BioMassSustainability.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.181500002741814ms
+Image conversion took 49.8806991577148ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\storage0.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\storage0.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+ERR : Unknown file format P8, skipping conversion for D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\storage0.png
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\storage1.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\storage1.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.183200001716614ms
+Image conversion took 42.7139015197754ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\tank4.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Resources\RDSimpleIcons\tank4.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+    Format : Dxt5, normalmap : False, res: 32x32
+Flipping image...
+FlipImage took 0.211500003933907ms
+Image conversion took 36.8227996826172ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_diff.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_diff.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.66709995269775ms
+Image conversion took 349.319702148438ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_glow.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_glow.dds
+    Format : Dxt1, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.58570003509521ms
+Image conversion took 229.801193237305ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_n_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\tanks_round\old\big_n_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 7.38070011138916ms
+SwizzleImage took 13.2468996047974ms
+Image conversion took 73.4144973754883ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\OrganicSlurry\tankimgA2.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFITank\OrganicSlurry\tankimgA2.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.10690021514893ms
+Image conversion took 293.540802001953ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFIRadialTank\tankimgA2.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\IFIRadialTank\tankimgA2.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 6.92679977416992ms
+Image conversion took 294.147399902344ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\BOX_normals_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\BOX_normals_NRM.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+LOG : Skipping D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\BOX_normals_NRM.png, resolution is too low.
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\Sludge\oldbox_diff_A_C.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_small\Sludge\oldbox_diff_A_C.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.34489989280701ms
+Image conversion took 118.99479675293ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\BOX_normals_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\BOX_normals_NRM.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+LOG : Skipping D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\BOX_normals_NRM.png, resolution is too low.
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\Sludge\oldbox_diff_A_C.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_medium\Sludge\oldbox_diff_A_C.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 1.91999995708466ms
+Image conversion took 94.7068023681641ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\BOX_normals_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\BOX_normals_NRM.dds
+LOG : Resolution is considered too low for DXT compression. DISABLING MIPMAPS!
+LOG : Skipping D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\BOX_normals_NRM.png, resolution is too low.
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\Sludge\old_box_diff_A_C.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\cont_large\Sludge\old_box_diff_A_C.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 1.9375ms
+Image conversion took 97.4949035644531ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\black.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\black.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.17689990997314ms
+Image conversion took 81.4039993286133ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\engine_txr.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\engine_txr.dds
+    Format : Dxt1, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.431400001049042ms
+Image conversion took 38.4952011108398ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\goldTubing.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\goldTubing.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 5.54080009460449ms
+Image conversion took 97.7835006713867ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\IonEngine.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\IonEngine.dds
+    Format : Dxt5, normalmap : True, res: 64x64
+Flipping image...
+FlipImage took 0.253100007772446ms
+SwizzleImage took 0.098800003528595ms
+Image conversion took 32.5313987731934ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\legogrey.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\legogrey.dds
+    Format : Dxt5, normalmap : False, res: 64x64
+Flipping image...
+FlipImage took 0.246199995279312ms
+Image conversion took 32.6511001586914ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\litegray.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\litegray.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.871599972248077ms
+Image conversion took 50.6922988891602ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\red-glass.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\red-glass.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.12100005149841ms
+Image conversion took 88.325798034668ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\SciExp2-L1.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\SciExp2-L1.dds
+    Format : Dxt1, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.29780006408691ms
+Image conversion took 289.589385986328ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\white.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\GooExp\white.dds
+    Format : Dxt5, normalmap : True, res: 64x64
+Flipping image...
+FlipImage took 0.232099995017052ms
+SwizzleImage took 0.150700002908707ms
+Image conversion took 32.8742980957031ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\AGSTUDY.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\AGSTUDY.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.07539987564087ms
+Image conversion took 305.018585205078ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\engine_txr.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\engine_txr.dds
+    Format : Dxt1, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.428700000047684ms
+Image conversion took 43.9883995056152ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.30849981307983ms
+Image conversion took 304.406005859375ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf2.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf2.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.49289989471436ms
+Image conversion took 297.607604980469ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf3.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\leaf3.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.80219984054565ms
+Image conversion took 276.696685791016ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\legogrey.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\legogrey.dds
+    Format : Dxt5, normalmap : False, res: 64x64
+Flipping image...
+FlipImage took 0.24269999563694ms
+Image conversion took 32.5999984741211ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\white.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Science\AGStudy\white.dds
+    Format : Dxt5, normalmap : True, res: 64x64
+Flipping image...
+FlipImage took 0.250200003385544ms
+SwizzleImage took 0.136500000953674ms
+Image conversion took 37.4361991882324ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\CENTRIFUGE.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\CENTRIFUGE.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 8.91370010375977ms
+Image conversion took 351.105285644531ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\engine_txr.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\engine_txr.dds
+    Format : Dxt1, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.40650001168251ms
+Image conversion took 38.7182998657227ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\goldTubing.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\goldTubing.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 2.19460010528564ms
+Image conversion took 101.774597167969ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\litegray.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\litegray.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.812799990177155ms
+Image conversion took 48.187801361084ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\white.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\CryogenicAirSeperator\white.dds
+    Format : Dxt5, normalmap : True, res: 64x64
+Flipping image...
+FlipImage took 0.221599996089935ms
+SwizzleImage took 0.133399993181229ms
+Image conversion took 31.9102001190186ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\ALGAE.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\ALGAE.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 1.09829998016357ms
+Image conversion took 59.1377983093262ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\algea.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\algea.dds
+    Format : Dxt5, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.875100016593933ms
+Image conversion took 83.4806976318359ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\b15goo002.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\b15goo002.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.75780010223389ms
+Image conversion took 392.490997314453ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\BIOANIMATED.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\BIOANIMATED.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 8.77579975128174ms
+Image conversion took 327.947814941406ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\soapbubble.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_3\BioReactor\soapbubble.dds
+    Format : Dxt5, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.525799989700317ms
+Image conversion took 67.363899230957ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\can-algae-feed-the-world-and-fuel-the-planet_1.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\can-algae-feed-the-world-and-fuel-the-planet_1.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 1.23129999637604ms
+Image conversion took 116.367401123047ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\goldTubing.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\goldTubing.dds
+    Format : Dxt1, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 1.98880004882813ms
+Image conversion took 111.466102600098ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\quater-cylblend.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\quater-cylblend.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.67280006408691ms
+Image conversion took 313.282806396484ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\quater-cylblend_Normal_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\quater-cylblend_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 6.78679990768433ms
+SwizzleImage took 15.0022001266479ms
+Image conversion took 98.4188003540039ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\soapbubble.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\soapbubble.dds
+    Format : Dxt5, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.498699992895126ms
+Image conversion took 60.2667999267578ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\steel.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\MicroBiome\steel.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.955900013446808ms
+Image conversion took 96.8707962036133ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\ALGAE.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\ALGAE.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.905399978160858ms
+Image conversion took 58.4915008544922ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae2.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae2.dds
+    Format : Dxt1, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.45230007171631ms
+Image conversion took 313.250305175781ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae_Emissive.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae_Emissive.dds
+    Format : Dxt1, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.11770009994507ms
+Image conversion took 209.70100402832ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae_Normal_NRM.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algae_Normal_NRM.dds
+    Format : Dxt5, normalmap : True, res: 1024x1024
+Flipping image...
+FlipImage took 7.02500009536743ms
+SwizzleImage took 13.2827997207642ms
+Image conversion took 66.5999984741211ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algea.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\algea.dds
+    Format : Dxt5, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.802900016307831ms
+Image conversion took 48.1291007995605ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\soapbubble.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\soapbubble.dds
+    Format : Dxt5, normalmap : False, res: 128x128
+Flipping image...
+FlipImage took 0.633800029754639ms
+Image conversion took 46.5407981872559ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\steel.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_2\4AlgaeHouse\steel.dds
+    Format : Dxt1, normalmap : False, res: 256x256
+Flipping image...
+FlipImage took 0.828499972820282ms
+Image conversion took 59.1641998291016ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\Greenhouse\model000.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\Greenhouse\model000.dds
+    Format : Dxt5, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 7.20170021057129ms
+Image conversion took 409.4462890625ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\Greenhouse\model001.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Level_1\Greenhouse\model001.dds
+    Format : Dxt1, normalmap : False, res: 1024x1024
+Flipping image...
+FlipImage took 8.0447998046875ms
+Image conversion took 260.647094726563ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Flags\IFI_Flag.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Flags\IFI_Flag.dds
+    Format : Dxt5, normalmap : False, res: 256x160
+Flipping image...
+FlipImage took 0.726300001144409ms
+Image conversion took 63.9533996582031ms
+---
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Flags\IFI_Flag_large.png to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Flags\IFI_Flag_large.dds
+    Format : Dxt1, normalmap : False, res: 512x320
+Flipping image...
+FlipImage took 1.51839995384216ms
+Image conversion took 107.929100036621ms
+---
+-----
+Conversion done! 94 files processed in 16734.5ms.
+7 files skipped, check log.txt for more informations.
+-----
