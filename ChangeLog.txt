@@ -136,9 +136,6 @@ TODO
 		Rename life support containers to Kibbles & Bits containers
 
 
-Dependency
-	CommunityCategoryKit
-
 
 Ideas for names
 
@@ -146,3 +143,6 @@ Kibbles & Bits
 Munchies
 Food
 Logistics
+Need to get O2 & LqdO2 tanks
+
+The algaeGreenhouse has a slight jump when first starting the rotating animation, only the first time

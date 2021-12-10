@@ -75,14 +75,52 @@ namespace IFILifeSupport
         public string StopActionName = "Turn UV Lights OFF";
 
         [KSPField(isPersistant = true)]
-        public bool UVLightsActivated  = false;
+        public bool UVLightsActivated = false;
 
+        [KSPField]
+        public bool checkForOxygen = false;
 
+        //
+        // animation stuff here
+        //
+
+        [KSPField]
+        public bool Reversable = true;
+
+        [KSPField]
+        public float RampSpeed = 1;
+
+        [KSPField]
+        public bool Continuous = false;
+
+        [KSPField]
+        public string AnimationName = null;
+
+        [KSPField]
+        public float AnimationStartOffset = 0f;
+
+        public bool isPlaying = false;
+
+        Animation BioAnimate = null;
+
+        void UpdateEventNames()
+        {
+            switch (UVLightsActivated)
+            {
+                case true:
+                    Events["ToggleUVLightsAction"].guiName = StopActionName;
+                    break;
+                case false:
+                    Events["ToggleUVLightsAction"].guiName = StartActionName;
+                    break;
+            }
+        }
 
         [KSPEvent(guiActive = true, guiActiveEditor = false, guiName = "Toggle UV Lights")]
         public void ToggleUVLightsAction()
         {
             UVLightsActivated = !UVLightsActivated;
+            UpdateEventNames();
         }
 
         [KSPAction("Toggle UV Lights")]
@@ -91,7 +129,7 @@ namespace IFILifeSupport
             ToggleUVLightsAction();
         }
 
-        [KSPField]
+        [KSPField(isPersistant = true)]
         public bool IsActivated = false;
 
 
@@ -100,9 +138,11 @@ namespace IFILifeSupport
 
         public bool ModuleIsActive()
         {
-            IsActivated = (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER) && (UVLightsActivated || (moduleIFIgreenhousePanel != null && moduleIFIgreenhousePanel.Active));
+            IsActivated = UVLightsActivated ||
+                (moduleIFIgreenhousePanel != null && moduleIFIgreenhousePanel.Active);
             return IsActivated;
         }
+
         public override void OnLoad(ConfigNode node)
         {
             if (Log == null)
@@ -147,10 +187,24 @@ namespace IFILifeSupport
             if (Log != null)
                 Log.Info("ModuleIFILifeSupport.Start");
             moduleIFIgreenhousePanel = part.GetComponent<ModuleIFIGreenhousePanel>();
-            //IFITimer = Convert.ToInt32(Planetarium.GetUniversalTime());
-            // CancelInvoke();
+
             lastUpdateTime = Planetarium.GetUniversalTime();
-            //InvokeRepeating("RunConverter", 0, HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().refreshInterval);
+            if (AnimationName != null)
+                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationName: [" + AnimationName + "]");
+
+            var ma = part.FindModelAnimators(AnimationName);
+            if (ma != null && ma.Length > 0)
+                BioAnimate = ma[0];
+
+            UpdateEventNames();
+
+            if (BioAnimate != null)
+            {
+                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
+                BioAnimate.Stop();
+                BioAnimate[AnimationName].speed = 0;
+                lastTime = BioAnimate[AnimationName].time = AnimationStartOffset;
+            }
         }
 
         double lastUpdateTime;
@@ -241,8 +295,74 @@ namespace IFILifeSupport
             }
         }
 #endif
+        float curSpeed, endSpeed, lastTime = 0;
+        public void FixedUpdate()
+        {
+            //Log.Info("ModuleIFILifeSupport.FixedUpdate, IsActivated: " + IsActivated + ",   isPlaying: " + isPlaying);
+            if (BioAnimate != null)
+            {
+                if (IsActivated && !isPlaying)
+                {
+                    isPlaying = true;
+                    try
+                    {
+                        Log.Info("ModuleIFILifeSupport, part: " + part.partInfo.title + " Artificial Lights Activated");
 
-        #region info
+                        curSpeed = BioAnimate[AnimationName].speed;
+                        endSpeed = 1;
+                        if (Continuous)
+                            BioAnimate[AnimationName].wrapMode = WrapMode.Loop;
+                        else
+                            BioAnimate[AnimationName].wrapMode = WrapMode.ClampForever;
+                        BioAnimate[AnimationName].time = lastTime;
+                        BioAnimate.Play();
+                    }
+                    catch (System.IndexOutOfRangeException)
+                    {
+                        Log.Error("ModuleIFILifeSupport.FixedUpdate IndexOutOfRangeException: " + AnimationName);
+                    }
+                }
+                if (!IsActivated && isPlaying)
+                {
+                    Log.Info("ModuleIFILifeSupport, part: " + part.partInfo.title + " Artificial Lights Deactivated");
+                    isPlaying = !isPlaying;
+                    try
+                    {
+                        curSpeed = BioAnimate[AnimationName].speed;
+
+                        if (Reversable)
+                            endSpeed = -1;
+                        else
+                            endSpeed = 0;
+
+                    }
+                    catch (System.IndexOutOfRangeException)
+                    {
+                        Log.Error("ModuleIFILifeSupport.FixedUpdate IndexOutOfRangeException: " + AnimationName);
+                    }
+                }
+                if (endSpeed == 1 && curSpeed < 1)
+                {
+                    curSpeed += RampSpeed;
+                    BioAnimate[AnimationName].speed = curSpeed;
+                    
+                }
+                if (endSpeed <= 0 && curSpeed > endSpeed)
+                {
+                    curSpeed -= RampSpeed;
+                    BioAnimate[AnimationName].speed = curSpeed;
+                    lastTime = BioAnimate[AnimationName].time;
+                    if (curSpeed <= endSpeed)
+                    {
+                        BioAnimate[AnimationName].wrapMode = WrapMode.ClampForever;
+                        BioAnimate.Stop();
+                    }
+                }
+            }
+        }
+
+
+#region info
         const string MODULETITLE = "IFI Life Support";
         string info = "";
         void AddToInfo(string s)
@@ -301,6 +421,6 @@ namespace IFILifeSupport
         public Callback<Rect> GetDrawModulePanelCallback() { return null; }
 
         public string GetPrimaryField() { return "Missing LS"; }
-        #endregion
+#endregion
     }
 }

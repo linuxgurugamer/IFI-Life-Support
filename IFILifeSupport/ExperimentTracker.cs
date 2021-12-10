@@ -99,7 +99,6 @@ namespace RequiredExperiments
             this.StopAllCoroutines();
             GameEvents.OnScienceChanged.Remove(onScienceChanged);
             GameEvents.OnScienceRecieved.Remove(onScienceReceived);
-
         }
 
         void AddCompletedScienceToList(string s, string title, float science, float scienceCap)
@@ -179,7 +178,6 @@ namespace RequiredExperiments
             float w = 2 * waitTime;
             while (true)
             {
-                yield return new WaitForSeconds(waitTime);
                 if (!HighLogic.LoadedSceneIsGame)
                 {
                     lastGameTitle = "";
@@ -208,6 +206,7 @@ namespace RequiredExperiments
                         lastUT = Planetarium.GetUniversalTime();
                     }
                 }
+                yield return new WaitForSeconds(waitTime);
             }
         }
 

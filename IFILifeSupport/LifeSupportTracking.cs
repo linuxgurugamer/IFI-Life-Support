@@ -503,7 +503,10 @@ namespace IFILifeSupport
                     {
                         if (part.Modules[m].moduleName == "ModuleIFILifeSupport")
                         {
+
                             ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)part.Modules[m];
+
+
                             for (int i = 0; i < m1.inputList.Count; i++)
                             {
                                 ResourceRatio inp = m1.inputList[i];
