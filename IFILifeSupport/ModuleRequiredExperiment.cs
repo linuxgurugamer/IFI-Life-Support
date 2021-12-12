@@ -372,7 +372,7 @@ namespace RequiredExperiments
                         EnableModules();
                         availableAtTime = -1;
                     }
-                    yield return new WaitForSecondsRealtime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
+                    yield return new WaitForSecondsRealtime(1f); //  HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
                 }
                 else
                     yield return new WaitForSecondsRealtime(0.1f);

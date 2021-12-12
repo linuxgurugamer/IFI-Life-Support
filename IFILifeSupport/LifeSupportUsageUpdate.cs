@@ -227,8 +227,12 @@ namespace IFILifeSupport
 
         static bool ResourceConverterActive(ProtoPartSnapshot pps, int j)
         {
-            bool active = false;
-            Boolean.TryParse(pps.modules[j].moduleValues.GetValue("isEnabled"), out active);
+            Boolean.TryParse(pps.modules[j].moduleValues.GetValue("isEnabled"), out bool active);
+            Boolean.TryParse(pps.modules[j].moduleValues.GetValue("checkForOxygen"), out bool checkForOxygen);
+
+            if (checkForOxygen && !pps.pVesselRef.vesselRef.mainBody.atmosphereContainsOxygen)
+                return false;
+
             return active;
         }
 
@@ -326,7 +330,10 @@ namespace IFILifeSupport
 
             if (converter.ModuleIsActive())
             {
-                Log.Info("Loaded_Converter_Update, ModuleIsActive");
+                //Log.Info("Loaded_Converter_Update, ModuleIsActive:" + converter.part.partInfo.title);
+                //Log.Info("converter.checkForOxygen: " + converter.checkForOxygen + ", converter.vessel.mainBody.atmosphereContainsOxygen: " + converter.vessel.mainBody.atmosphereContainsOxygen);
+                if (converter.checkForOxygen && !converter.vessel.mainBody.atmosphereContainsOxygen)
+                    return;
 
                 double percentResAvail = 1;
 

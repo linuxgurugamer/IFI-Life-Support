@@ -52,8 +52,7 @@ namespace IFILifeSupport
 
         static internal bool PartShouldBeHidden(AvailablePart part)
         {
-            ConfigNode n;
-            return PartShouldBeHidden(part, out n);
+            return PartShouldBeHidden(part, out ConfigNode n);
         }
         /// <summary>
         /// Used both in the Editor and in the PartUpdater.
