@@ -16,7 +16,6 @@ namespace IFILifeSupport
     public class IFI_LifeSupportTrackingDisplay : MonoBehaviour
     {
         public static IFI_LifeSupportTrackingDisplay Instance;
-        //internal static int LS_ID;
 
         internal const string MODID = "IFILifeSupport_NS";
         internal const string MODNAME = "IFI Life Support";
@@ -74,7 +73,7 @@ namespace IFILifeSupport
         public void Start()
         {
             Log.Info("IFI_LIFESUPPORT_TRACKING.Start");
-            //LS_ID = PartResourceLibrary.Instance.GetDefinition("ElectricCharge").id;
+
             if (toolbarControl == null)
             {
                 toolbarControl = gameObject.AddComponent<ToolbarControl>();
@@ -91,10 +90,11 @@ namespace IFILifeSupport
 
             GameEvents.onVesselRecoveryProcessingComplete.Add(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Add(OnVesselRecoveryRequested);
+            GameEvents.onCrewBoardVessel.Add(onCrewBoardVessel);
 
             GameEvents.onHideUI.Add(OnHideUI);
             GameEvents.onShowUI.Add(OnShowUI);
-                    }
+        }
 
         private void GUIToggle()
         {
@@ -120,21 +120,24 @@ namespace IFILifeSupport
             }
 
             LS_Status_Hold[LS_Status_Hold_Count, CREW] = H_Crew;
-            if (vessel.vesselType == VesselType.EVA && LifeSupportUsageUpdate. KerbalEVARescueDetect(vessel, IFI_Crew))
+            if (vessel.vesselType == VesselType.EVA && LifeSupportUsageUpdate.KerbalEVARescueDetect(vessel, IFI_Crew))
             {
                 LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = "RESCUE";
                 LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = "RESCUE";
             }
             else
             {
-                string color = lblGreenColor;
-                if (days_rem < 3)
-                    color = lblYellowColor;
-                if (days_rem < 1)
-                    color = lblRedColor;
+                {
+                    string color = lblGreenColor;
+                    if (IFI_Crew > 0 && days_rem < 3)
+                        color = lblYellowColor;
+                    if (IFI_Crew > 0 && days_rem < 1)
+                        color = lblRedColor;
 
-                LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Convert.ToString(Math.Round(LSAval, 1)));
-                LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = Colorized(color, FormatToDateTime(days_rem));
+                    LS_Status_Hold[LS_Status_Hold_Count, LSAVAIL] = Colorized(color, Convert.ToString(Math.Round(LSAval, 1)));
+                    if (IFI_Crew > 0)
+                        LS_Status_Hold[LS_Status_Hold_Count, DAYS_REM] = Colorized(color, FormatToDateTime(days_rem));
+                }
             }
             if (vessel.vesselType != VesselType.EVA)
             {
@@ -186,7 +189,7 @@ namespace IFILifeSupport
                 if (LifeSupportDisplayInfo.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                 {
                     TimeWarp.SetRate(0, false);
-                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 3 days of Life Support remaining", 10f);
+                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 3 days of Kibbles & Bits remaining", 10f);
 
                 }
             }
@@ -197,7 +200,7 @@ namespace IFILifeSupport
                 if (LifeSupportDisplayInfo.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                 {
                     TimeWarp.SetRate(0, false);
-                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 1 day of Life Support remaining", 10f);
+                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 1 day of Kibbles & Bits remaining", 10f);
                 }
             }
         }
@@ -209,6 +212,10 @@ namespace IFILifeSupport
         void OnShowUI() { hide = false; }
         bool Hide { get { return hide; } }
 
+        void onCrewBoardVessel(GameEvents.FromToAction<Part, Part> fta)
+        {
+            RestoreStarvingCrew(fta.from.vessel, fta.to.vessel.protoVessel);
+        }
         void OnVesselRecoveryRequested(Vessel v)
         {
             Log.Info("OnVesselRecoveryRequested");
@@ -221,6 +228,8 @@ namespace IFILifeSupport
             Log.Info("LifeSupportTracking.OnDestroy");
             GameEvents.onVesselRecoveryProcessingComplete.Remove(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Remove(OnVesselRecoveryRequested);
+            GameEvents.onCrewBoardVessel.Remove(onCrewBoardVessel);
+
             Instance = null;
         }
 
@@ -237,10 +246,10 @@ namespace IFILifeSupport
         {
             StarvingKerbal sk;
             List<string> toDelete = new List<string>();
-
+            Log.Info("RestoreStarvingCrew");
             if (v != null)
             {
-                foreach (var c in v.GetVesselCrew())
+                foreach (ProtoCrewMember c in v.GetVesselCrew())
                 {
                     Log.Info("RestoreStarvingcrew, v.crew.name: " + c.name);
                     if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(c.name, out sk))
@@ -257,7 +266,7 @@ namespace IFILifeSupport
             }
             if (pv != null)
             {
-                foreach (var c in pv.GetVesselCrew())
+                foreach (ProtoCrewMember c in pv.GetVesselCrew())
                 {
                     Log.Info("RestoreStarvingcrew, pv.crew.name: " + c.name);
                     if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(c.name, out sk))
@@ -296,9 +305,18 @@ namespace IFILifeSupport
                     }
                 }
             }
-            foreach (var s1 in toDelete)
-                LifeSupportUsageUpdate.starvingKerbals.Remove(s1);
-            toDelete.Clear();
+            if (toDelete.Count > 0)
+            {
+                foreach (var s1 in toDelete)
+                    LifeSupportUsageUpdate.starvingKerbals.Remove(s1);
+                toDelete.Clear();
+#if false
+                for (int i = 0; i < HighLogic.CurrentGame.CrewRoster.Count; i++)
+                {
+                    Log.Info("KerbalRoster[" + i + "]: " + HighLogic.CurrentGame.CrewRoster[i].name + ", trait: " + HighLogic.CurrentGame.CrewRoster[i].trait);
+                }
+#endif
+            }
         }
 
 
@@ -740,7 +758,7 @@ namespace IFILifeSupport
             AppendLine(ref data, "Breathable Homeworld Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment.ToString("N2"));
             AppendLine(ref data, "\nKerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie.ToString());
             AppendLine(ref data, "EVA Kerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().EVAkerbalsCanDie.ToString());
-            AppendLine(ref data, "Kerbals inactive time before dying (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath.ToString());
+            AppendLine(ref data, "Kerbals inactive time before dying (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs.ToString());
 
             AppendLine(ref data, "\nFollowing adjustments are multiplied to the LS Rate when applicable\n");
             AppendLine(ref data, "Breathable Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment.ToString("N2"));
@@ -869,7 +887,7 @@ namespace IFILifeSupport
             //GUILayout.FlexibleSpace();
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "Auto Cancel Warp on Low Life Support");
+            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "Auto Cancel Warp on Low Kibbles & Bits");
             GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {

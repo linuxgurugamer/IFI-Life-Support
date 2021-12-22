@@ -97,14 +97,26 @@ namespace IFILifeSupport
         public string AnimationName = null;
 
         [KSPField]
+        public string AnimationLights = null;
+
+        [KSPField]
         public float AnimationStartOffset = 0f;
 
         public bool isPlaying = false;
 
         Animation BioAnimate = null;
+        Animation Lights = null;
+
+        ModuleDeployableSolarPanel solarPanel;
+        ModuleDeployablePart.DeployState lastDeployState;
 
         void UpdateEventNames()
         {
+            if (solarPanel != null)
+            {
+                Events["ToggleUVLightsAction"].guiActive = (solarPanel.deployState == ModuleDeployablePart.DeployState.EXTENDED);
+                lastDeployState = solarPanel.deployState;
+            }
             switch (UVLightsActivated)
             {
                 case true:
@@ -186,25 +198,48 @@ namespace IFILifeSupport
         {
             if (Log != null)
                 Log.Info("ModuleIFILifeSupport.Start");
+
+            solarPanel = part.FindModuleImplementing<ModuleDeployableSolarPanel>();
+
             moduleIFIgreenhousePanel = part.GetComponent<ModuleIFIGreenhousePanel>();
 
             lastUpdateTime = Planetarium.GetUniversalTime();
             if (AnimationName != null)
+            {
                 Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationName: [" + AnimationName + "]");
 
-            var ma = part.FindModelAnimators(AnimationName);
-            if (ma != null && ma.Length > 0)
-                BioAnimate = ma[0];
+                var ma = part.FindModelAnimators(AnimationName);
+                if (ma != null && ma.Length > 0)
+                    BioAnimate = ma[0];
 
-            UpdateEventNames();
+                UpdateEventNames();
 
-            if (BioAnimate != null)
-            {
-                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
-                BioAnimate.Stop();
-                BioAnimate[AnimationName].speed = 0;
-                lastTime = BioAnimate[AnimationName].time = AnimationStartOffset;
+                if (BioAnimate != null)
+                {
+                    Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
+                    //BioAnimate.Play();
+                    BioAnimate[AnimationName].speed = 0;
+                    //lastTime = BioAnimate[AnimationName].time = AnimationStartOffset;
+                    lastTime = BioAnimate[AnimationName].time = 0;
+                }
             }
+            if (AnimationLights != null)
+            {
+                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationLights: [" + AnimationLights + "]");
+
+                var ma = part.FindModelAnimators(AnimationLights);
+                if (ma != null && ma.Length > 0)
+                    Lights = ma[0];
+
+                UpdateEventNames();
+
+                if (Lights != null)
+                {
+                    //Lights.Stop();
+                    Lights[AnimationLights].speed = 0;
+                }
+            }
+            
         }
 
         double lastUpdateTime;
@@ -306,7 +341,7 @@ namespace IFILifeSupport
                     isPlaying = true;
                     try
                     {
-                        Log.Info("ModuleIFILifeSupport, part: " + part.partInfo.title + " Artificial Lights Activated");
+                        Log.Info("ModuleIFILifeSupport, part: " + part.partInfo.title + " Artificial Lights Activated, BioAnimate[AnimationName].time: " + BioAnimate[AnimationName].time + ", BioAnimate[AnimationName].speed: " + BioAnimate[AnimationName].speed);
 
                         curSpeed = BioAnimate[AnimationName].speed;
                         endSpeed = 1;
@@ -316,6 +351,14 @@ namespace IFILifeSupport
                             BioAnimate[AnimationName].wrapMode = WrapMode.ClampForever;
                         BioAnimate[AnimationName].time = lastTime;
                         BioAnimate.Play();
+
+                        if (Lights != null)
+                        {
+                            Lights[AnimationLights].wrapMode = WrapMode.ClampForever;
+                            Lights[AnimationLights].speed = 1;
+                            Lights.Play();
+                        }
+
                     }
                     catch (System.IndexOutOfRangeException)
                     {
@@ -335,12 +378,22 @@ namespace IFILifeSupport
                         else
                             endSpeed = 0;
 
+                        if (Lights != null)
+                        {
+                            Lights[AnimationLights].speed = -1;
+                            Lights[AnimationLights].time = 1;
+
+                        }
+
                     }
                     catch (System.IndexOutOfRangeException)
                     {
                         Log.Error("ModuleIFILifeSupport.FixedUpdate IndexOutOfRangeException: " + AnimationName);
                     }
                 }
+
+                Log.Info("ModuleIFILifeSupport.FixedUpdate, part: " + part.partInfo.title + " BioAnimate[AnimationName].time: " + BioAnimate[AnimationName].time + ", BioAnimate[AnimationName].speed: " + BioAnimate[AnimationName].speed);
+
                 if (endSpeed == 1 && curSpeed < 1)
                 {
                     curSpeed += RampSpeed;
@@ -356,9 +409,13 @@ namespace IFILifeSupport
                     {
                         BioAnimate[AnimationName].wrapMode = WrapMode.ClampForever;
                         BioAnimate.Stop();
+                        if (Lights != null)
+                            Lights.Stop();
                     }
                 }
             }
+            if (solarPanel != null && lastDeployState != solarPanel.deployState)
+                UpdateEventNames();
         }
 
 

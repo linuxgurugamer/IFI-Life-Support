@@ -13,7 +13,7 @@ namespace IFILifeSupport
 {
     public class StarvingKerbal
     {
-        const int IFICWLS = 25;
+        const float IFICWLS = .25f;
 
 
         public string name;
@@ -28,22 +28,25 @@ namespace IFILifeSupport
         }
 
 
-        public static void CrewTestEVA(Vessel IV, double l)
+        public static void CrewTestEVA(Vessel kerbalVessel, double CUR_CWLS)
         {
-#if true
+            Log.Info("CrewTestEVA");
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().dieDuringTimewarp && TimeWarp.CurrentRate > 1)
+                return;
+
             StarvingKerbal sk;
-            if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(IV.rootPart.protoModuleCrew[0].name, out sk))
+            if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(kerbalVessel.rootPart.protoModuleCrew[0].name, out sk))
             {
-                if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs > Planetarium.GetUniversalTime())
                 {
                     return;
                 }
             }
             else
             {
-                if (IV.loaded)
+                if (kerbalVessel.loaded)
                 {
-                    Part p = IV.rootPart;
+                    Part p = kerbalVessel.rootPart;
                     ProtoCrewMember iCrew = p.protoModuleCrew[0];
 
                     sk = new StarvingKerbal(iCrew.name, iCrew.trait);
@@ -52,22 +55,24 @@ namespace IFILifeSupport
                     message += iCrew.name + ":\n Was turned into a  tourist for Life Support Failure.";
                     MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed to Tourist on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                     MessageSystem.Instance.AddMessage(m);
+                    ScreenMessages.PostScreenMessage(iCrew.name + " (eva) was turned into a  tourist for Life Support Failure.", 10f);
+
                     Log.Info("Old experienceTrait: " + iCrew.trait);
                     LifeSupportUsageUpdate.starvingKerbals.Add(sk.name, sk);
                     iCrew.type = ProtoCrewMember.KerbalType.Tourist;
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                 }
             }
-#endif
+
             float rand;
-            int CUR_CWLS = IFICWLS;
-            CUR_CWLS += (Convert.ToInt32(l) * 10);
-            rand = UnityEngine.Random.Range(0.0f, 100.0f);
+            //int CUR_CWLS = IFICWLS;
+           
+            rand = UnityEngine.Random.Range(0.0f, 1f);
             if (CUR_CWLS > rand)
             {
-                if (IV.loaded)
+                if (kerbalVessel.loaded)
                 {
-                    Part p = IV.rootPart;
+                    Part p = kerbalVessel.rootPart;
                     ProtoCrewMember iCrew = p.protoModuleCrew[0];
 
                     if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().EVAkerbalsCanDie)
@@ -79,6 +84,7 @@ namespace IFILifeSupport
                         message += iCrew.name + ":\n Was killed for Life Support Failure.";
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death on EVA", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
+                        ScreenMessages.PostScreenMessage(iCrew.name + " (eva) was killed for Life Support Failure.", 10f);
                     }
 #if false
                     else
@@ -109,12 +115,14 @@ namespace IFILifeSupport
 
         }
 
-        public static void CrewTest(int REASON, Part p, double l)
+        public static void CrewTest(int REASON, Part p, double deathChance           )
         {
-            int CUR_CWLS = IFICWLS;
-            CUR_CWLS += (Convert.ToInt32(l) * 10);
             float rand;
             ProtoCrewMember iCrew;
+
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().dieDuringTimewarp && TimeWarp.CurrentRate > 1)
+                return;
+
             for (int i = 0; i < p.protoModuleCrew.Count; i++)
             {
 #if true
@@ -122,7 +130,7 @@ namespace IFILifeSupport
                 StarvingKerbal sk;
                 if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
                 {
-                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs > Planetarium.GetUniversalTime())
                     {
                         return;
                     }
@@ -136,20 +144,21 @@ namespace IFILifeSupport
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                     IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
                     string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
-                    message += "No Life Support Remaining";
+                    message += "No Kibbles & Bits Remaining";
                     message += "::";
                     MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                     MessageSystem.Instance.AddMessage(m);
+                    ScreenMessages.PostScreenMessage(iCrew.name + " (in a pod) turned into tourist due to no Life Support", 10f);
                 }
 #endif
-                rand = UnityEngine.Random.Range(0.0f, 100.0f);
+                rand = UnityEngine.Random.Range(0.0f, 1f);
                 IFIDebug.IFIMess("!!!!!!!!");
                 IFIDebug.IFIMess("Testing Crew Death Crewmember=" + p.protoModuleCrew[i].name);
-                IFIDebug.IFIMess("Crew Death Chance = " + Convert.ToString(CUR_CWLS));
+                IFIDebug.IFIMess("Crew Death Chance = " + Convert.ToString(deathChance));
                 IFIDebug.IFIMess("Crew Death Roll = " + Convert.ToString(rand));
                 IFIDebug.IFIMess("!!!!!!!!");
 
-                if (CUR_CWLS > rand)
+                if (deathChance > rand)
                 {
                     iCrew = p.protoModuleCrew[i];
                     if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie)
@@ -158,10 +167,11 @@ namespace IFILifeSupport
                         iCrew.Die();  // Kill crew after removal or death will reset to active.
                         IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
                         string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                        message += "No Life Support Remaining";
+                        message += "No Kibbles & Bits Remaining";
                         message += "::";
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
+                        ScreenMessages.PostScreenMessage(iCrew.name + " (in a pod) was killed for Life Support Failure.", 10f);
                     }
 #if false
                     else
@@ -188,23 +198,22 @@ namespace IFILifeSupport
             }
         }
 
-        public static void CrewTestProto(int REASON, ProtoPartSnapshot p, double l)
+        public static void CrewTestProto(int REASON, ProtoPartSnapshot p, double deathChance)
         {
-
-            int CUR_CWLS = IFICWLS;
-            CUR_CWLS += (Convert.ToInt32(l) * 10);
             float rand;
 
+            Log.Info("CrewTestProto");
             ProtoCrewMember iCrew;
             for (int i = 0; i < p.protoModuleCrew.Count; i++)
             {
 
 #if true
                 iCrew = p.protoModuleCrew[i];
+                Log.Info("CrewTestProto, crew: " + iCrew.name);
                 StarvingKerbal sk;
                 if (LifeSupportUsageUpdate.starvingKerbals.TryGetValue(iCrew.name, out sk))
                 {
-                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().inactiveTimeBeforeDeath > Planetarium.GetUniversalTime())
+                    if (sk.startTime + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs > Planetarium.GetUniversalTime())
                     {
                         return;
                     }
@@ -218,22 +227,23 @@ namespace IFILifeSupport
                     KerbalRoster.SetExperienceTrait(iCrew, "Tourist");
                     IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
                     string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
-                    message += "No Life Support Remaining";
+                    message += "No Kibbles & Bits Remaining";
                     message += "::";
                     MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                     MessageSystem.Instance.AddMessage(m);
+                    ScreenMessages.PostScreenMessage(iCrew.name + "(in a pod) turned into tourist due to no Life Support", 10f);
                 }
 #endif
 
 
-                rand = UnityEngine.Random.Range(0.0f, 100.0f);
+                rand = UnityEngine.Random.Range(0.0f, 1f);
                 IFIDebug.IFIMess("!!!!!!!!");
                 IFIDebug.IFIMess("Testing Crew Death Crewmember=" + p.protoModuleCrew[i].name);
-                IFIDebug.IFIMess("Crew Death Chance = " + Convert.ToString(CUR_CWLS));
+                IFIDebug.IFIMess("Crew Death Chance = " + Convert.ToString(deathChance));
                 IFIDebug.IFIMess("Crew Death Roll = " + Convert.ToString(rand));
                 IFIDebug.IFIMess("!!!!!!!!");
 
-                if (CUR_CWLS > rand)
+                if (deathChance > rand)
                 {
                     iCrew = p.protoModuleCrew[i];
                     if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie)
@@ -243,10 +253,11 @@ namespace IFILifeSupport
 
                         IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
                         string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                        message += "No Life Support Remaining";
+                        message += "No Kibbles & Bits Remaining";
                         message += "::";
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport Failure", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
+                        ScreenMessages.PostScreenMessage(iCrew.name + " (in a pod) killed due to no Kibbles & Bits", 10f);
                     }
 #if false
                     else

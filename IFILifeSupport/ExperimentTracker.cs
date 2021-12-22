@@ -15,7 +15,7 @@ namespace RequiredExperiments
         string lastGameTitle = "";
         double lastUT = 0;
         //private IEnumerator coroutine;
-        const float WAITTIME = 2f;
+        const float WAITTIME = 1f;
 
         public class CompletedExperiment
         {
@@ -71,8 +71,7 @@ namespace RequiredExperiments
 
         void Start()
         {
-            //coroutine = MonitorGameTime(WAITTIME);
-            StartCoroutine(MonitorGameTime(WAITTIME));
+            StartCoroutine(MonitorGameTime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval));
 
             GameEvents.OnScienceChanged.Add(onScienceChanged);
             GameEvents.OnScienceRecieved.Add(onScienceReceived);

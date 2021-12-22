@@ -28,13 +28,12 @@ namespace IFILifeSupport
         {
             Instance = this;
             lastUpdateTime = Planetarium.GetUniversalTime();
-            //DontDestroyOnLoad(this);
         }
 
         void Start()
         {
             Log.Info("LifeSupportUsageUpdate.Start, scene: " + HighLogic.LoadedScene);
-            CancelInvoke();
+            //CancelInvoke();
             lastUpdateTime = Planetarium.GetUniversalTime();
             //InvokeRepeating("IFILifeSupportFixedUpdate", 0, 2); // maybe change to 10 later
             StopAllCoroutines();
@@ -61,12 +60,12 @@ namespace IFILifeSupport
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame &&
                     (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.SPACECENTER) &&
                     (!refreshed || TimeWarp.CurrentRate > 800 ||
-                    Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval))
+                    Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval))
                 {
                     Life_Support_Update();
                     lastUpdateTime = Planetarium.GetUniversalTime();
                     refreshed = true;
-                    yield return new WaitForSecondsRealtime(2f);
+                    yield return new WaitForSecondsRealtime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval);
                 }
                 else
                 {
@@ -108,12 +107,13 @@ namespace IFILifeSupport
 
                     GetCrewInfo(vessel, out IFI_Crew, out IFI_ALT, out IFI_Location);
 
+                   double LS_Needed =  LS_Use = CalcLS(vessel, IFI_Crew, Elapsed_Time, out LSAval, out days_rem);
+
                     if (IFI_Crew > 0.0)
                     {
                         //
                         // Figure out how much is needed for the Elapsed_Time
                         //
-                        LS_Use = CalcLS(vessel, IFI_Crew, Elapsed_Time, out LSAval, out days_rem);
 
                         //if (LS_Use > 0.0)
                         {
@@ -121,8 +121,8 @@ namespace IFILifeSupport
                             // Special case for an EVA kerbal and a rescue
                             if (/* vessel.vesselType == VesselType.EVA && */ KerbalEVARescueDetect(vessel, IFI_Crew))
                             {
-                                LSAval = 200.0;
-                                days_rem = 10.0;
+                                //LSAval = 200.0;
+                                //days_rem = 10.0;
                             }
 
                             if (vessel.loaded)
@@ -137,7 +137,7 @@ namespace IFILifeSupport
                                     Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, TotalLS_ResourcesAvail, ResourceFlowMode.ALL_VESSEL);
                                     Log.Info("LifeSupportUsageUpdate.IFIUSEResources 1, RequestedResource, part: " + vessel.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
                                     double amount2 = Util.GetResourceTotal(vessel, Constants.LIFESUPPORT);
-
+                                    LS_Use = 0;
                                     Log.Info("Before request amount: " + amount + ",  After request: amount2: " + amount2);
                                 }
                                 else
@@ -145,7 +145,9 @@ namespace IFILifeSupport
                                     Log.Info("RequestResource: " + Constants.LIFESUPPORT + ",  UR_Amount: " + LS_Use);
                                     Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, LS_Use);
                                 }
-                                Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource);
+                                Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource + ", LS_Use: " + LS_Use);
+                                if (LS_Use <= 0)
+                                    IFI_Check_Kerbals(vessel);
 
                             }
                             else
@@ -169,13 +171,16 @@ namespace IFILifeSupport
                                         }
                                     }
                                 }
+                                if (LS_Needed == LS_Use)
+                                    IFI_Check_Kerbals(vessel);
+
                             }
                         }
                     }
                     else
                     {
-                        days_rem = 10;
-                        LSAval = 200.0;
+                        //days_rem = 0;
+                        //LSAval = 200.0;
                     }
                     if (vessel.loaded)
                     {
@@ -270,8 +275,10 @@ namespace IFILifeSupport
                     report.AppendLine("Atmospheric adjustment: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment);
                 }
             }
-
-            days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
+            if (IFI_Crew > 0)
+                days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
+            else
+                days_rem = -1;
             report.AppendLine("After Atmo adjust, LS_Use: " + LS_Use_Per_Minute + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time + ", LSAval: " + LSAval); // + ", HoursPerDay: " + HoursPerDay);
             LS_Use_Per_Minute *= IFI_Crew;
 
@@ -803,41 +810,41 @@ namespace IFILifeSupport
         }
 #endif
 
-        private void IFI_Check_Kerbals(Vessel IV, double l) // Find All Kerbals Hiding on Vessel 
+        private void IFI_Check_Kerbals(Vessel vessel) // Find All Kerbals Hiding on Vessel 
         {
-            if (IV.vesselType == VesselType.EVA)
+            Log.Info("IFI_Check_Kerbals");
+            if (vessel.vesselType == VesselType.EVA)
             {
                 try
                 {
-                    // following was commented out, need to test
-                    StarvingKerbal.CrewTestEVA(IV, l);
+                    StarvingKerbal.CrewTestEVA(vessel, 0.2f);
                 }
                 catch (Exception ex) { IFIDebug.IFIMess("Vessel IFI Exception ++Finding Kerbals++ eva " + ex.Message); }
             }
             else
             {
-                if (IV.loaded)
+                if (vessel.loaded)
                 {
-                    for (int idx = 0; idx < IV.parts.Count; idx++)
+                    for (int idx = 0; idx < vessel.parts.Count; idx++)
                     {
-                        Part p = IV.parts[idx];
+                        Part p = vessel.parts[idx];
                         int IFIcrew = p.protoModuleCrew.Count;
                         if (IFIcrew > 0)
                         {
-                            StarvingKerbal.CrewTest(0, p, l);
+                            StarvingKerbal.CrewTest(0, p,0.1f);
                         }
 
                     }
                 }
                 else
                 {
-                    for (int idx = 0; idx < IV.protoVessel.protoPartSnapshots.Count; idx++)
+                    for (int idx = 0; idx < vessel.protoVessel.protoPartSnapshots.Count; idx++)
                     {
-                        ProtoPartSnapshot p = IV.protoVessel.protoPartSnapshots[idx];
+                        ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[idx];
                         int IFIcrew = p.protoModuleCrew.Count;
                         if (IFIcrew > 0)
                         {
-                            StarvingKerbal.CrewTestProto(0, p, l);
+                            StarvingKerbal.CrewTestProto(0, p, 0.1f);
                         }
 
                     }
@@ -1162,7 +1169,9 @@ namespace IFILifeSupport
         {
             if (!vessel.loaded)
             {
-                IFI_Crew = vessel.protoVessel.GetVesselCrew().Count;
+                IFI_Crew = 0;
+                foreach (var p in vessel.protoVessel.protoPartSnapshots)
+                    IFI_Crew += p.protoModuleCrew.Count;
                 IFI_ALT = vessel.protoVessel.altitude;
                 IFI_Location = vessel.mainBody.name;
             }

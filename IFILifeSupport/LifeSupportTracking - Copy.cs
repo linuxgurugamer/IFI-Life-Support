@@ -567,7 +567,7 @@ namespace IFILifeSupport
                         iCrew.Die();  // Kill crew after removal or death will reset to active.
                         IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
                         string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                        message += "No Life Support Remaining";
+                        message += "No Kibbles & Bits Remaining";
                         message += "::";
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
@@ -585,7 +585,7 @@ namespace IFILifeSupport
 
                             IFIDebug.IFIMess(p.vessel.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
                             string message = ""; message += p.vessel.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
-                            message += "No Life Support Remaining";
+                            message += "No Kibbles & Bits Remaining";
                             message += "::";
                             MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                             MessageSystem.Instance.AddMessage(m);
@@ -621,7 +621,7 @@ namespace IFILifeSupport
 
                         IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal Killed due to no LS - " + iCrew.name);
                         string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was killed due to ::";
-                        message += "No Life Support Remaining";
+                        message += "No Kibbles & Bits Remaining";
                         message += "::";
                         MessageSystem.Message m = new MessageSystem.Message("Kerbal Death from LifeSupport Failure", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                         MessageSystem.Instance.AddMessage(m);
@@ -639,7 +639,7 @@ namespace IFILifeSupport
 
                             IFIDebug.IFIMess(p.pVesselRef.vesselName + " POD Kerbal turned into tourist due to no LS - " + iCrew.name);
                             string message = ""; message += p.pVesselRef.vesselName + "\n\n"; message += iCrew.name + "\n Was turned into a tourist due to ::";
-                            message += "No Life Support Remaining";
+                            message += "No Kibbles & Bits Remaining";
                             message += "::";
                             MessageSystem.Message m = new MessageSystem.Message("Kerbal transformed into Tourist from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
                             MessageSystem.Instance.AddMessage(m);

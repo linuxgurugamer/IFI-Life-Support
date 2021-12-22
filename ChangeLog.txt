@@ -126,14 +126,18 @@
 3.4.6.x
 	Added flag to toggle skin
 	Changed name of life support resource to "Kibbles & Bits"
-
+	Changed time to die from seconds to hours
+	Added option to not die during timewarp
+	Added configurable delay for display updates
+	All animations working properly.
+	Added code to prevent starting lights when solar panels are closed
+	Fixed air compressor scaling
+	Added textures to new tanks for liquid and gas O2
 
 
 TODO
-	Add a day/hours/minutes display instead of decimal days
+	
 	possible use goo containers as emergency food supply
-
-		Rename life support containers to Kibbles & Bits containers
 
 
 

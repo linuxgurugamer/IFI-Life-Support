@@ -1,0 +1,6 @@
+LOG : Opening file : D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\metaball\IFI-logo.tga
+LOG : Converting D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\metaball\IFI-logo.tga to D:\Users\jbb\github\IFI-Life-Support\GameData\IFILS\Parts\Storage\metaball\IFI-logo.dds
+    Format : Dxt5, normalmap : False, res: 512x512
+Flipping image...
+FlipImage took 8.29990005493164ms
+Image conversion took 85.659797668457ms

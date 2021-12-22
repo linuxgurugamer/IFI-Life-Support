@@ -74,6 +74,11 @@ namespace IFILifeSupport
 
         public float RefreshInterval {  get { return TimeWarp.CurrentRate * refreshInterval; } }
 
+        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 1, maxValue = 15)]
+        public int displayRefreshInterval = 1;
+
+
+
         public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
         public LifeSupportLevel Level {  get
             {
@@ -166,7 +171,6 @@ namespace IFILifeSupport
         }
         public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
-            Log.Info("IFILS1.Interactible");
             if (oldClassic != classic)
                 SetLevel(LifeSupportLevel.classic);
 
@@ -280,12 +284,20 @@ namespace IFILifeSupport
         [GameParameters.CustomParameterUI("EVA Kerbals can die")]
         public bool EVAkerbalsCanDie = true;
 
-        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying (seconds)", minValue = 0, maxValue = 3600)]
-        public int inactiveTimeBeforeDeath = 0;
+        [GameParameters.CustomIntParameterUI("Kerbals inactive time before dying (hours)", minValue = 0, maxValue = 60)]
+        public int inactiveTimeBeforeDeath = 1;
 
+        public int InactiveTimeBeforeDeathSecs {  get { return inactiveTimeBeforeDeath * 3600; } }
         [GameParameters.CustomParameterUI("Debug mode",
             toolTip = "Writes reports to the log file ")]
         public bool Debug = false;
+
+
+        [GameParameters.CustomParameterUI("Kerbals can die during timewarp",
+            toolTip = "If false, then kerbals will not die during timewarp, the time until death will begin when the timewarp ends")]
+        public bool dieDuringTimewarp = true;
+
+
 
 
         void SetValues(double mult)

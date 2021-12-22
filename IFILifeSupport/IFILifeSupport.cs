@@ -20,7 +20,7 @@ namespace IFILifeSupport
         [KSPField(guiActive = true, guiName = "Life Support Status", isPersistant = false)]
         public string lifeSupportStatus;
 
-        [KSPField(guiActive = true, guiName = "Life Support", guiUnits = " Days ", guiFormat = "F2", isPersistant = false)]
+        [KSPField(guiActive = true, guiName = "Kibbles & Bits", guiUnits = " Days ", guiFormat = "F2", isPersistant = false)]
         public float displayRate;
 
         [KSPField(guiActive = false, isPersistant = true)]
