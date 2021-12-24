@@ -1,0 +1,58 @@
+//Original model and texturing done by zzz
+
+PART
+{
+	name = OrganicSlurryConntainerSmall
+	module = Part
+	author = Akinesis
+
+	//mesh = B_black_flat.mu
+	//scale = 1
+	MODEL
+	{
+		model = IFILS/Parts/Storage/cont_small/B_black_flat
+		//texture = box_diff_A_C, IFILS/Parts/Storage/cont_small/OrganicSlurry/box_diff_A_C
+		texture = box_diff_A_C, IFILS/Parts/Storage/cont_common/Sludge/box_diff_A_C
+		texture = BOX_normals_NRM, IFILS/Parts/Storage/cont_common/BOX_normals_NRM
+	}
+	rescaleFactor = 0.5
+
+	node_attach = 0.0, -0.3, 0.0 , 0.0, -1.0, 0.0
+   
+	TechRequired = enhancedBioSystems
+	entryCost = 900
+	cost = 500
+	category = none
+	subcategory = 0
+	title = Organic Slurry Container - Small
+	manufacturer = DAA Aerospace
+	description = This unit contains the waste products, called Organic Slurry. This container will hold the waste products of 1 Kerbal for 20 Kerbin days.
+
+	// attachment rules: stack, srfAttach, allowStack, allowSrfAttach, allowCollision
+	attachRules = 1,1,1,1,0
+		   
+	mass = 0.02
+	dragModelType = default
+	maximum_drag = 0.5
+	minimum_drag = 0.5
+	angularDrag = 2
+	crashTolerance = 6
+	maxTemp = 1700 // 1800
+	fuelCrossFeed = True
+	breakingForce = 25
+	breakingTorque = 25
+
+	bulkheadProfiles = size0, srf
+	tags = cck-lifesupport
+	
+	RESOURCE
+	{
+		name = OrganicSlurry
+		amount = 0
+		maxAmount = 20
+	}
+	MODULE
+	{
+		name = IFI_Improved
+	}
+}

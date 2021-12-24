@@ -133,7 +133,13 @@
 	Added code to prevent starting lights when solar panels are closed
 	Fixed air compressor scaling
 	Added textures to new tanks for liquid and gas O2
-
+	Added new tank parts from JadeOfMaar 
+	Combined existing tanks from 9 to 3, using B9 Part Switcher to switch between them
+	Removed IFITank parts, as they were just a duplicate of other tanks
+	Merged the K&B container tanks into one with variable sizing
+	Adjusted all  parts models to use the MODEL stanza
+	Set all rescaleFactor settings to 1, moved the scaling into the MODEL stanza
+	Fixed all attach node sizes and locations
 
 TODO
 	
@@ -147,6 +153,4 @@ Kibbles & Bits
 Munchies
 Food
 Logistics
-Need to get O2 & LqdO2 tanks
 
-The algaeGreenhouse has a slight jump when first starting the rotating animation, only the first time
