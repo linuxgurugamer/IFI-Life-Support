@@ -12,11 +12,10 @@
 	// 4.  Remove the following line from the file AssemblyInfo.cs (usually located in the "Property" folder inside your C# project):
 	//        [assembly: AssemblyVersion("1.0.0.0")]
 	// 5.  Add the following to the PreBuild steps:
-	//		set textTemplatingPath="%CommonProgramFiles(x86)%\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 	//
-	//		if %textTemplatingPath%=="\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe" set textTemplatingPath="%CommonProgramFiles%\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
-	//
-	//		%textTemplatingPath% "$(ProjectDir)AssemblyFileVersion.tt"
+	// set textTemplatingPath="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\texttransform.exe"
+	// %textTemplatingPath% "$(ProjectDir)AssemblyVersion.tt"
+
 
     int major = 0; 
     int minor = 0; 	
@@ -27,8 +26,16 @@
 	int i = 0;
 	int i2 = 0;
 	string s;
+	
+	// For Visual Studio / MSBuild Build-Time Template Resolution
+	string RootDirectory = System.IO.Path.GetDirectoryName(Host.TemplateFile) + @"\..\..\";
 
-	string versionfile =  @"D:\Users\jbb\github\IFI-Life-Support\IFILS.version";
+	//
+	// Update the following with the name of the .version file which is in the root directory
+	//
+	string versionfile = RootDirectory + "IFILS.version";
+
+	 
 	if (!File.Exists(versionfile))
 	{
 		Write("File: " + versionfile + " missing\n");		
@@ -91,3 +98,5 @@
  using System.Reflection;
 
  [assembly: AssemblyVersion("<#= major #>.<#= minor #>.<#= patch #>.<#= build #>")]
+ [assembly: AssemblyFileVersion("<#= major #>.<#= minor #>.<#= patch #>.<#= build #>")]
+ [assembly: AssemblyInformationalVersion("v<#= major #>.<#= minor #>.<#= patch #>.<#= build #>")]

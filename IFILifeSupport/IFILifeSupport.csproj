@@ -67,11 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimatedGenerator.cs" />
-    <Compile Include="AssemblyVersion.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyVersion.tt</DependentUpon>
-    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DisplayLSInfoWindow.cs" />
     <Compile Include="Editor.cs" />
@@ -140,7 +135,9 @@ if $(ConfigurationName) == Release (
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>"$(DevEnvDir)\texttransform.exe" "$(ProjectDir)AssemblyVersion.tt"
+    <PreBuildEvent>
+"$(DevEnvDir)\texttransform.exe" "$(ProjectDir)AssemblyVersion.tt"
+    
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
