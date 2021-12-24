@@ -123,7 +123,7 @@
 3.4.6.2
 	Updated to latest toolbarcontroller
 
-3.4.6.x
+4.0.0
 	Added flag to toggle skin
 	Changed name of life support resource to "Kibbles & Bits"
 	Changed time to die from seconds to hours
@@ -140,6 +140,7 @@
 	Adjusted all  parts models to use the MODEL stanza
 	Set all rescaleFactor settings to 1, moved the scaling into the MODEL stanza
 	Fixed all attach node sizes and locations
+	Updated the metaball parts to liimit the switichable parts in flight
 
 TODO
 	
