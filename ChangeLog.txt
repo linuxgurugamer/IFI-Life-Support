@@ -142,6 +142,9 @@
 	Fixed all attach node sizes and locations
 	Updated the metaball parts to liimit the switichable parts in flight
 
+4.0.0.1
+	Updated tank textures & parts, thanks to @JadeOfMaar
+
 TODO
 	
 	possible use goo containers as emergency food supply

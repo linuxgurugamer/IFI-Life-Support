@@ -2,13 +2,13 @@
 
 PART
 {
-	name = LifeSupportContainerVariantRed
+	name = LifeSupportContainerVariantBlue
 	module = Part
 	author = Akinesis
 
 	MODEL
 	{
-		model = IFILS/Parts/Storage/cont_common/tiny-red
+		model = IFILS/Parts/Storage/cont_common/tiny-blue
 		// texture = box_diff_A_C, IFILS/Parts/Storage/cont_common/box_diff_A_C
 		// texture = BOX_normals_NRM, IFILS/Parts/Storage/cont_common/BOX_normals_NRM
 		scale = 0.25, 0.25, 0.25
@@ -16,12 +16,12 @@ PART
 	MODEL
 	{
 		model = IFILS/Parts/Storage/decals/BoxFlatDecal-tiny
-		texture = logo, IFILS/Parts/Storage/decals/logo-Sludge
+		texture = logo, IFILS/Parts/Storage/decals/logo-IFI
 		scale = 0.25, 0.25, 0.25
 	}
 	MODEL
 	{
-		model = IFILS/Parts/Storage/cont_common/small-red
+		model = IFILS/Parts/Storage/cont_common/small-blue
 		// texture = box_diff_A_C, IFILS/Parts/Storage/cont_common/box_diff_A_C
 		// texture = BOX_normals_NRM, IFILS/Parts/Storage/cont_common/BOX_normals_NRM
 		scale = 0.5, 0.5, 0.5
@@ -29,12 +29,12 @@ PART
 	MODEL
 	{
 		model = IFILS/Parts/Storage/decals/BoxFlatDecal-small
-		texture = logo, IFILS/Parts/Storage/decals/logo-Sludge
+		texture = logo, IFILS/Parts/Storage/decals/logo-IFI
 		scale = 0.5, 0.5, 0.5
 	}
 	MODEL
 	{
-		model = IFILS/Parts/Storage/cont_common/medium-red
+		model = IFILS/Parts/Storage/cont_common/medium-blue
 		// texture = box_diff_A_C, IFILS/Parts/Storage/cont_common/box_diff_A_C
 		// texture = BOX_normals_NRM, IFILS/Parts/Storage/cont_common/BOX_normals_NRM
 		scale = 0.5, 0.5, 0.5
@@ -42,12 +42,12 @@ PART
 	MODEL
 	{
 		model = IFILS/Parts/Storage/decals/BoxDecal-medium
-		texture = logo, IFILS/Parts/Storage/decals/logo-Sludge
+		texture = logo, IFILS/Parts/Storage/decals/logo-IFI
 		scale = 0.5, 0.5, 0.5
 	}
 	MODEL
 	{
-		model = IFILS/Parts/Storage/cont_common/large-red
+		model = IFILS/Parts/Storage/cont_common/large-blue
 		// texture = box_diff_A_C, IFILS/Parts/Storage/cont_common/box_diff_A_C
 		// texture = BOX_normals_NRM, IFILS/Parts/Storage/cont_common/BOX_normals_NRM
 		scale = 0.5, 0.5, 0.5
@@ -74,7 +74,7 @@ PART
 	cost = 200
 	category = none
 	subcategory = 0
-	title = Unknown Red Tank - Variable Size
+	title = Unknown Blue Tank - Variable Size
 	manufacturer = DAA Aerospace
 	description = This unit contains breathable air, water and food for the Kerbals. This container will support 1 Kerbal for 80 Kerbin days.
 
@@ -107,17 +107,17 @@ PART
 		name = ModuleB9PartSwitch
 		moduleID = TankSwitch
 		baseVolume = 10
-		switcherDescription = Tank Selection 
+		switcherDescription = O2 Tank Selection 
 		switchInFlight = true
-		percentFilled = 0
+		percentFilled = 100
 
 		SUBTYPE
 		{
 			name = Tiny
 			title = Tiny Tank
-			secondaryColor = red
-			tankType = IFI_Sludge_Tank
-			transform = IFILS/Parts/Storage/cont_common/tiny-red(Clone)
+			secondaryColor = blue
+			tankType = IFI_FilteredOxygen_Tank
+			transform = IFILS/Parts/Storage/cont_common/tiny-blue(Clone)
 			transform = IFILS/Parts/Storage/decals/BoxFlatDecal-tiny(Clone)
 			attachNode = 0.0, -0.13, 0.0, 0.0, -1.0, 0.0
 			node = left-xs
@@ -128,11 +128,11 @@ PART
 		{
 			name = Small
 			title = Small Tank
-			secondaryColor = red
-			tankType = IFI_Sludge_Tank
+			secondaryColor = blue
+			tankType = IFI_FilteredOxygen_Tank
 			volumeAdded = 10
 			costAdded = 300
-			transform = IFILS/Parts/Storage/cont_common/small-red(Clone)
+			transform = IFILS/Parts/Storage/cont_common/small-blue(Clone)
 			transform = IFILS/Parts/Storage/decals/BoxFlatDecal-small(Clone)
 			attachNode = 0.0, -0.26, 0.0, 0.0, -1.0, 0.0
 			node = left-s-m
@@ -143,11 +143,11 @@ PART
 		{
 			name = Medium
 			title = Medium Tank
-			secondaryColor = red
-			tankType = IFI_Sludge_Tank
+			secondaryColor = blue
+			tankType = IFI_FilteredOxygen_Tank
 			volumeAdded = 25
 			costAdded = 500
-			transform = IFILS/Parts/Storage/cont_common/medium-red(Clone)
+			transform = IFILS/Parts/Storage/cont_common/medium-blue(Clone)
 			transform = IFILS/Parts/Storage/decals/BoxDecal-medium(Clone)
 			attachNode = 0.0, -0.42, 0.0, 0.0, -1.0, 0.0
 			node = left-s-m
@@ -158,11 +158,11 @@ PART
 		{
 			name = Large
 			title = Large Tank
-			secondaryColor = red
-			tankType = IFI_Sludge_Tank
+			secondaryColor = blue
+			tankType = IFI_FilteredOxygen_Tank
 			volumeAdded = 70
 			costAdded = 750
-			transform = IFILS/Parts/Storage/cont_common/large-red(Clone)
+			transform = IFILS/Parts/Storage/cont_common/large-blue(Clone)
 			transform = IFILS/Parts/Storage/decals/BoxDecal-medium(Clone)
 			attachNode = 0.0, -0.42, 0.0, 0.0, -1.0, 0.0
 			node = left-l
