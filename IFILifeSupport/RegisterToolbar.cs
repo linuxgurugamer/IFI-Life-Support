@@ -10,19 +10,19 @@ namespace IFILifeSupport
     {
         internal static Log Log = null;
         static bool _gamePaused = false;
-        static double  lastTime = 0;
+        static double lastTime = 0;
         public static bool GamePaused
-        { 
-            get 
-            { 
+        {
+            get
+            {
                 if (_gamePaused)
                 {
                     if (Planetarium.GetUniversalTime() != lastTime)
                         _gamePaused = false;
                 }
                 lastTime = Planetarium.GetUniversalTime();
-                return _gamePaused; 
-            } 
+                return _gamePaused;
+            }
         }
 
         void Awake()
@@ -35,15 +35,23 @@ namespace IFILifeSupport
 #endif
             GameEvents.onGamePause.Add(onGamePause);
             GameEvents.onGameUnpause.Add(onGameUnpause);
-     
+
             DontDestroyOnLoad(this);
         }
 
         void onGamePause() { lastTime = Planetarium.GetUniversalTime(); _gamePaused = true; }
-        void onGameUnpause() { lastTime = Planetarium.GetUniversalTime(); _gamePaused = false; }
+        void onGameUnpause() { if (HighLogic.CurrentGame != null) lastTime = Planetarium.GetUniversalTime(); _gamePaused = false; }
         void Start()
         {
             ToolbarControl.RegisterMod(IFI_LifeSupportTrackingDisplay.MODID, IFI_LifeSupportTrackingDisplay.MODNAME);
+        }
+
+        static public bool initted = false;
+        static public GUIStyle tooltipStyle;
+        static public GUIStyle kspToolTipStyle;
+
+        void OnGUI()
+        {
         }
     }
 }

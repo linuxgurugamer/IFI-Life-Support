@@ -74,10 +74,9 @@
     <Compile Include="ExperimentTracker.cs" />
     <Compile Include="IFILS_Main.cs" />
     <Compile Include="LifeSupportUsageUpdate.cs" />
+    <Compile Include="ModeSelectWindow.cs" />
     <Compile Include="RegisterToolbar.cs" />
     <Compile Include="ResourceProcessing\Greenhouse.cs" />
-    <Compile Include="LoadScreen.cs" />
-    <Compile Include="Log.cs" />
     <Compile Include="ModuleIFILifeSupport.cs" />
     <Compile Include="ModuleRequiredExperiment.cs" />
     <Compile Include="PartUpdate.cs" />

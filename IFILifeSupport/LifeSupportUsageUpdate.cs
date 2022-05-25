@@ -54,7 +54,7 @@ namespace IFILifeSupport
             {
                 if (!HighLogic.LoadedSceneIsGame || RegisterToolbar.GamePaused /*("IFILifeSupportFixedUpdate") */ )
                 {
-                    yield return new WaitForSecondsRealtime(0.1f);
+                    yield return  Util.WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 1", 0.1f);
                     continue;
                 }
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame &&
@@ -65,11 +65,11 @@ namespace IFILifeSupport
                     Life_Support_Update();
                     lastUpdateTime = Planetarium.GetUniversalTime();
                     refreshed = true;
-                    yield return new WaitForSecondsRealtime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval);
+                    yield return Util. WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 2",HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval);
                 }
                 else
                 {
-                    yield return new WaitForSecondsRealtime(0.1f);
+                    yield return Util. WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 3", 0.1f);
                     refreshed = false;
                 }
             }
@@ -106,8 +106,8 @@ namespace IFILifeSupport
                     Log.Info("Life_Support_Update.vessel: " + vessel.name);
 
                     GetCrewInfo(vessel, out IFI_Crew, out IFI_ALT, out IFI_Location);
-
-                   double LS_Needed =  LS_Use = CalcLS(vessel, IFI_Crew, Elapsed_Time, out LSAval, out days_rem);
+                    double LS_Needed =
+                         LS_Use = CalcLS(vessel, IFI_Crew, Elapsed_Time, out LSAval, out days_rem);
 
                     if (IFI_Crew > 0.0)
                     {
@@ -115,72 +115,100 @@ namespace IFILifeSupport
                         // Figure out how much is needed for the Elapsed_Time
                         //
 
-                        //if (LS_Use > 0.0)
+                        //
+                        // Special case for an EVA kerbal and a rescue
+                        if (/* vessel.vesselType == VesselType.EVA && */ KerbalEVARescueDetect(vessel, IFI_Crew))
                         {
-                            //
-                            // Special case for an EVA kerbal and a rescue
-                            if (/* vessel.vesselType == VesselType.EVA && */ KerbalEVARescueDetect(vessel, IFI_Crew))
+                            //LSAval = 200.0;
+                            //days_rem = 10.0;
+                        }
+                        double NewSlurry = 0;
+                        if (vessel.loaded)
+                        {
+                            double Temp_Resource;
+                            double TotalLS_ResourcesAvail = IFIGetAllResources(Constants.LIFESUPPORT, vessel);
+                            if (LS_Use > TotalLS_ResourcesAvail)
                             {
-                                //LSAval = 200.0;
-                                //days_rem = 10.0;
-                            }
+                                Log.Info("RequestResource (not enough for full request): " + Constants.LIFESUPPORT + ",  requesting ALL_Resources: " + TotalLS_ResourcesAvail);
 
-                            if (vessel.loaded)
-                            {
-                                double Temp_Resource;
-                                double TotalLS_ResourcesAvail = IFIGetAllResources(Constants.LIFESUPPORT, vessel);
-                                if (LS_Use > TotalLS_ResourcesAvail)
-                                {
-                                    Log.Info("RequestResource (not enough for full request): " + Constants.LIFESUPPORT + ",  requesting ALL_Resources: " + TotalLS_ResourcesAvail);
-
-                                    double amount = Util.GetResourceTotal(vessel, Constants.LIFESUPPORT);
-                                    Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, TotalLS_ResourcesAvail, ResourceFlowMode.ALL_VESSEL);
-                                    Log.Info("LifeSupportUsageUpdate.IFIUSEResources 1, RequestedResource, part: " + vessel.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
-                                    double amount2 = Util.GetResourceTotal(vessel, Constants.LIFESUPPORT);
-                                    LS_Use = 0;
-                                    Log.Info("Before request amount: " + amount + ",  After request: amount2: " + amount2);
-                                }
-                                else
-                                {
-                                    Log.Info("RequestResource: " + Constants.LIFESUPPORT + ",  UR_Amount: " + LS_Use);
-                                    Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, LS_Use);
-                                }
-                                Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource + ", LS_Use: " + LS_Use);
-                                if (LS_Use <= 0)
-                                    IFI_Check_Kerbals(vessel);
-
+                                double amount = Util.GetResourceTotal(vessel, Constants.LIFESUPPORT);
+                                Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, TotalLS_ResourcesAvail, ResourceFlowMode.ALL_VESSEL);
+                                Log.Info("LifeSupportUsageUpdate.IFIUSEResources 1, RequestedResource, part: " + vessel.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
+                                double amount2 = Util.GetResourceTotal(vessel, Constants.LIFESUPPORT);
+                                NewSlurry = TotalLS_ResourcesAvail;
+                                LS_Use = 0;
+                                Log.Info("Before request amount: " + amount + ",  After request: amount2: " + amount2);
                             }
                             else
                             {
-                                int PartCountForShip = 0;
-                                for (int partIdx = 0; partIdx < vessel.protoVessel.protoPartSnapshots.Count; partIdx++)
-                                {
-                                    ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[partIdx];
-                                    PartCountForShip++;
-                                    for (int resIdx = 0; resIdx < p.resources.Count; resIdx++)
-                                    {
-                                        ProtoPartResourceSnapshot LSresource = p.resources[resIdx];
-                                        if (LSresource.resourceName == Constants.LIFESUPPORT)
-                                        {
-                                            Log.Info("Resource found");
-                                            double resUsedInPart = Math.Min(LSresource.amount, LS_Use);
-                                            LSresource.amount -= resUsedInPart;
-                                            LS_Use -= resUsedInPart;
+                                Log.Info("RequestResource: " + Constants.LIFESUPPORT + ",  UR_Amount: " + LS_Use);
+                                Temp_Resource = vessel.rootPart.RequestResource(Constants.LIFESUPPORT, LS_Use);
+                                NewSlurry = LS_Use;
+                            }
+                            Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource + ", LS_Use: " + LS_Use);
+                            vessel.rootPart.RequestResource(Constants.SLURRY, -NewSlurry, ResourceFlowMode.ALL_VESSEL_BALANCE);
+                            Log.Info("NewSlurry: " + NewSlurry);
+                            if (LS_Use <= 0)
+                                IFI_Check_Kerbals(vessel);
 
-                                            Log.Info("IFIUSEResources 2, Resource: " + Constants.LIFESUPPORT + ",  LSresource.amount: " + LSresource.amount + ",   r.amount: " + LSresource.amount + ",   LS_Use: " + LS_Use);
-                                        }
+                        }
+                        else
+                        {
+                            int PartCountForShip = 0;
+
+                            for (int partIdx = 0; partIdx < vessel.protoVessel.protoPartSnapshots.Count; partIdx++)
+                            {
+                                ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[partIdx];
+                                PartCountForShip++;
+                                for (int resIdx = 0; resIdx < p.resources.Count; resIdx++)
+                                {
+                                    ProtoPartResourceSnapshot LSresource = p.resources[resIdx];
+                                    if (LSresource.resourceName == Constants.LIFESUPPORT)
+                                    {
+                                        Log.Info("Resource found");
+                                        double resUsedInPart = Math.Min(LSresource.amount, LS_Use);
+                                        LSresource.amount -= resUsedInPart;
+                                        LS_Use -= resUsedInPart;
+
+                                        Log.Info("IFIUSEResources 2, Resource: " + Constants.LIFESUPPORT + ",  LSresource.amount: " + LSresource.amount + ",   r.amount: " + LSresource.amount + ",   LS_Use: " + LS_Use);
                                     }
                                 }
-                                if (LS_Needed == LS_Use)
-                                    IFI_Check_Kerbals(vessel);
-
                             }
+
+                            NewSlurry = LS_Needed - LS_Use;
+                            Log.Info("NewSlurry: " + NewSlurry);
+
+                            for (int partIdx = 0; partIdx < vessel.protoVessel.protoPartSnapshots.Count; partIdx++)
+                            {
+                                ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[partIdx];
+
+                                for (int resIdx = 0; resIdx < p.resources.Count; resIdx++)
+                                {
+                                    ProtoPartResourceSnapshot LSresource = p.resources[resIdx];
+                                    if (LSresource.resourceName == Constants.SLURRY)
+                                    {
+                                        var availSpace = LSresource.maxAmount - LSresource.amount;
+                                        var toAdd = Math.Min(availSpace, NewSlurry);
+                                        LSresource.amount += toAdd;
+                                        NewSlurry -= toAdd;
+                                        break;
+                                    }
+                                }
+                                if (NewSlurry <= 0)
+                                    break;
+                            }
+                            Log.Info("Left Over NewSlurry: " + NewSlurry);
+
+                            if (LS_Needed == LS_Use)
+                                IFI_Check_Kerbals(vessel);
+
                         }
-                    }
-                    else
-                    {
-                        //days_rem = 0;
-                        //LSAval = 200.0;
+
+
+                        {
+                            //days_rem = 0;
+                            //LSAval = 200.0;
+                        }
                     }
                     if (vessel.loaded)
                     {
@@ -235,10 +263,12 @@ namespace IFILifeSupport
             Boolean.TryParse(pps.modules[j].moduleValues.GetValue("isEnabled"), out bool active);
             Boolean.TryParse(pps.modules[j].moduleValues.GetValue("checkForOxygen"), out bool checkForOxygen);
 
+            Boolean.TryParse(pps.modules[j].moduleValues.GetValue("IsActivated"), out bool IsActivated);
+
             if (checkForOxygen && !pps.pVesselRef.vesselRef.mainBody.atmosphereContainsOxygen)
                 return false;
 
-            return active;
+            return IsActivated;
         }
 
 
@@ -321,10 +351,14 @@ namespace IFILifeSupport
                     {
                         ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)tmpPM;
                         report.AppendLine("Part: " + vessel.parts[idx2].partInfo.title + ", activated: " + m1.IsActivated);
-                        Loaded_Converter_Update(Elapsed_Time, m1, ref report, ref  slurryRate, ref  sludgeRate);
+                        Loaded_Converter_Update(Elapsed_Time, m1, ref report, ref slurryRate, ref sludgeRate);
                     }
                 }
             }
+            report.AppendLine("============================");
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Debug)
+                Log.Info(report.ToString());
+            report.Clear();
         }
 
         void Loaded_Converter_Update(double Elapsed_Time, ModuleIFILifeSupport converter, ref StringBuilder report, ref double slurryRate, ref double sludgeRate)
@@ -334,10 +368,9 @@ namespace IFILifeSupport
             double[] usedInputResource = new double[10];    // How much is available, never more than inputResource
             double[] outputResource = new double[10];
 
-
             if (converter.ModuleIsActive())
             {
-                //Log.Info("Loaded_Converter_Update, ModuleIsActive:" + converter.part.partInfo.title);
+                Log.Info("Loaded_Converter_Update, ModuleIsActive:" + converter.part.partInfo.title);
                 //Log.Info("converter.checkForOxygen: " + converter.checkForOxygen + ", converter.vessel.mainBody.atmosphereContainsOxygen: " + converter.vessel.mainBody.atmosphereContainsOxygen);
                 if (converter.checkForOxygen && !converter.vessel.mainBody.atmosphereContainsOxygen)
                     return;
@@ -351,16 +384,35 @@ namespace IFILifeSupport
                 converter.part.ResetSimulationResources();
                 for (int i = 0; i < converter.inputList.Count; i++)
                 {
-                    inputResource[i] = converter.inputList[i].Ratio * Elapsed_Time;
-                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].ResourceName, inputResource[i], true);
-                    percentResAvail = Math.Min(percentResAvail, usedInputResource[i] / inputResource[i]);
-                    if (converter.inputList[i].ResourceName == Constants.SLURRY)
+                    converter.inputList[i].uvMultipler = 1f;
+                    if (converter.UVLightsActivated)
                     {
-                        slurryRate += converter.inputList[i].Ratio;
+                        if (converter.inputList[i].rr.ResourceName == "ElectricCharge")
+                            converter.inputList[i].uvMultipler = 1.25f;
+                        else
+                            converter.inputList[i].uvMultipler = 1.5f;
                     }
-                    if (converter.inputList[i].ResourceName == Constants.SLUDGE)
+                    inputResource[i] = converter.inputList[i].rr.Ratio * Elapsed_Time * converter.inputList[i].uvMultipler;
+                    //usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].rr.ResourceName, inputResource[i], ResourceFlowMode.STAGE_PRIORITY_FLOW, true);
+
+                    converter.part.GetConnectedResourceTotals(converter.inputList[i].resourceId, out usedInputResource[i], out double maxAmt);
+                    usedInputResource[i] = Math.Min(usedInputResource[i], inputResource[i] * converter.inputList[i].uvMultipler);
+
+                    Log.Info("Resource: " + converter.inputList[i].rr.ResourceName +
+                        ", Ratio: " + converter.inputList[i].rr.Ratio +
+                        ", Elapsed_Time: " + Elapsed_Time +
+                        ", uvMultiplier: " + converter.inputList[i].uvMultipler +
+                        ", inputResource: " + inputResource[i] +
+                        ", usedInputResource: " + usedInputResource[i]);
+
+                    percentResAvail = Math.Min(percentResAvail, usedInputResource[i] / inputResource[i]);
+                    if (converter.inputList[i].rr.ResourceName == Constants.SLURRY)
                     {
-                        slurryRate += converter.inputList[i].Ratio;
+                        slurryRate += converter.inputList[i].rr.Ratio * converter.inputList[i].uvMultipler;
+                    }
+                    if (converter.inputList[i].rr.ResourceName == Constants.SLUDGE)
+                    {
+                        sludgeRate += converter.inputList[i].rr.Ratio * converter.inputList[i].uvMultipler;
                     }
                 }
 
@@ -369,11 +421,14 @@ namespace IFILifeSupport
                 //
                 for (int i = 0; i < converter.inputList.Count; i++)
                 {
-                    inputResource[i] = converter.inputList[i].Ratio * Elapsed_Time * percentResAvail;
-                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].ResourceName, inputResource[i], false);
-                    report.AppendLine("Input: " + converter.inputList[i].ResourceName +
-                        ", ratio: " + converter.inputList[i].Ratio + ", percentResAvail: " + percentResAvail + ", amt: " + inputResource[i]);
 
+                    inputResource[i] = converter.inputList[i].rr.Ratio * Elapsed_Time * percentResAvail * converter.inputList[i].uvMultipler;
+                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].rr.ResourceName, inputResource[i], false);
+                    report.AppendLine("Input: " + converter.inputList[i].rr.ResourceName +
+                                    ", ratio: " + converter.inputList[i].rr.Ratio + 
+                                    ", percentResAvail: " + percentResAvail + 
+                                    ", uvMultiplier: " + converter.inputList[i].uvMultipler +
+                                    ", amt: " + inputResource[i]);
                 }
 
                 //
@@ -381,15 +436,22 @@ namespace IFILifeSupport
                 //
                 for (int i = 0; i < converter.outputList.Count; i++)
                 {
+                    float uvMultipler = 1f;
+                    if (converter.UVLightsActivated)
+                        uvMultipler = 1.5f;
+
+
                     bool locked = false;
                     for (int r = 0; r < converter.part.Resources.Count; r++)
+                    {
                         if (converter.part.Resources[r].resourceName == converter.outputList[i].ResourceName)
                         {
                             locked = !converter.part.Resources[r].flowState;
                             break;
                         }
+                    }
 
-                    outputResource[i] = converter.outputList[i].Ratio * Elapsed_Time * percentResAvail;
+                    outputResource[i] = converter.outputList[i].Ratio * Elapsed_Time * percentResAvail * uvMultipler;
                     double resProduced = outputResource[i];
 
                     report.AppendLine("Output: " + converter.outputList[i].ResourceName);
@@ -399,23 +461,19 @@ namespace IFILifeSupport
                     //
                     if (!locked)
                     {
-                        Log.Info("Not locked");
                         int resourceid = PartResourceLibrary.Instance.GetDefinition(converter.outputList[i].ResourceName).id;
                         converter.part.GetConnectedResourceTotals(resourceid, out double amount, out double maxAmount, false);
                         resProduced = Math.Min(outputResource[i], maxAmount - amount);
                         converter.part.RequestResource(converter.outputList[i].ResourceName, -resProduced);
-                        report.AppendLine("Resource produced: " + resProduced);
+                        report.AppendLine("uvMultiplier: " + uvMultipler +
+                            ", Resource produced: " + resProduced);
                     }
                     converter.part.RequestResource(converter.outputList[i].ResourceName, -(outputResource[i] - resProduced), ResourceFlowMode.ALL_VESSEL_BALANCE);
 
-                    report.AppendLine("locked: " + locked + ", avail: " + resProduced + ", amt: " + -(outputResource[i] - resProduced));
+                    report.AppendLine("locked: " + locked + ", avail: " + resProduced + ", Amt to other parts: " + -(outputResource[i] - resProduced));
                 }
             }
             report.AppendLine();
-            report.AppendLine("============================");
-            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Debug)
-                Log.Info(report.ToString());
-            report.Clear();
         }
 
 
@@ -600,10 +658,21 @@ namespace IFILifeSupport
                 foreach (ConfigNode i in inputRes)
                 {
                     ConverterResources cr = new ConverterResources();
-
                     cr.resName = i.GetValue("ResourceName");
                     var ratioStr = i.GetValue("Ratio");
-                    cr.ratio = Double.Parse(ratioStr);
+
+                    var uvLightsActivated = bool.Parse(i.GetValue("UVLightsActivated"));
+                    float uvMultipler = 1f;
+                    if (uvLightsActivated)
+                    {
+                        if (cr.resName == "ElectricCharge")
+                            uvMultipler = 1.25f;
+                        else
+                            uvMultipler = 1.5f;
+                    }
+
+                    cr.ratio = Double.Parse(ratioStr) * uvMultipler;
+
                     inputResources.Add(cr);
                     inputResourcesSim.Add(cr);
                 }
@@ -756,59 +825,6 @@ namespace IFILifeSupport
         }
 
 
-#if false
-        void UnLoaded_Converter_Update(ModuleIFILifeSupport converter)
-        {
-            double Elapsed_Time = IFI_Get_Elasped_Time();
-
-
-            double[] inputResource = new double[10];        // How much is needed for ElapsedTime
-            double[] usedInputResource = new double[10];    // How much is available, never more than inputResource
-            double[] outputResource = new double[10];
-
-            double[] minPercent = new double[10];
-            Log.Info("LifeSupportUsageUpdate.UnLoaded_Converter_Update, Elapsed_Time: " + Elapsed_Time + ",   lastUpdateTime: " + lastUpdateTime);
-
-            if (converter.ModuleIsActive())
-            {
-                Log.Info("LifeSupportUsageUpdate.UnLoaded_Converter_Update, Elapsed_Time: " + Elapsed_Time + ",   lastUpdateTime: " + lastUpdateTime);
-                Log.Info("ModuleIFILifeSupport.ModuleIsActive, vessel: " + converter.vessel.name + ",  part: " + converter.part.partInfo.title);
-                //Log.Info("ModuleIFILifeSupport, inputList.Count: " + inputList.Count);
-                double percentResAvail = 1;
-                for (int i = 0; i < converter.inputList.Count; i++)
-                {
-                    inputResource[i] = converter.inputList[i].Ratio * Elapsed_Time;
-                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].ResourceName, inputResource[i]);
-                    Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 1, RequestedResource, part: " + converter.part.partInfo.title + ", usedInputResource[" + i + "]: " + usedInputResource[i]);
-                    minPercent[i] = Math.Min(1, usedInputResource[i] / inputResource[i]);
-                    percentResAvail = Math.Min(percentResAvail, minPercent[i]);
-                    Log.Info("ModuleIFILifeSupport.Input Resource: " + converter.inputList[i].ResourceName + ",  amount requested: " + inputResource[i] + ", amount unavailable: " + (inputResource[i] - usedInputResource[i]));
-                    Log.Info("ModuleIFILifeSupport.minPercent: " + minPercent[i]);
-                }
-                for (int i = 0; i < converter.inputList.Count; i++)
-                {
-                    if (percentResAvail < 1)
-                    {
-                        double percentUsed = (usedInputResource[i] / inputResource[i]);
-                        double percentToreturn = percentResAvail - percentUsed;
-                        converter.part.RequestResource(converter.inputList[i].ResourceName, percentToreturn * inputResource[i]);
-                        Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 2, RequestedResource, part: " + converter.part.partInfo.title + ", percentToreturn * inputResource[" + i + "]: " + percentToreturn * inputResource[i]);
-                        Log.Info("ModuleIFILifeSupport.Returning Resource: " + converter.inputList[i].ResourceName + ", amount: " + percentToreturn * inputResource[i]);
-                    }
-                }
-
-                Log.Info("ModuleIFILifeSupport, percentResAvail: " + percentResAvail + ", outputList.Count: " + converter.outputList.Count);
-
-                for (int i = 0; i < converter.outputList.Count; i++)
-                {
-                    outputResource[i] = -1 * converter.outputList[i].Ratio * Elapsed_Time * percentResAvail;
-                    converter.part.RequestResource(converter.outputList[i].ResourceName, outputResource[i]);
-                    Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 3, RequestedResource, part: " + converter.part.partInfo.title + ", outputResource[" + i + "]: " + outputResource[i]);
-                    Log.Info("ModuleIFILifeSupport.Output Resource (should be negative): " + converter.outputList[i].ResourceName + ", amount: " + outputResource[i]);
-                }
-            }
-        }
-#endif
 
         private void IFI_Check_Kerbals(Vessel vessel) // Find All Kerbals Hiding on Vessel 
         {
@@ -831,7 +847,7 @@ namespace IFILifeSupport
                         int IFIcrew = p.protoModuleCrew.Count;
                         if (IFIcrew > 0)
                         {
-                            StarvingKerbal.CrewTest(0, p,0.1f);
+                            StarvingKerbal.CrewTest(0, p, 0.1f);
                         }
 
                     }
@@ -889,266 +905,11 @@ namespace IFILifeSupport
             if (RescueTest == 29)
             {
                 return true;
-            } 
+            }
             return false;
         }
 
 
-#if false
-        private double IFIUSELifeSupport(Vessel vessel, double UR_Amount, int CREWHOLD)
-        {
-            UR_Amount *= IFI_Resources.BASE_MULTIPLIER;
-            double Temp_Resource = UR_Amount;
-            string IFIResource = Constants.LIFESUPPORT;
-
-            bool giveBack = (UR_Amount < 0);
-
-            //Log.Info("IFIUSEResources 1, resource: " + IFIResource + ", ISLoaded: " + vessel.loaded + "   UR_Amount: " + UR_Amount);
-            if (vessel.loaded)
-            {
-
-                double ALL_Resources = IFIGetAllResources(IFIResource, vessel);
-                Log.Info("IFIUSEResources: Vessel: " + vessel.vesselName + ",  crewCount: " + vessel.rootPart.protoModuleCrew.Count() + ",  IFIResource: " + IFIResource + ",  ALL_Resources: " + ALL_Resources + ", UR_Amount: " + UR_Amount);
-
-                if (ALL_Resources == 0.0 && !giveBack)
-                {
-                    IFI_Check_Kerbals(vessel, UR_Amount);
-                    return 0.0;
-                }
-                else
-                {
-                    //Log.Info("Vessel: " + vessel.vesselName + ",  crewCount: " + vessel.rootPart.protoModuleCrew.Count());
-
-                    List<string> toDelete = new List<string>();
-
-                    // check to see if this kerbal is on the vessel
-                    for (int idx = 0; idx < vessel.Parts.Count; idx++)
-                    {
-                        var p = vessel.Parts[idx];
-                        for (int i1 = p.protoModuleCrew.Count(); i1 > 0; i1--)
-                        {
-                            StarvingKerbal sk;
-                            if (starvingKerbals.TryGetValue(p.protoModuleCrew[i1 - 1].name, out sk))
-                            {
-                                Log.Info("Vessel: " + vessel.vesselName + ",   protoModuleCrew: " + p.protoModuleCrew[i1 - 1].name);
-
-                                toDelete.Add(sk.name);
-                                p.protoModuleCrew[i1 - 1].type = ProtoCrewMember.KerbalType.Crew;
-                                KerbalRoster.SetExperienceTrait(p.protoModuleCrew[i1 - 1], sk.trait);
-
-                                IFIDebug.IFIMess(vessel.vesselName + " Kerbal returned to crew status due to LS - " + sk.name + ", trait restored to: " + sk.trait);
-                                string message = ""; message += vessel.vesselName + "\n\n"; message += sk.name + "\n Was returned to duty due to ::";
-                                message += "Life Support Restored";
-                                message += "::";
-                                MessageSystem.Message m = new MessageSystem.Message("Kerbal returned to duty from LifeSupport System", message, MessageSystemButton.MessageButtonColor.RED, MessageSystemButton.ButtonIcons.ALERT);
-                                MessageSystem.Instance.AddMessage(m);
-
-                            }
-                        }
-                    }
-                    foreach (var s in toDelete)
-                        starvingKerbals.Remove(s);
-                    toDelete.Clear();
-
-                }
-                if (ALL_Resources >= UR_Amount || giveBack)
-                {
-                    Log.Info("RequestResource: " + IFIResource + ",  requesting UR_Amount: " + UR_Amount);
-
-                    double amount = Util.GetResourceTotal(vessel, IFIResource);
-                    Temp_Resource = vessel.rootPart.RequestResource(IFIResource, UR_Amount, ResourceFlowMode.ALL_VESSEL);
-                    Log.Info("LifeSupportUsageUpdate.IFIUSELifeSupport 1, RequestedResource, part: " + vessel.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
-                    double amount2 = Util.GetResourceTotal(vessel, IFIResource);
-                    Log.Info("Before request amount: " + amount + ",  After request: amount2: " + amount2);
-                }
-                else
-                {
-                    Log.Info("RequestResource (not enough for full request): " + IFIResource + ",  UR_Amount: " + UR_Amount);
-                    Temp_Resource = vessel.rootPart.RequestResource(IFIResource, UR_Amount, ResourceFlowMode.ALL_VESSEL);
-                    Log.Info("LifeSupportUsageUpdate.IFIUSELifeSupport 2, RequestedResource, part: " + vessel.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
-                }
-                Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource);
-            }
-            else
-            {
-                KerbalEVARescueDetect = false;
-                int PartCountForShip = 0;
-                for (int idx = 0; idx < vessel.protoVessel.protoPartSnapshots.Count; idx++)
-                {
-                    ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[idx];
-                    PartCountForShip++;
-                    for (int idx2 = 0; idx2 < p.resources.Count; idx2++)
-                    {
-                        ProtoPartResourceSnapshot r = p.resources[idx2];
-                        Log.Info("Resource in part: " + p.partInfo.title + ", : " + r.resourceName);
-                        if (r.resourceName == IFIResource)
-                        {
-                            Log.Info("Resource found");
-
-                            if ((UR_Amount <= 0.0 && !giveBack) ||
-                                (UR_Amount >= 0 && giveBack))
-                                break;
-                            double IHold = r.amount;
-                            // Fix for Kerbal rescue Missions
-                            Int16 RescueTest = -1;
-                            ConfigNode RT = p.pVesselRef.discoveryInfo;
-                            System.Int16.TryParse(RT.GetValue("state"), out RescueTest);
-
-                            if (PartCountForShip <= 2 && CREWHOLD == 1 && IHold <= 0.0 && RescueTest == 29)
-                            {
-                                // Add Resources to Rescue Contract POD 1 time
-                                IFIDebug.IFIMess("#### IFI LIfeSupport #### Rescue POD Found with No LS Resource TAG Flagging --" + Convert.ToString(RescueTest));
-                                KerbalEVARescueDetect = true;
-                                IHold = r.maxAmount;
-                                r.amount = IHold;
-                                UR_Amount = 0.0;
-                                return 0.0;
-                            }
-                            if (RescueTest == 29)
-                            {
-                                KerbalEVARescueDetect = true;
-                                return 0.0;
-                            } // DO NOT USE LS ON RESCUE POD TILL player gets  CLOSE
-                            UR_Amount -= IHold;
-                            if (UR_Amount <= 0.0)
-                            {
-                                IHold -= Temp_Resource;
-                                r.amount = IHold;
-                                UR_Amount = 0.0;
-                            }
-                            else
-                            {
-                                r.amount = 0.0;
-                            }
-                            var r1 = p.resources[idx2];
-                            Log.Info("IFIUSEResources 2, Resource: " + IFIResource + ",  r1.amount: " + r1.amount + ",   r.amount: " + r.amount + ",   UR_Amount: " + UR_Amount + ",  IHold: " + IHold);
-
-                            Temp_Resource = UR_Amount;
-                        }
-                    }
-                    //
-                    if ((UR_Amount <= 0.0 && !giveBack) ||
-                                 (UR_Amount >= 0 && giveBack))
-                        break;
-                }
-
-
-                //if (IV.isEVA && )
-                //{
-                //    IFIDebug.IFIMess("#### IFI LIfeSupport #### Rescue Kerbal Found with No LS Resource TAG Flagging");
-                //    UR_Amount = 0.0;
-                //}
-            }
-            return UR_Amount / IFI_Resources.BASE_MULTIPLIER;
-        }
-#endif
-#if false
-        private double IFIUSEResources(string IFIResource, Vessel IV, double UR_Amount, int CREWHOLD)
-        {
-            UR_Amount *= IFI_Resources.BASE_MULTIPLIER;
-            double Temp_Resource = UR_Amount;
-            //IFIResource = IFIResource.ToLower();
-
-            Log.Info("IFIUSEResources 1, resource: " + IFIResource + ", IV.loaded: " + IV.loaded + "   UR_Amount: " + UR_Amount);
-            if (IV.loaded)
-            {
-
-
-                Log.Info("IFIUSEResources: Vessel: " + IV.vesselName + ",  crewCount: " + IV.rootPart.protoModuleCrew.Count() + ",  IFIResource: " + IFIResource);
-
-#if false
-                foreach (var p in IV.Parts)
-                {
-                    Log.Info("Part: " + p.partInfo.name + ", crewCount: " + p.protoModuleCrew.Count());
-                }
-#endif
-                if (UR_Amount > 0)
-                {
-                    double ALL_Resources = IFIGetAllResources(IFIResource, IV);
-                    if (ALL_Resources < UR_Amount)
-                    {
-                        //double TEST_Mod = (UR_Amount - ALL_Resources) * 100000;
-                        Log.Info("RequestResource: " + IFIResource + ",  requesting ALL_Resources: " + ALL_Resources);
-
-                        double amount = Util.GetResourceTotal(IV, IFIResource);
-                        Temp_Resource = IV.rootPart.RequestResource(IFIResource, ALL_Resources, ResourceFlowMode.ALL_VESSEL);
-                        Log.Info("LifeSupportUsageUpdate.IFIUSEResources 1, RequestedResource, part: " + IV.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
-                        double amount2 = Util.GetResourceTotal(IV, IFIResource);
-
-                        Log.Info("Before request amount: " + amount + ",  After request: amount2: " + amount2);
-                    }
-                    else
-                    {
-                        Log.Info("RequestResource (not enough for full request): " + IFIResource + ",  UR_Amount: " + UR_Amount);
-                        Temp_Resource = IV.rootPart.RequestResource(IFIResource, UR_Amount);
-                    }
-                    Log.Info("Temp_Resource (result from RequestResource): " + Temp_Resource);
-                }
-                else
-                {
-                    Temp_Resource = IV.rootPart.RequestResource(IFIResource, UR_Amount, ResourceFlowMode.ALL_VESSEL);
-                    Log.Info("LifeSupportUsageUpdate.IFIUSEResources 2, RequestedResource, part: " + IV.rootPart.partInfo.title + ", Temp_Resource: " + Temp_Resource);
-                    Log.Info("UR_Amount is negative: " + UR_Amount + ",   Temp_Resource (result from RequestResource): " + Temp_Resource);
-                }
-            }
-            else
-            {
-                bool giveBack = (UR_Amount < 0);
-
-                KerbalEVARescueDetect = false;
-                int PartCountForShip = 0;
-                for (int idx = 0; idx < IV.protoVessel.protoPartSnapshots.Count; idx++)
-                {
-                    ProtoPartSnapshot p = IV.protoVessel.protoPartSnapshots[idx];
-                    PartCountForShip++;
-                    for (int idx2 = 0; idx2 < p.resources.Count; idx2++)
-                    {
-                        ProtoPartResourceSnapshot r = p.resources[idx2];
-                        Log.Info("Resource in part: " + p.partInfo.title + ", : " + r.resourceName);
-                        if (r.resourceName == IFIResource)
-                        {
-                            Log.Info("Resource found");
-                            //if (UR_Amount <= 0.0)
-                            if ((UR_Amount <= 0.0 && !giveBack) ||
-                                (UR_Amount >= 0 && giveBack))
-                                break;
-                            double IHold = r.amount;
-
-
-                            UR_Amount -= IHold;
-                            if (UR_Amount <= 0.0)
-                            {
-                                IHold -= Temp_Resource;
-                                r.amount = IHold;
-                                UR_Amount = 0.0;
-                            }
-                            else
-                            {
-                                r.amount = 0.0;
-                            }
-                            var r1 = p.resources[idx2];
-                            Log.Info("IFIUSEResources 2, Resource: " + IFIResource + ",  r1.amount: " + r1.amount + ",   r.amount: " + r.amount + ",   UR_Amount: " + UR_Amount + ",  IHold: " + IHold);
-
-                            Temp_Resource = UR_Amount;
-                        }
-                    }
-                    //
-                    if ((UR_Amount <= 0.0 && !giveBack) ||
-                                 (UR_Amount >= 0 && giveBack))
-                        break;
-                }
-
-
-                //if (IV.isEVA && )
-                //{
-                //    IFIDebug.IFIMess("#### IFI LIfeSupport #### Rescue Kerbal Found with No LS Resource TAG Flagging");
-                //    UR_Amount = 0.0;
-                //}
-            }
-            return UR_Amount / IFI_Resources.BASE_MULTIPLIER;
-        }
-
-#endif
         private double IFI_Get_Elasped_Time()
         {
             double CurrTime = Planetarium.GetUniversalTime();
@@ -1197,17 +958,16 @@ namespace IFILifeSupport
         {
             Log.Info("Found Vessel: " + vessel.vesselName);//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
 
-            IFI_Resources.UpdateDisplayValues(vessel);
+            //IFI_Resources.UpdateDisplayValues(vessel);
 
             IFIDebug.IFIMess("IFI_LIFESUPPORT_TRACKING.Life_Support_Update, IFI_Location: " + IFI_Location +
                 ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   IFI_ALT: " + IFI_ALT);
             double SlurryAvail = IFIGetAllResources(Constants.SLURRY, vessel);
-            double SludgeAvail = IFIGetAllResources(Constants.SLURRY, vessel);
-
+            double SludgeAvail = IFIGetAllResources(Constants.SLUDGE, vessel);
 
             IFI_LifeSupportTrackingDisplay.Instance.SetUpDisplayLines(vessel, IFI_Location, IFI_Crew, days_rem, LSAval, SlurryAvail, SludgeAvail, slurryRate, sludgeRate, ref IFI_LifeSupportTrackingDisplay.Instance.LS_Status_Hold_Count);
-
-            IFI_LifeSupportTrackingDisplay.Instance.CheckAlertLevels(days_rem, ref LS_ALERT_LEVEL);
+            if (IFI_Crew > 0)
+                IFI_LifeSupportTrackingDisplay.Instance.CheckAlertLevels(days_rem, ref LS_ALERT_LEVEL);
         }
 
     }

@@ -17,6 +17,8 @@ namespace IFILifeSupport
 
         private void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             Log.Info("Transfer.Start");
 
             onTransferSpawn.Add(OnTransferSpawned);
@@ -97,7 +99,6 @@ namespace IFILifeSupport
 
         private void OnTransferSpawned(UIPartActionResourceTransfer transfer)
         {
-            Log.Info("OnTransferSpawned");
             t = transfer;
 
             DisplayTransferInfo(t, true);
@@ -110,7 +111,7 @@ namespace IFILifeSupport
 
         bool LifeSupportResource(string resource)
         {
-            var b = IFI_Resources.DISPLAY_RESOURCES.Contains(resource);
+            var b = IFI_Resources.RESOURCES.Contains(resource);
             Log.Info("Transfer.LifesupportResource, res: " + resource);
             if (b)
             {
@@ -190,7 +191,7 @@ namespace IFILifeSupport
                         //Log.Info("Transfer 2, after:  amount: " + t1.Part.Resources[t.Resource.resourceName].amount + ", transferred: " + totalTransferred);
                         var afterAmt = t1.Part.Resources[t.Resource.resourceName].amount;
                         Log.Info("Transfer 2, after:  amount: " + afterAmt + ", Logged transfer amt: " + transferredAmt + ", actual diff (after - before): " + (afterAmt - beforeAmt));
-                        IFI_Resources.UpdatePartInfo(t1.Part);
+                        //IFI_Resources.UpdatePartInfo(t1.Part);
                     }
                 }
 
@@ -205,9 +206,9 @@ namespace IFILifeSupport
                
                 if (totalTransferred == 0)
                     OnStopClick();
-                IFI_Resources.UpdatePartInfo(t.Part);
-                foreach (UIPartActionResourceTransfer t1 in targets)
-                    IFI_Resources.UpdatePartInfo(t1.Part);
+                //IFI_Resources.UpdatePartInfo(t.Part);
+                //foreach (UIPartActionResourceTransfer t1 in targets)
+                //    IFI_Resources.UpdatePartInfo(t1.Part);
                 
                     Log.Info("Transfer --------------------------------------------------------------------------------------");
             }

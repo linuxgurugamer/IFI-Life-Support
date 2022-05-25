@@ -238,7 +238,7 @@ namespace RequiredExperiments
         private Rect ifiDebugWinRect;
         void OnGUI()
         {
-            if (HighLogic.LoadedScene == GameScenes.EDITOR)
+            if (HighLogic.LoadedScene == GameScenes.EDITOR || !HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
                 return;
             ifiDebugWinRect = GUILayout.Window(123532, ifiDebugWinRect, DrawIFIDebugWin, "IFI Debug Window");
         }
@@ -298,6 +298,8 @@ namespace RequiredExperiments
         void Start()
         {
             if (HighLogic.CurrentGame== null || requiredExperimentID == "" || HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX)
+                return;
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
                 return;
 
             experiment = ResearchAndDevelopment.GetExperiment(requiredExperimentID);
@@ -372,10 +374,10 @@ namespace RequiredExperiments
                         EnableModules();
                         availableAtTime = -1;
                     }
-                    yield return new WaitForSecondsRealtime(1f); //  HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
+                    yield return Util. WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 1", 1f); //  HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
                 }
                 else
-                    yield return new WaitForSecondsRealtime(0.1f);
+                    yield return Util.WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 2", 0.1f);
             }
         }
 
@@ -402,7 +404,7 @@ namespace RequiredExperiments
 
         IEnumerator CheckExperimentCompletions(float waitTime)
         {
-            yield return new WaitForSeconds(waitTime);
+            yield return new WaitForSecondsLogged(waitTime);
 #else
         void CheckExperimentCompletions()
         {

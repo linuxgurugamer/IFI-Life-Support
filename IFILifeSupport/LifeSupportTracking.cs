@@ -72,6 +72,8 @@ namespace IFILifeSupport
 
         public void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             Log.Info("IFI_LIFESUPPORT_TRACKING.Start");
 
             if (toolbarControl == null)
@@ -366,10 +368,29 @@ namespace IFILifeSupport
             }
         }
 
+        string tooltip = "";
+
         private void OnGUI()
         {
-            if (HighLogic.LoadedSceneIsGame && !Hide && LifeSupportDisplayInfo.LSDisplayActive)
+            if (HighLogic.LoadedSceneIsGame && !Hide && LifeSupportDisplayInfo.LSDisplayActive && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
             {
+                if (!RegisterToolbar.initted)
+                {
+                    RegisterToolbar.initted = true;
+
+                    RegisterToolbar.tooltipStyle = new GUIStyle(GUI.skin.GetStyle("label"));
+                    Texture2D texBack = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                    texBack.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, 1f));
+                    texBack.Apply();
+                    RegisterToolbar.tooltipStyle.normal.background = texBack;
+
+                    RegisterToolbar.kspToolTipStyle = new GUIStyle(HighLogic.Skin.GetStyle("label"));
+                    texBack = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                    texBack.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, 1f));
+                    texBack.Apply();
+                    RegisterToolbar.kspToolTipStyle.normal.background = texBack;
+                }
+
                 if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useKSPskin)
                     GUI.skin = HighLogic.Skin;
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame)
@@ -393,6 +414,8 @@ namespace IFILifeSupport
                     LifeSupportDisplayInfo.infoWindowPos = ClickThruBlocker.GUILayoutWindow(99989, LifeSupportDisplayInfo.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
+                DrawToolTip();
+
             }
         }
 
@@ -527,7 +550,7 @@ namespace IFILifeSupport
 
                             for (int i = 0; i < m1.inputList.Count; i++)
                             {
-                                ResourceRatio inp = m1.inputList[i];
+                                ResourceRatio inp = m1.inputList[i].rr;
                                 if (inp.ResourceName == Constants.SLURRY)
                                     stageSummary.SlurryProcessRate += inp.Ratio;
                                 if (inp.ResourceName == Constants.SLUDGE)
@@ -542,30 +565,6 @@ namespace IFILifeSupport
                                     stageSummary.SludgeOutputRate += output.Ratio;
                             }
                         }
-#if false
-                        if (part.Modules[m].moduleName == "AnimatedGenerator")
-                        {
-                            AnimatedGenerator m1 = (AnimatedGenerator)part.Modules[m];
-
-                            for (int i = 0; i < m1.inputList.Count; i++)
-                            {
-                                ResourceRatio inp = m1.inputList[i];
-
-                                if (inp.ResourceName == Constants.SLURRY)
-                                    stageSummary.SlurryProcessRate += inp.Ratio;
-                                if (inp.ResourceName == Constants.SLUDGE)
-                                    stageSummary.SludgeProcessRate += inp.Ratio;
-                            }
-                            for (int i = 0; i < m1.outputList.Count; i++)
-                            {
-                                ResourceRatio output = m1.outputList[i];
-                                if (output.ResourceName == Constants.LIFESUPPORT)
-                                    stageSummary.LifeSupportOutputRate += output.Ratio;
-                                if (output.ResourceName == Constants.SLUDGE)
-                                    stageSummary.SludgeOutputRate += output.Ratio;
-                            }
-                        }
-#endif
                     }
                     if (newStage)
                     {
@@ -758,7 +757,7 @@ namespace IFILifeSupport
             AppendLine(ref data, "Breathable Homeworld Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment.ToString("N2"));
             AppendLine(ref data, "\nKerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie.ToString());
             AppendLine(ref data, "EVA Kerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().EVAkerbalsCanDie.ToString());
-            AppendLine(ref data, "Kerbals inactive time before dying (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs.ToString());
+            AppendLine(ref data, "Inactive time before dying (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs.ToString());
 
             AppendLine(ref data, "\nFollowing adjustments are multiplied to the LS Rate when applicable\n");
             AppendLine(ref data, "Breathable Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment.ToString("N2"));
@@ -887,7 +886,9 @@ namespace IFILifeSupport
             //GUILayout.FlexibleSpace();
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "Auto Cancel Warp on Low Kibbles & Bits");
+
+            var s = new GUIContent("Auto-Cancel Warp on low K & B", "Only for crewed vessels");
+            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, s);
             GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
@@ -917,7 +918,43 @@ namespace IFILifeSupport
                 toolbarControl.SetFalse(true);
             }
             GUI.DragWindow();
+            if (Event.current.type == EventType.Repaint)
+                tooltip = GUI.tooltip;
         }
+
+        void DrawToolTip()
+        {
+            if (tooltip == "")
+                return;
+            GUIStyle activeStyle;
+            GUISkin activeSkin = GUI.skin;
+            float multiplier = 1f;
+            if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useKSPskin)
+            {
+                activeStyle = RegisterToolbar.kspToolTipStyle;
+                multiplier = 1.5f;
+            }
+            else
+            {
+                activeStyle = RegisterToolbar.tooltipStyle;
+            }
+
+            Rect pos = new Rect();
+            pos.x = Event.current.mousePosition.x + 10;
+            pos.y = Event.current.mousePosition.y + 20;
+            Vector2 size = activeSkin.box.CalcSize(new GUIContent(tooltip));
+            pos.width = size.x*multiplier;
+            pos.height = size.y*multiplier;
+
+            GUI.Window(9999345, pos, DrawToolTipWindow, "", activeStyle);
+        }
+
+        void DrawToolTipWindow(int id)
+        {
+            GUILayout.Label(tooltip);
+            GUI.BringWindowToFront(id);
+        }
+
 
 
     }

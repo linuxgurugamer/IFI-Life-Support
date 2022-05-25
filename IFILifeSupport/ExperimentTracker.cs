@@ -71,7 +71,13 @@ namespace RequiredExperiments
 
         void Start()
         {
-            StartCoroutine(MonitorGameTime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval));
+            //this will get a null ref sinceitstarts at the main menu
+            //KSPAssemblyDependency
+            //if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+            //    return;
+
+            //StartCoroutine(MonitorGameTime(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval));
+            StartCoroutine(MonitorGameTime());
 
             GameEvents.OnScienceChanged.Add(onScienceChanged);
             GameEvents.OnScienceRecieved.Add(onScienceReceived);
@@ -172,9 +178,9 @@ namespace RequiredExperiments
         }
 
 
-        IEnumerator MonitorGameTime(float waitTime)
+        IEnumerator MonitorGameTime()
         {
-            float w = 2 * waitTime;
+            float waitTime = 15f;
             while (true)
             {
                 if (!HighLogic.LoadedSceneIsGame)
@@ -184,28 +190,35 @@ namespace RequiredExperiments
                 }
                 else
                 {
-                    if (HighLogic.CurrentGame != null)
+                    if (HighLogic.CurrentGame != null && (HighLogic.LoadedSceneIsFlight||HighLogic.LoadedSceneHasPlanetarium  || HighLogic.LoadedScene == GameScenes.SPACECENTER))
                     {
                         // for debugging
-                        LoadCompletedExperiments();
-
-                        //Log.Info("MonitorGameTime, lastGameTitle: " + lastGameTitle + ", currentGameTitle: " + HighLogic.CurrentGame.Title + ",  UT: " + Planetarium.GetUniversalTime().ToString() + ", " + lastUT.ToString());
-                        if (lastGameTitle == HighLogic.CurrentGame.Title)
+                        if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
                         {
-                            // Use abs here in case a game is loaded which is LATER than the current time
-                            // Both cases are considered to be "reverted"
-                            if (Math.Abs(Planetarium.GetUniversalTime() - lastUT) > w)
+                            waitTime = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval;
+                            float w = 2 * waitTime;
+                            LoadCompletedExperiments();
+
+                            //Log.Info("MonitorGameTime, lastGameTitle: " + lastGameTitle + ", currentGameTitle: " + HighLogic.CurrentGame.Title + ",  UT: " + Planetarium.GetUniversalTime().ToString() + ", " + lastUT.ToString());
+                            if (lastGameTitle == HighLogic.CurrentGame.Title)
+                            {
+                                // Use abs here in case a game is loaded which is LATER than the current time
+                                // Both cases are considered to be "reverted"
+                                if (Math.Abs(Planetarium.GetUniversalTime() - lastUT) > w)
+                                    LoadCompletedExperiments();
+                            }
+                            else
+                            {
+                                lastGameTitle = HighLogic.CurrentGame.Title;
                                 LoadCompletedExperiments();
+                            }
+                            lastUT = Planetarium.GetUniversalTime();
                         }
                         else
-                        {
-                            lastGameTitle = HighLogic.CurrentGame.Title;
-                            LoadCompletedExperiments();
-                        }
-                        lastUT = Planetarium.GetUniversalTime();
+                            waitTime = 15f;
                     }
                 }
-                yield return new WaitForSeconds(waitTime);
+                yield return  Util.WaitForSecondsLogged("ExperimentTracker.MonitorGameTime", waitTime);
             }
         }
 

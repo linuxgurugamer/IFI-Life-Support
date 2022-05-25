@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
+using static IFILifeSupport.RegisterToolbar;
+
 
 namespace IFILifeSupport
 {
@@ -66,5 +69,16 @@ namespace IFILifeSupport
 #endif
         }
 
+        public static WaitForSeconds WaitForSecondsLogged(string caller, float seconds)
+        {
+            Log.Info("WaitForSecondsLogged: From: " + caller + " for: " + seconds);
+            return new WaitForSeconds(seconds);
+        }
+
+        public static WaitForSecondsRealtime WaitForSecondsRealtimeLogged(string caller, float seconds)
+        {
+            Log.Info("WaitForSecondsRealtimeLogged: From: " + caller + " for: " + seconds);
+            return new WaitForSecondsRealtime(seconds);
+        }
     }
 }

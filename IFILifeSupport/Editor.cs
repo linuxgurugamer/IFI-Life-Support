@@ -129,6 +129,8 @@ namespace IFILifeSupport
         }
         public void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             Instance = this;
             Log.Info("Editor.Start");
             InitData();

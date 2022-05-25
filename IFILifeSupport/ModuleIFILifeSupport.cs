@@ -11,13 +11,11 @@ namespace IFILifeSupport
 
     public class ModuleIFIGreenhousePanel : ModuleAnimateGeneric
     {
-        //[KSPField]
-        //public bool FixAnim = false;
         internal bool Active { get { return !animSwitch; } }
 
         public void Start()
         {
-            if (HighLogic.CurrentGame == null)
+            if (HighLogic.CurrentGame == null || !HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
                 return;
             anim[animationName].speed = 0f;
         }
@@ -51,10 +49,15 @@ namespace IFILifeSupport
 
     }
 
+    public class LocalResourceRatio
+    {
+        public ResourceRatio rr;
+        public int resourceId;
+        public float uvMultipler;
+    }
     public class ModuleIFILifeSupport : PartModule, IModuleInfo
     {
-        //double IFITimer = 0;
-        public List<ResourceRatio> inputList;
+        public List<LocalResourceRatio> inputList;
         public List<ResourceRatio> outputList;
 
         ModuleIFIGreenhousePanel moduleIFIgreenhousePanel;
@@ -152,6 +155,7 @@ namespace IFILifeSupport
         {
             IsActivated = UVLightsActivated ||
                 (moduleIFIgreenhousePanel != null && moduleIFIgreenhousePanel.Active);
+
             return IsActivated;
         }
 
@@ -160,7 +164,7 @@ namespace IFILifeSupport
             if (Log == null)
                 return;
 
-            inputList = new List<ResourceRatio>();
+            inputList = new List<LocalResourceRatio>();
             outputList = new List<ResourceRatio>();
 
             var p = part.partInfo.partConfig.GetNodes("MODULE");
@@ -173,9 +177,11 @@ namespace IFILifeSupport
                     {
                         foreach (ConfigNode dataNode in p1.GetNodes(INPUT))
                         {
-                            ResourceRatio rr = new ResourceRatio();
-                            rr.Load(dataNode);
-                            inputList.Add(rr);
+                            LocalResourceRatio lrr = new LocalResourceRatio();
+
+                            lrr.rr.Load(dataNode);
+                            lrr.resourceId = PartResourceLibrary.Instance.GetDefinition(lrr.rr.ResourceName).id;
+                            inputList.Add(lrr);
                         }
                     }
 
@@ -196,6 +202,8 @@ namespace IFILifeSupport
 
         void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             if (Log != null)
                 Log.Info("ModuleIFILifeSupport.Start");
 
@@ -217,9 +225,7 @@ namespace IFILifeSupport
                 if (BioAnimate != null)
                 {
                     Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
-                    //BioAnimate.Play();
                     BioAnimate[AnimationName].speed = 0;
-                    //lastTime = BioAnimate[AnimationName].time = AnimationStartOffset;
                     lastTime = BioAnimate[AnimationName].time = 0;
                 }
             }
@@ -235,7 +241,6 @@ namespace IFILifeSupport
 
                 if (Lights != null)
                 {
-                    //Lights.Stop();
                     Lights[AnimationLights].speed = 0;
                 }
             }
@@ -244,96 +249,9 @@ namespace IFILifeSupport
 
         double lastUpdateTime;
 
-#if false
-        void RunConverter()
-        {
-            if (!HighLogic.LoadedSceneIsEditor &&
-                (Planetarium.GetUniversalTime() - lastUpdateTime >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval || TimeWarp.CurrentRate > 800))
-            {
-                Life_Support_Converter_Update();
-                lastUpdateTime = Planetarium.GetUniversalTime();
-            }
-
-        }
-#endif
-#if false
-        private double IFI_Get_Elasped_Time()
-        {
-            double CurrTime = Planetarium.GetUniversalTime();
-            if (Time.timeSinceLevelLoad < 1f || !FlightGlobals.ready)
-            {
-                lastUpdateTime = Planetarium.GetUniversalTime();
-            }
-
-            double IHOLD = CurrTime - lastUpdateTime;
-
-            lastUpdateTime = Planetarium.GetUniversalTime();
-            return IHOLD;
-        }
-#endif
-
-#if false
-        void Life_Support_Converter_Update()
-        {
-            double Elapsed_Time = IFI_Get_Elasped_Time();
-
-
-            double[] inputResource = new double[10];        // How much is needed for ElapsedTime
-            double[] usedInputResource = new double[10];    // How much is available, never more than inputResource
-            double[] outputResource = new double[10];
-
-            double[] minPercent = new double[10];
-            Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update, Elapsed_Time: " + Elapsed_Time + ",   lastUpdateTime: " + lastUpdateTime);
-            {
-
-                if (this.ModuleIsActive())
-                {
-                    Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update, Elapsed_Time: " + Elapsed_Time + ",   lastUpdateTime: " + lastUpdateTime);
-                    Log.Info("ModuleIFILifeSupport.ModuleIsActive, vessel: " + this.vessel.name + ",  part: " + this.part.partInfo.title);
-                    //Log.Info("ModuleIFILifeSupport, inputList.Count: " + inputList.Count);
-                    double percentResAvail = 1;
-                    for (int i = 0; i < this.inputList.Count; i++)
-                    {
-                        inputResource[i] = inputList[i].Ratio * Elapsed_Time;
-                        usedInputResource[i] = this.part.RequestResource(inputList[i].ResourceName, inputResource[i]);
-                        Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 1, RequestedResource, part: " + part.partInfo.title + ", usedInputResource[" + i + "]: " + usedInputResource[i]);
-                        minPercent[i] = Math.Min(1, usedInputResource[i] / inputResource[i]);
-                        percentResAvail = Math.Min(percentResAvail, minPercent[i]);
-                        Log.Info("ModuleIFILifeSupport.Input Resource: " + inputList[i].ResourceName + ",  amount requested: " + inputResource[i] + ", amount unavailable: " + (inputResource[i] - usedInputResource[i]));
-                        Log.Info("ModuleIFILifeSupport.minPercent: " + minPercent[i]);
-                    }
-                    for (int i = 0; i < this.inputList.Count; i++)
-                    {
-                        if (percentResAvail < 1)
-                        {
-                            double percentUsed = (usedInputResource[i] / inputResource[i]);
-                            double percentToreturn = percentResAvail - percentUsed;
-                            this.part.RequestResource(inputList[i].ResourceName, percentToreturn * inputResource[i]);
-                            Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 2, RequestedResource, part: " + part.partInfo.title + ", percentToreturn * inputResource[" + i + "]: " + percentToreturn * inputResource[i]);
-                            Log.Info("ModuleIFILifeSupport.Returning Resource: " + inputList[i].ResourceName + ", amount: " + percentToreturn * inputResource[i]);
-                        }
-                    }
-
-                    Log.Info("ModuleIFILifeSupport, percentResAvail: " + percentResAvail + ", outputList.Count: " + outputList.Count);
-
-                    for (int i = 0; i < this.outputList.Count; i++)
-                    {
-                        outputResource[i] = -1 * outputList[i].Ratio * Elapsed_Time * percentResAvail;
-                        this.part.RequestResource(outputList[i].ResourceName, outputResource[i]);
-                        Log.Info("ModuleIFILifeSupport.Life_Support_Converter_Update 3, RequestedResource, part: " + part.partInfo.title + ", outputResource[" + i + "]: " + outputResource[i]);
-                        Log.Info("ModuleIFILifeSupport.Output Resource (should be negative): " + outputList[i].ResourceName + ", amount: " + outputResource[i]);
-                    }
-
-
-                }
-
-            }
-        }
-#endif
         float curSpeed, endSpeed, lastTime = 0;
         public void FixedUpdate()
         {
-            //Log.Info("ModuleIFILifeSupport.FixedUpdate, IsActivated: " + IsActivated + ",   isPlaying: " + isPlaying);
             if (BioAnimate != null)
             {
                 if (IsActivated && !isPlaying)
@@ -341,8 +259,6 @@ namespace IFILifeSupport
                     isPlaying = true;
                     try
                     {
-                        Log.Info("ModuleIFILifeSupport, part: " + part.partInfo.title + " Artificial Lights Activated, BioAnimate[AnimationName].time: " + BioAnimate[AnimationName].time + ", BioAnimate[AnimationName].speed: " + BioAnimate[AnimationName].speed);
-
                         curSpeed = BioAnimate[AnimationName].speed;
                         endSpeed = 1;
                         if (Continuous)
@@ -460,7 +376,7 @@ namespace IFILifeSupport
             if (inputList != null)
                 for (int i = 0; i < this.inputList.Count; i++)
                 {
-                    AddToInfo("     " + inputList[i].ResourceName + ": " + ResourceRatioToString(inputList[i].Ratio));
+                    AddToInfo("     " + inputList[i].rr.ResourceName + ": " + ResourceRatioToString(inputList[i].rr.Ratio));
                 }
             AddToInfo("Outputs:");
             if (outputList != null)

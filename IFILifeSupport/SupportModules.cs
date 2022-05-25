@@ -14,7 +14,6 @@ namespace IFILifeSupport
     {
         public const int BASE_SECS_PER_DAY = 21600;
         public const int BASE_MULTIPLIER = 1; // 10
-        //public const int MULTIPLER = BASE_SECS_PER_DAY * BASE_MULTIPLIER;
 
 
         internal string info = "";
@@ -43,27 +42,23 @@ namespace IFILifeSupport
 
         public void Start()
         {
-            if (HighLogic.LoadedSceneIsEditor)
-            {
-                GameEvents.onEditorShipModified.Add(ShipModified);
-            }
-            else
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
+            if (!HighLogic.LoadedSceneIsEditor && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
             {
                 GameEvents.onPartResourceFlowModeChange.Add(onPartResourceFlowModeChange);
             }
 
-            ShipModified(new ShipConstruct("initship", "descr", this.part));
             initted = true;
         }
 
         void OnDestroy()
         {
             if (Log != null)
-            Log.Info("SupportModules.OnDestroy");
+                Log.Info("SupportModules.OnDestroy");
             if (initted && HighLogic.LoadedSceneIsEditor)
             {
                 Log.Info("IFI_Resources.OnDestory");
-                GameEvents.onEditorShipModified.Remove(ShipModified);
                 initted = false;
             }
             else
@@ -85,56 +80,16 @@ namespace IFILifeSupport
 
         }
 
-        internal static string[] DISPLAY_RESOURCES = new string[] { Constants.LIFESUPPORT, Constants.SLURRY, Constants.SLUDGE };
-        internal static string[] RESOURCES = new string[] { Constants.LIFESUPPORT, Constants.SLURRY, Constants.SLURRY };
+        internal static string[] RESOURCES = new string[] { Constants.LIFESUPPORT, Constants.SLURRY, Constants.SLUDGE };
 
-        static public void UpdateDisplayValues(Vessel v)
-        {
-            for (int i = v.Parts.Count - 1; i >= 0; i--)
-            {
-                UpdatePartInfo( v.Parts[i]);
-            }
-        }
-
-        static internal void UpdatePartInfo(Part p)
-        {
-            for (int i = RESOURCES.Length - 1; i >= 0; i--)
-            {
-                if (p.Resources[RESOURCES[i]] != null && p.Resources[DISPLAY_RESOURCES[i]] != null)
-                {
-                    //Log.Info("UpdatePartInfo, p.Resources[RESOURCES[i]].isVisible: " + p.Resources[RESOURCES[i]].isVisible + ",  p.Resources[DISPLAY_RESOURCES[i]].isVisible: " + p.Resources[DISPLAY_RESOURCES[i]].isVisible);
-
-                    //Log.Info("resLS.amount: " + p.Resources[RESOURCES[i]].amount + ",  resLSdisplay.amount: " + p.Resources[DISPLAY_RESOURCES[i]].amount);
-                    if (HighLogic.LoadedSceneIsEditor)
-                    {
-                        //Log.Info("Updating resource: " + RESOURCES[i]);
-                        p.Resources[RESOURCES[i]].amount = p.Resources[DISPLAY_RESOURCES[i]].amount ;
-                        p.Resources[RESOURCES[i]].maxAmount = p.Resources[DISPLAY_RESOURCES[i]].maxAmount ;
-                        //Log.Info("setting " + RESOURCES[i] + ": amount: " + p.Resources[RESOURCES[i]].amount + ", maxAmount: " + p.Resources[RESOURCES[i]].maxAmount);
-                    }
-                    else
-                    {
-                        //Log.Info("Updating resource: " + DISPLAY_RESOURCES[i]);
-                        p.Resources[DISPLAY_RESOURCES[i]].amount = p.Resources[RESOURCES[i]].amount ;
-                        p.Resources[DISPLAY_RESOURCES[i]].maxAmount = p.Resources[RESOURCES[i]].maxAmount ;
-                        //Log.Info("Transfer  Part: " + p.partInfo.title + ", setting " + RESOURCES[i] + ".amount: " + p.Resources[RESOURCES[i]].amount + ", maxAmount: " + p.Resources[RESOURCES[i]].maxAmount);
-                        //Log.Info("Transfer  Part: " + p.partInfo.title + ", setting " + DISPLAY_RESOURCES[i] + ".amount: " + p.Resources[DISPLAY_RESOURCES[i]].amount + ", maxAmount: " + p.Resources[DISPLAY_RESOURCES[i]].maxAmount);
-                    }
-                }
-            }
-        }
-
-        void ShipModified(ShipConstruct sc)
-        {
-            Log.Info("IFI_Resources.ShipModified, sc: " + sc.shipName);
-            UpdatePartInfo(this.part);            
-        }
     }
 
     public class IFI_Basic : IFI_Resources
     {
         new void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             Log.Info("IFI_Basic");
             info = "IFI_Basic";
         }
@@ -143,6 +98,8 @@ namespace IFILifeSupport
     {
         new void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             Log.Info("IFI_Improved");
             info = "IFI_Improved";
         }
@@ -151,6 +108,8 @@ namespace IFILifeSupport
     {
         new void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             info = "IFI_Advanced";
             Log.Info("IFI_Advanced");
         }
@@ -159,6 +118,8 @@ namespace IFILifeSupport
     {
         new void Start()
         {
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+                return;
             info = "IFI_Extreme";
             Log.Info("IFI_Extreme");
         }

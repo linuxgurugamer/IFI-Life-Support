@@ -45,7 +45,7 @@ namespace IFILifeSupport
                     //if (lsTracking == null)
                         //lsTracking = gameObject.AddComponent<IFI_LIFESUPPORT_TRACKING>();
                 }
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSecondsLogged(1f);
             }
         }
     }

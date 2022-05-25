@@ -2,6 +2,10 @@
 @echo off
 
 set H=%KSPDIR%
+
+set H=R:\KSP_1.12.3_IFI_US2
+rem set H=R:\KSP_1.12.3_Career-Dev-JNSQ
+
 set GAMEDIR=IFILS
 set GAMEDATA="GameData"
 

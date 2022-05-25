@@ -144,6 +144,20 @@
 
 4.0.0.1
 	Updated tank textures & parts, thanks to @JadeOfMaar
+		fixed white "eroded" patch in box texture.
+		deleted alternate textures for cylinder tank, no longer needed.
+		supplied new/revised/upsized decal textures at IFILS/Parts/Storage/decals/. These are 512px, not 256px. More decals will be produced in same style on request.
+		updated tiny box to start with 10 units of resource, not 1, because the tiny isn't that much smaller than the small. (Pardon me if it's really meant to be the previous way. I went out of scope by messing with that.)
+		added stack nodes to all box sizes.
+		welded new flag meshes to box and cylinder tanks.
+		updated all texture configs concerning decals.
+		changed mesh switch config for boxes to not require box models to be ripped and internally renamed. The formating is transform = <full path>/<filename>(Clone).
+		supplied other box colors and configs for them in case they're wanted.
+	Fixed warp stopping on vessels with 0 crew
+
+4.0.0.2
+	Fixed tech tree to work with or without CTT
+	Many other changes
 
 TODO
 	
