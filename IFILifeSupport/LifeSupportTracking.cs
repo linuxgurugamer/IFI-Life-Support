@@ -539,7 +539,7 @@ namespace IFILifeSupport
                         if (partResource.resourceName == Constants.LIFESUPPORT)
                             stageSummary.LifeSupport += partResource.amount;
                         if (partResource.resourceName == Constants.LIFESUPPORT)
-                            stageSummary.maxLifeSupport += partResource.maxAmount;
+                            stageSummary.MaxLifeSupport += partResource.maxAmount;
                         if (partResource.resourceName == Constants.SLURRY)
                             stageSummary.OrganicSlurry += partResource.maxAmount;
                         if (partResource.resourceName == Constants.SLUDGE)
@@ -573,7 +573,7 @@ namespace IFILifeSupport
                     }
                     if (newStage)
                     {
-                        if (stageSummary.crew > 0 || stageSummary.MaxStageSummary > 0 || stageSummary.OrganicSlurry > 0 || stageSummary.Sludge > 0 ||
+                        if (stageSummary.crew > 0 || stageSummary.MaxLifeSupport > 0 || stageSummary.OrganicSlurry > 0 || stageSummary.Sludge > 0 ||
                             stageSummary.SlurryProcessRate > 0 || stageSummary.SludgeProcessRate > 0 ||
                             stageSummary.LifeSupportOutputRate > 0 || stageSummary.SludgeOutputRate > 0)
                             stageSummaryList.Add(stage, stageSummary);
