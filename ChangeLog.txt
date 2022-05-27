@@ -159,16 +159,12 @@
 	Fixed tech tree to work with or without CTT
 	Many other changes
 
+4.0.0.3 
+	Fixed issue when setting up new game, the difficulty buttons weren't working properly
+	Fixed Mode Selection window to make sure that at least one of each option is specified (needed for when adding to existing game)
+	Updated Display Update Frequency settings to have a min of 5, and set the default to 15.  Existing games will need to go into the settings to update it
+	Fixed Life Support Estimate window to show available LS, not max
+
 TODO
-	
-	possible use goo containers as emergency food supply
 
-
-
-Ideas for names
-
-Kibbles & Bits
-Munchies
-Food
-Logistics
 

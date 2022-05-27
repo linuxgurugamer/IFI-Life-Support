@@ -77,8 +77,8 @@ namespace IFILifeSupport
 
         public float RefreshInterval {  get { return TimeWarp.CurrentRate * refreshInterval; } }
 
-        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 1, maxValue = 15)]
-        public int displayRefreshInterval = 1;
+        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 5, maxValue = 15)]
+        public int displayRefreshInterval = 15;
 
         [GameParameters.CustomParameterUI("Initted",
     toolTip = "Set to false to have the selection window show up at the Space Center")]
@@ -328,15 +328,15 @@ namespace IFILifeSupport
         {
             SetDiffPreset(preset);
         }
-        public static void SetDiffPreset(GameParameters.Preset preset)
+        public static void SetDiffPresetStatic(GameParameters.Preset preset)
         {
-            if (HighLogic.CurrentGame == null)
-                return;
             Log.Info("IFILS2.SetDifficultyPreset: " + preset);
             switch (preset)
             {
                 case GameParameters.Preset.Easy:
                     SetValues(0.8);
+                    if (HighLogic.CurrentGame == null)
+                        return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = true;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = false;
@@ -345,6 +345,8 @@ namespace IFILifeSupport
 
                 case GameParameters.Preset.Normal:
                     SetValues(1);
+                    if (HighLogic.CurrentGame == null)
+                        return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = true;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = false;
@@ -353,6 +355,8 @@ namespace IFILifeSupport
 
                 case GameParameters.Preset.Moderate:
                     SetValues(1.1);
+                    if (HighLogic.CurrentGame == null)
+                        return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = true;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = false;
@@ -361,7 +365,9 @@ namespace IFILifeSupport
 
                 case GameParameters.Preset.Hard:
                     SetValues(1.2);
-                    HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard = true;
+                             if (HighLogic.CurrentGame == null)
+                return;
+   HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard = true;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = false;
@@ -371,6 +377,48 @@ namespace IFILifeSupport
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().oldNormal = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal;
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().oldModerate = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate;
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().oldHard = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard;
+        }
+
+        public  void SetDiffPreset(GameParameters.Preset preset)
+        {
+            Log.Info("IFILS2.SetDifficultyPreset: " + preset);
+            switch (preset)
+            {
+                case GameParameters.Preset.Easy:
+                    SetValues(0.8);
+                    easy = true;
+                    normal = false;
+                    moderate = false;
+                    hard = false;
+                    break;
+
+                case GameParameters.Preset.Normal:
+                    normal = true;
+                    easy = false;
+                    moderate = false;
+                    hard = false;
+                    break;
+
+                case GameParameters.Preset.Moderate:
+                    SetValues(1.1);
+                    moderate = true;
+                    easy = false;
+                    normal = false;
+                    hard = false;
+                    break;
+
+                case GameParameters.Preset.Hard:
+                    SetValues(1.2);
+                    hard = true;
+                    easy = false;
+                    normal = false;
+                    moderate = false;
+                    break;
+            }
+            oldEasy = easy;
+            oldNormal = normal;
+            oldModerate = moderate;
+            oldHard = hard;
         }
 
         public override bool Enabled(MemberInfo member, GameParameters parameters)

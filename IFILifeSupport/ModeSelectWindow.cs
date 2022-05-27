@@ -61,10 +61,15 @@ namespace IFILifeSupport
             advancedMode = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().advanced;
             extremeMode = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().extreme;
 
+            if (!classicMode && !improvedMode && !advancedMode && !extremeMode)
+                HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().classic = classicMode = true;
+
             easyLevel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy;
             normalLevel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal;
             moderateLevel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate;
             hardLevel = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard;
+            if (!easyLevel && !normalLevel && !moderateLevel && !hardLevel)
+                HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = normalLevel = true;
         }
 
         public void OnGUI()
@@ -217,16 +222,16 @@ namespace IFILifeSupport
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard = hardLevel;
 
                     if (easyLevel)
-                        IFILS2.SetDiffPreset(GameParameters.Preset.Easy);
+                        IFILS2.SetDiffPresetStatic(GameParameters.Preset.Easy);
 
                     if (normalLevel)
-                        IFILS2.SetDiffPreset(GameParameters.Preset.Normal);
+                        IFILS2.SetDiffPresetStatic(GameParameters.Preset.Normal);
 
                     if (moderateLevel)
-                        IFILS2.SetDiffPreset(GameParameters.Preset.Moderate);
+                        IFILS2.SetDiffPresetStatic(GameParameters.Preset.Moderate);
 
                     if (hardLevel)
-                        IFILS2.SetDiffPreset(GameParameters.Preset.Hard);
+                        IFILS2.SetDiffPresetStatic(GameParameters.Preset.Hard);
 
 
 

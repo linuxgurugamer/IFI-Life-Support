@@ -481,6 +481,7 @@ namespace IFILifeSupport
             public int stage;
             public int crew;
             public double LifeSupport;
+            public double MaxLifeSupport;
             public double OrganicSlurry;
             public double Sludge;
             public double SlurryProcessRate;
@@ -494,6 +495,7 @@ namespace IFILifeSupport
                 stage = s;
                 crew = 0;
                 LifeSupport = 0;
+                MaxLifeSupport = 0;
                 OrganicSlurry = 0;
                 Sludge = 0;
                 SlurryProcessRate = 0;
@@ -502,6 +504,7 @@ namespace IFILifeSupport
                 SludgeOutputRate = 0;
             }
         }
+
         Dictionary<int, StageSummary> stageSummaryList = new Dictionary<int, StageSummary>();
         int maxStage = -1;
         public void GetStageSummary()
@@ -534,7 +537,9 @@ namespace IFILifeSupport
                     foreach (PartResource partResource in part.Resources)
                     {
                         if (partResource.resourceName == Constants.LIFESUPPORT)
-                            stageSummary.LifeSupport += partResource.maxAmount;
+                            stageSummary.LifeSupport += partResource.amount;
+                        if (partResource.resourceName == Constants.LIFESUPPORT)
+                            stageSummary.maxLifeSupport += partResource.maxAmount;
                         if (partResource.resourceName == Constants.SLURRY)
                             stageSummary.OrganicSlurry += partResource.maxAmount;
                         if (partResource.resourceName == Constants.SLUDGE)
@@ -568,7 +573,7 @@ namespace IFILifeSupport
                     }
                     if (newStage)
                     {
-                        if (stageSummary.crew > 0 || stageSummary.LifeSupport > 0 || stageSummary.OrganicSlurry > 0 || stageSummary.Sludge > 0 ||
+                        if (stageSummary.crew > 0 || stageSummary.MaxStageSummary > 0 || stageSummary.OrganicSlurry > 0 || stageSummary.Sludge > 0 ||
                             stageSummary.SlurryProcessRate > 0 || stageSummary.SludgeProcessRate > 0 ||
                             stageSummary.LifeSupportOutputRate > 0 || stageSummary.SludgeOutputRate > 0)
                             stageSummaryList.Add(stage, stageSummary);
