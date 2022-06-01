@@ -29,7 +29,7 @@ namespace IFILifeSupport
         public bool active = true;
 
         [GameParameters.CustomParameterUI("Classic Life Support",
-            toolTip ="Basic life support, no recycling of any kind.")]
+            toolTip = "Basic life support, no recycling of any kind.")]
 #if false
         public bool classic = true;
         bool oldClassic = false;
@@ -75,9 +75,9 @@ namespace IFILifeSupport
         [GameParameters.CustomIntParameterUI("Update Frequency (secs)", minValue = 15, maxValue = 300)]
         public int refreshInterval = 15;
 
-        public float RefreshInterval {  get { return TimeWarp.CurrentRate * refreshInterval; } }
+        public float RefreshInterval { get { return TimeWarp.CurrentRate * refreshInterval; } }
 
-        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 5, maxValue = 15)]
+        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 15, maxValue = 300)]
         public int displayRefreshInterval = 15;
 
         [GameParameters.CustomParameterUI("Initted",
@@ -86,8 +86,10 @@ namespace IFILifeSupport
 
 
 
-        public enum LifeSupportLevel { none, classic, improved, advanced, extreme};
-        public LifeSupportLevel Level {  get
+        public enum LifeSupportLevel { none, classic, improved, advanced, extreme };
+        public LifeSupportLevel Level
+        {
+            get
             {
                 if (classic) return LifeSupportLevel.classic;
                 if (improved) return LifeSupportLevel.improved;
@@ -225,7 +227,7 @@ namespace IFILifeSupport
         const double BREATHABLE_ATMO_ADJUSTMENT = 0.60;
         const double LOW_EC_ADJUSTMENT = 1.2;
 
-        [GameParameters.CustomParameterUI("Easy", toolTip ="Set all values to the standard Easy level")]
+        [GameParameters.CustomParameterUI("Easy", toolTip = "Set all values to the standard Easy level")]
         public bool easy = false;
         bool oldEasy = false;
 
@@ -251,7 +253,7 @@ namespace IFILifeSupport
         {
             get
             {
-                return lsRatePerDay / (60* (GameSettings.KERBIN_TIME ? 6 : 24));
+                return lsRatePerDay / (60 * (GameSettings.KERBIN_TIME ? 6 : 24));
             }
         }
 
@@ -266,7 +268,7 @@ namespace IFILifeSupport
 
 
         [GameParameters.CustomFloatParameterUI("Breathable Atmo Pressure", minValue = 46.1f, maxValue = 69.15f, stepCount = 100, displayFormat = "N2",
-            toolTip ="The pressure at which a Kerbal can breath")]
+            toolTip = "The pressure at which a Kerbal can breath")]
         public double breathableAtmoPressure = BREATHABLE_ATMO_PRESSURE;
 
         [GameParameters.CustomFloatParameterUI("Min Intake Air Atmo Pressure", minValue = 9.864f, maxValue = 14.796f, stepCount = 100, displayFormat = "N3",
@@ -274,7 +276,7 @@ namespace IFILifeSupport
         public double intakeAirAtmoPressure = INTAKE_AIR_ATMO_PRESSURE;
 
         [GameParameters.CustomFloatParameterUI("Breathable Homeworld Atmo Adj", minValue = .16f, maxValue = .24f, stepCount = 100, displayFormat = "N2",
-            toolTip ="Adjustment when on the homeworld (multiplier)")]
+            toolTip = "Adjustment when on the homeworld (multiplier)")]
         public double breathableHomeworldAtmoAdjustment = BREATHABLE_HOMEWORLD_ATMO_ADJUSTMENT;
 
         [GameParameters.CustomFloatParameterUI("Breathable Atmo Adj", minValue = 0.48f, maxValue = 0.72f, stepCount = 100, displayFormat = "N2",
@@ -282,7 +284,7 @@ namespace IFILifeSupport
         public double breathableAtmoAdjustment = BREATHABLE_ATMO_ADJUSTMENT;
 
         [GameParameters.CustomFloatParameterUI("Low EC Adj", minValue = 0.96f, maxValue = 1.44f, stepCount = 100, displayFormat = "N2",
-            toolTip ="When no EC is available, LS is used at a higher rate, controlled by this value")]
+            toolTip = "When no EC is available, LS is used at a higher rate, controlled by this value")]
         public double lowEcAdjustment = LOW_EC_ADJUSTMENT;
 
         [GameParameters.CustomParameterUI("Kerbals can die")]
@@ -300,18 +302,30 @@ namespace IFILifeSupport
         public bool dieDuringTimewarp = true;
 
 
-        public int InactiveTimeBeforeDeathSecs {  get { return inactiveTimeBeforeDeath * 3600; } }
+        public int InactiveTimeBeforeDeathSecs { get { return inactiveTimeBeforeDeath * 3600; } }
         [GameParameters.CustomParameterUI("Debug mode",
             toolTip = "Writes reports to the log file ")]
         public bool Debug = false;
 
 
 
-        static void SetValues(double mult)
+        void SetValues(double mult)
         {
-            if (HighLogic.CurrentGame == null)
-                return;
             Log.Info("IFILS2.SetValues, mult: " + mult);
+            lsRatePerDay = 1 * mult;
+
+            breathableAtmoPressure = BREATHABLE_ATMO_PRESSURE / mult; // For the atmo pressure, use a division so that easier becomes higher
+            intakeAirAtmoPressure = INTAKE_AIR_ATMO_PRESSURE / mult;
+
+            breathableHomeworldAtmoAdjustment = BREATHABLE_HOMEWORLD_ATMO_ADJUSTMENT * mult;
+            breathableAtmoAdjustment = BREATHABLE_ATMO_ADJUSTMENT * mult;
+            lowEcAdjustment = LOW_EC_ADJUSTMENT * mult;
+        }
+
+        static void SetValuesStatic(double mult)
+        {
+            Log.Info("IFILS2.SetValuesStatic, mult: " + mult);
+
             //Rate_Per_Kerbal = RATE_PER_KERBAL * mult;
             //lsRatePerDay / 3600 / 6 * mult;
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lsRatePerDay = 1 * mult;
@@ -322,19 +336,21 @@ namespace IFILifeSupport
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment = BREATHABLE_HOMEWORLD_ATMO_ADJUSTMENT * mult;
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment = BREATHABLE_ATMO_ADJUSTMENT * mult;
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment = LOW_EC_ADJUSTMENT * mult;
+
         }
 
         public override void SetDifficultyPreset(GameParameters.Preset preset)
         {
             SetDiffPreset(preset);
         }
+
         public static void SetDiffPresetStatic(GameParameters.Preset preset)
         {
             Log.Info("IFILS2.SetDifficultyPreset: " + preset);
             switch (preset)
             {
                 case GameParameters.Preset.Easy:
-                    SetValues(0.8);
+                    SetValuesStatic(0.8);
                     if (HighLogic.CurrentGame == null)
                         return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = true;
@@ -344,7 +360,7 @@ namespace IFILifeSupport
                     break;
 
                 case GameParameters.Preset.Normal:
-                    SetValues(1);
+                    SetValuesStatic(1);
                     if (HighLogic.CurrentGame == null)
                         return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = true;
@@ -354,7 +370,7 @@ namespace IFILifeSupport
                     break;
 
                 case GameParameters.Preset.Moderate:
-                    SetValues(1.1);
+                    SetValuesStatic(1.1);
                     if (HighLogic.CurrentGame == null)
                         return;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = true;
@@ -364,10 +380,10 @@ namespace IFILifeSupport
                     break;
 
                 case GameParameters.Preset.Hard:
-                    SetValues(1.2);
-                             if (HighLogic.CurrentGame == null)
-                return;
-   HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard = true;
+                    SetValuesStatic(1.2);
+                    if (HighLogic.CurrentGame == null)
+                        return;
+                    HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard = true;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().easy = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().normal = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().moderate = false;
@@ -379,7 +395,7 @@ namespace IFILifeSupport
             HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().oldHard = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().hard;
         }
 
-        public  void SetDiffPreset(GameParameters.Preset preset)
+        public void SetDiffPreset(GameParameters.Preset preset)
         {
             Log.Info("IFILS2.SetDifficultyPreset: " + preset);
             switch (preset)
@@ -393,6 +409,7 @@ namespace IFILifeSupport
                     break;
 
                 case GameParameters.Preset.Normal:
+                    SetValues(1);
                     normal = true;
                     easy = false;
                     moderate = false;

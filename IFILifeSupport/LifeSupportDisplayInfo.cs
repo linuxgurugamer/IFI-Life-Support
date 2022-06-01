@@ -29,6 +29,7 @@ namespace IFILifeSupport
         public const float WINDOW_WIDTH_DEFAULT = 100;
         public const float WINDOW_HEIGHT = 200;
         public static bool WarpCancel = true;
+        public static bool HideUnmanned = true;
         public static bool ShowRecyclers = true;
         public static bool LSDisplayActive = false;
         public static bool LSInfoDisplay = false;

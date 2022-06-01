@@ -894,6 +894,9 @@ namespace IFILifeSupport
 
             var s = new GUIContent("Auto-Cancel Warp on low K & B", "Only for crewed vessels");
             LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, s);
+
+            LifeSupportDisplayInfo.HideUnmanned = GUILayout.Toggle(LifeSupportDisplayInfo.HideUnmanned, "Hide uncrewed vessels");
+
             GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {

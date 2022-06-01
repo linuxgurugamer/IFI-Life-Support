@@ -67,16 +67,23 @@ namespace IFILifeSupport
         /// </summary>
         /// <param name="active"></param>
         /// <returns></returns>
-        public static bool IntakeAirAvailable(Vessel active)
+        public static bool IntakeAirAvailable(Vessel active, out double usageAdjustment)
         {
+            usageAdjustment = 1f;
             if (active.mainBody.atmosphereContainsOxygen)
             {
                 if (active.mainBody.ocean && active.altitude < 0.0)
                     return false;
-                if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
-                    active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure)
+                if (active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure)
+                {
+                    if (active.mainBody.name == FlightGlobals.GetHomeBodyName())
+
+                        usageAdjustment = active.mainBody.name == FlightGlobals.GetHomeBodyName() ? 
+                            HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment :
+                            HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment;
                     return true;
 
+                }
                 //            if (active.mainBody.name == FlightGlobals.GetHomeBodyName() && active.altitude <= 12123)
                 //                return true;
             }

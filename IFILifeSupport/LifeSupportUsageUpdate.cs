@@ -54,7 +54,7 @@ namespace IFILifeSupport
             {
                 if (!HighLogic.LoadedSceneIsGame || RegisterToolbar.GamePaused /*("IFILifeSupportFixedUpdate") */ )
                 {
-                    yield return  Util.WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 1", 0.1f);
+                    yield return Util.WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 1", 0.1f);
                     continue;
                 }
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame &&
@@ -65,11 +65,11 @@ namespace IFILifeSupport
                     Life_Support_Update();
                     lastUpdateTime = Planetarium.GetUniversalTime();
                     refreshed = true;
-                    yield return Util. WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 2",HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval);
+                    yield return Util.WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 2", HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().displayRefreshInterval);
                 }
                 else
                 {
-                    yield return Util. WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 3", 0.1f);
+                    yield return Util.WaitForSecondsRealtimeLogged("LifeSupportUsageUpdater.IFILifeSupportFixedUpdate 3", 0.1f);
                     refreshed = false;
                 }
             }
@@ -290,20 +290,10 @@ namespace IFILifeSupport
 
             report.AppendLine("Initial IFI_Crew: " + IFI_Crew + ", Elapsed_Time: " + Elapsed_Time + ", LS_Use: " + LS_Use_Per_Minute + ",  LSAval: " + LSAval);
 
-            if (LifeSupportRate.IntakeAirAvailable(vessel))
+            if (LifeSupportRate.IntakeAirAvailable(vessel, out double usageAdjustment))
             {
-                report.AppendLine("IntakeAirAvailable");
-
-                if (vessel.mainBody.name == FlightGlobals.GetHomeBodyName())
-                {
-                    LS_Use_Per_Minute *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment; //  0.20;
-                    report.AppendLine("HomeBody atmospheric adjustment: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment);
-                }
-                else
-                {
-                    LS_Use_Per_Minute *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment; // 0.60;
-                    report.AppendLine("Atmospheric adjustment: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment);
-                }
+                LS_Use_Per_Minute *= usageAdjustment;
+                report.AppendLine("IntakeAirAvailable, Atmospheric adjustment: " + usageAdjustment);
             }
             if (IFI_Crew > 0)
                 days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
@@ -425,8 +415,8 @@ namespace IFILifeSupport
                     inputResource[i] = converter.inputList[i].rr.Ratio * Elapsed_Time * percentResAvail * converter.inputList[i].uvMultipler;
                     usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].rr.ResourceName, inputResource[i], false);
                     report.AppendLine("Input: " + converter.inputList[i].rr.ResourceName +
-                                    ", ratio: " + converter.inputList[i].rr.Ratio + 
-                                    ", percentResAvail: " + percentResAvail + 
+                                    ", ratio: " + converter.inputList[i].rr.Ratio +
+                                    ", percentResAvail: " + percentResAvail +
                                     ", uvMultiplier: " + converter.inputList[i].uvMultipler +
                                     ", amt: " + inputResource[i]);
                 }
@@ -965,7 +955,8 @@ namespace IFILifeSupport
             double SlurryAvail = IFIGetAllResources(Constants.SLURRY, vessel);
             double SludgeAvail = IFIGetAllResources(Constants.SLUDGE, vessel);
 
-            IFI_LifeSupportTrackingDisplay.Instance.SetUpDisplayLines(vessel, IFI_Location, IFI_Crew, days_rem, LSAval, SlurryAvail, SludgeAvail, slurryRate, sludgeRate, ref IFI_LifeSupportTrackingDisplay.Instance.LS_Status_Hold_Count);
+            if (!LifeSupportDisplayInfo.HideUnmanned || IFI_Crew > 0)
+                IFI_LifeSupportTrackingDisplay.Instance.SetUpDisplayLines(vessel, IFI_Location, IFI_Crew, days_rem, LSAval, SlurryAvail, SludgeAvail, slurryRate, sludgeRate, ref IFI_LifeSupportTrackingDisplay.Instance.LS_Status_Hold_Count);
             if (IFI_Crew > 0)
                 IFI_LifeSupportTrackingDisplay.Instance.CheckAlertLevels(days_rem, ref LS_ALERT_LEVEL);
         }

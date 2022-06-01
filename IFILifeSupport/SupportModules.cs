@@ -12,8 +12,8 @@ namespace IFILifeSupport
 
     public class IFI_Resources : PartModule
     {
-        public const int BASE_SECS_PER_DAY = 21600;
-        public const int BASE_MULTIPLIER = 1; // 10
+        //public const int BASE_SECS_PER_DAY = 21600;
+        //public const int BASE_MULTIPLIER = 1; // 10
 
 
         internal string info = "";

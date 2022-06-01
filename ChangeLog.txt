@@ -165,6 +165,12 @@
 	Updated Display Update Frequency settings to have a min of 5, and set the default to 15.  Existing games will need to go into the settings to update it
 	Fixed Life Support Estimate window to show available LS, not max
 
+4.0.0.4
+	Fixed difficulty setting "normal" changing the sliders
+	Fixed PAW display of LS available
+	Changed display frequency range to 15-300
+	Added toggle to hide unmanned vessels in status window
+
 TODO
 
 

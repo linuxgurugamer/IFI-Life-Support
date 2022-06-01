@@ -32,6 +32,7 @@ namespace IFILifeSupport
         // Debug Button for right click info - TO BE removed after testing.
         [KSPField(guiActive = true, guiName = "Debug Logging", isPersistant = false)]
         public string DebugStatus = "Disabled";
+
         [KSPEvent(name = "ToggleDebug", active = true, guiActive = true, guiActiveUnfocused = true, guiName = "LS Debug Info")]
 
         public void ToggleDebug()
@@ -101,9 +102,10 @@ namespace IFILifeSupport
                 IFIDebug.IFIMess("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
                     ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
 
-                if (LifeSupportRate.IntakeAirAvailable(active))
+                if (LifeSupportRate.IntakeAirAvailable(active, out double usageAdjustment))
                 {
                     lifeSupportStatus = "Air Intake";
+                    LS_RR *= usageAdjustment;
                 }
                 else
                 {
@@ -116,8 +118,7 @@ namespace IFILifeSupport
                 {
                     LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                 }
-                displayRate = (float)((ResourceAval / (LS_RR * IFIGetAllKerbals())) / HoursPerDay / 3600); //  60 / 60);
-
+                displayRate = (float)(ResourceAval / (LS_RR * IFIGetAllKerbals()) / HoursPerDay / 60); 
 
                 if (displayRate > 1 && displayRate <= 3)
                 {
@@ -144,9 +145,8 @@ namespace IFILifeSupport
         private double IFIGetAllResources(string IFIResource)
         {
             double IFIResourceAmt = 0.0;
-            double num2 = 0;
             int id = PartResourceLibrary.Instance.GetDefinition(IFIResource).id;
-            this.part.GetConnectedResourceTotals(id, out IFIResourceAmt, out num2, true);
+            this.part.GetConnectedResourceTotals(id, out IFIResourceAmt, out double maxAvail, true);
 
             return IFIResourceAmt;
         }
