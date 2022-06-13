@@ -178,6 +178,7 @@
 	Added resizing of windows using icon in lower right corner & saving of window positions for each scene where visible:
 		Editor, Space Center & Flight, for SpaceCenter & Flight, saves seperate positions for the expanded window
 	Added hiding window when game is paused
+	Changed hard-coded window id's to generated ones
 	Fixed time calculations to use:
 			FlightGlobals.GetHomeBody().solarDayLength
 		instead of:

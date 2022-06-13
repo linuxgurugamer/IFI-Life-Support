@@ -76,6 +76,7 @@ namespace IFILifeSupport
             Instance = this;
         }
 
+        static int activeWinID, editorWinID, infoWinId, tooltipWinId;
         public void Start()
         {
             if (!HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
@@ -100,6 +101,11 @@ namespace IFILifeSupport
             }
             LS_Status_Width = new int[MAX_STATUSES];
             LS_Status_Spacing = new int[MAX_STATUSES];
+
+            activeWinID = SpaceTuxUtility.WindowHelper.NextWindowId("activeWinID");
+            editorWinID = SpaceTuxUtility.WindowHelper.NextWindowId("editorWinID");
+            infoWinId = SpaceTuxUtility.WindowHelper.NextWindowId("infoWinId");
+            tooltipWinId = SpaceTuxUtility.WindowHelper.NextWindowId("tooltipWinId");
 
             GameEvents.onVesselRecoveryProcessingComplete.Add(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Add(OnVesselRecoveryRequested);
@@ -412,7 +418,7 @@ namespace IFILifeSupport
                 {
                     string TITLE = "IFI Life Support Vessel Status Display";
 
-                    Settings.winPos[Settings.activeWin] = ClickThruBlocker.GUILayoutWindow(99988, Settings.winPos[Settings.activeWin], LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    Settings.winPos[Settings.activeWin] = ClickThruBlocker.GUILayoutWindow(activeWinID, Settings.winPos[Settings.activeWin], LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                 }
                 else
                 {
@@ -420,14 +426,14 @@ namespace IFILifeSupport
                     {
                         string TITLE = "IFI Life Support Vessel Info";
 
-                        Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin] = ClickThruBlocker.GUILayoutWindow(999888, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin], LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                        Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin] = ClickThruBlocker.GUILayoutWindow(editorWinID, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin], LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                     }
                 }
                 if (LifeSupportDisplayInfo.LSInfoDisplay)
                 {
                     string TITLE = "IFI Life Support Information";
 
-                    Settings.winPos[(int)Settings.ActiveWin.InfoWin] = ClickThruBlocker.GUILayoutWindow(99989, Settings.winPos[(int)Settings.ActiveWin.InfoWin], LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    Settings.winPos[(int)Settings.ActiveWin.InfoWin] = ClickThruBlocker.GUILayoutWindow(infoWinId, Settings.winPos[(int)Settings.ActiveWin.InfoWin], LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
                 DrawToolTip();
@@ -941,7 +947,9 @@ namespace IFILifeSupport
             LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "");
             GUILayout.Label(s);
 
-            LifeSupportDisplayInfo.HideUnmanned = GUILayout.Toggle(LifeSupportDisplayInfo.HideUnmanned, "Hide uncrewed vessels");
+            // s = new GUIContent("Hide empty", "Hide uncrewed vessels");
+
+            LifeSupportDisplayInfo.HideUnmanned = GUILayout.Toggle(LifeSupportDisplayInfo.HideUnmanned, new GUIContent("Hide empty", "Hide uncrewed vessels"));
 
             GUILayout.FlexibleSpace();
 
@@ -1042,7 +1050,7 @@ namespace IFILifeSupport
             pos.width = size.x * multiplier;
             pos.height = size.y * multiplier;
 
-            GUI.Window(9999345, pos, DrawToolTipWindow, "", activeStyle);
+            GUI.Window(tooltipWinId, pos, DrawToolTipWindow, "", activeStyle);
         }
 
         void DrawToolTipWindow(int id)
