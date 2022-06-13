@@ -14,7 +14,9 @@ namespace IFILifeSupport
         public bool initialized = false;
         double lastUpdateTime;
 
-        public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } } // Make sure LS remaining Display conforms to Kerbin time setting.
+        
+        //public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } } // Make sure LS remaining Display conforms to Kerbin time setting.
+       // public static int HoursPerDay { get { return (int)IFI_LifeSupportTrackingDisplay.HOURSPERDAY; } } // Make sure LS remaining Display conforms to Kerbin time setting.
 
         // Right Click Info display for Part
         [KSPField(guiActive = true, guiName = "Life Support Status", isPersistant = false)]
@@ -118,7 +120,7 @@ namespace IFILifeSupport
                 {
                     LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                 }
-                displayRate = (float)(ResourceAval / (LS_RR * IFIGetAllKerbals()) / HoursPerDay / 60); 
+                displayRate = (float)(ResourceAval / (LS_RR * IFIGetAllKerbals()) / IFI_LifeSupportTrackingDisplay.HOURSPERDAY / 60); 
 
                 if (displayRate > 1 && displayRate <= 3)
                 {

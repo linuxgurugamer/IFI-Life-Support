@@ -102,10 +102,14 @@ namespace IFILifeSupport
             return false;
         }
 
+#if fasle
         EditorPartListFilter<AvailablePart> filter;
+#endif
+
         internal void DefineFilters()
         {
             Log.Info("DefineFilters");
+#if false
             return;
             if (configs == null)
                 configs = GameDatabase.Instance.GetConfigs("PART");
@@ -117,7 +121,7 @@ namespace IFILifeSupport
             filter = new EditorPartListFilter<AvailablePart>("Unpurchased Filter", (part => PartShouldBeHidden(part)));
             EditorPartList.Instance.ExcludeFilters.AddFilter(filter);
             EditorPartList.Instance.Refresh();
-
+#endif
         }
         void InitData()
         {

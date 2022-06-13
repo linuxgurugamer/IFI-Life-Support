@@ -18,6 +18,7 @@ namespace IFILifeSupport
         {
             double ratePerMin = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().RatePerKerbalPerMinute * GetTechRateAdjustment();
             Log.Info("GetRatePerMinute, ratePerMin: " + ratePerMin);
+
             return ratePerMin;
         }
 

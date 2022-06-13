@@ -26,6 +26,10 @@ namespace IFILifeSupport
 
         internal string[,] LS_Status_Hold;
 
+        internal static double SECSPERDAY { get; set; } 
+        internal static double MINPERDAY { get; set; }
+        internal static int HOURSPERDAY { get; set; }
+
         class LS_Status_Row
         {
             public string[] data = new string[MAX_STATUSES];
@@ -36,7 +40,8 @@ namespace IFILifeSupport
         private int[] LS_Status_Spacing;
         internal int LS_Status_Hold_Count;
         // Make sure LS remaining Display conforms to Kerbin time setting.
-        public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } }
+        //public static int HoursPerDay { get { return GameSettings.KERBIN_TIME ? 6 : 24; } }
+        public static int HoursPerDay { get { return IFI_LifeSupportTrackingDisplay.HOURSPERDAY; } } // Make sure LS remaining Display conforms to Kerbin time setting.
 
         const int VESSEL = 0;
         const int LOCATION = 1;
@@ -62,6 +67,7 @@ namespace IFILifeSupport
         string lblYellowColor = "FFD966";
         string lblRedColor = "f90000";
 
+        bool resizingWindow = false;
 
 
         public void Awake()
@@ -86,6 +92,11 @@ namespace IFILifeSupport
                      "IFILS/Textures/IFI_LS_GRN_38",
                      "IFILS/Textures/IFI_LS_GRN_24",
                     MODNAME);
+
+                SECSPERDAY = FlightGlobals.GetHomeBody().solarDayLength;
+                MINPERDAY = SECSPERDAY / 60;
+                HOURSPERDAY = (int)(MINPERDAY / 60);
+
             }
             LS_Status_Width = new int[MAX_STATUSES];
             LS_Status_Spacing = new int[MAX_STATUSES];
@@ -94,8 +105,28 @@ namespace IFILifeSupport
             GameEvents.OnVesselRecoveryRequested.Add(OnVesselRecoveryRequested);
             GameEvents.onCrewBoardVessel.Add(onCrewBoardVessel);
 
+            GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
+
             GameEvents.onHideUI.Add(OnHideUI);
             GameEvents.onShowUI.Add(OnShowUI);
+        }
+
+        public void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> eData)
+        {
+            Log.Info("onGameSceneSwitchRequested");
+            Settings.Instance.SaveData();
+            switch (eData.to)
+            {
+                case GameScenes.SPACECENTER:
+                    Settings.Instance.SetActiveWin(Settings.ActiveWin.SpaceCenter);
+                    break;
+                case GameScenes.FLIGHT:
+                    Settings.Instance.SetActiveWin(Settings.ActiveWin.FlightStatusWin);
+                    break;
+                case GameScenes.EDITOR:
+                    Settings.Instance.SetActiveWin(Settings.ActiveWin.EditorInfoWin);
+                    break;
+            }
         }
 
         private void GUIToggle()
@@ -171,11 +202,11 @@ namespace IFILifeSupport
 
         string FormatToDateTime(double d)
         {
-            d = d * FlightGlobals.GetHomeBody().solarDayLength;
-            double days = Math.Floor(d / FlightGlobals.GetHomeBody().solarDayLength);
-            double hours = Math.Floor((d - days * FlightGlobals.GetHomeBody().solarDayLength) / 3600f);
-            double minutes = Math.Floor((d - days * FlightGlobals.GetHomeBody().solarDayLength - hours * 3600f) / 60f);
-            double secs = Math.Floor(d - days * FlightGlobals.GetHomeBody().solarDayLength - hours * 3600f - minutes * 60f);
+            d = d * IFI_LifeSupportTrackingDisplay.SECSPERDAY;
+            double days = Math.Floor(d / IFI_LifeSupportTrackingDisplay.SECSPERDAY);
+            double hours = Math.Floor((d - days * IFI_LifeSupportTrackingDisplay.SECSPERDAY) / 3600f);
+            double minutes = Math.Floor((d - days * IFI_LifeSupportTrackingDisplay.SECSPERDAY - hours * 3600f) / 60f);
+            double secs = Math.Floor(d - days * IFI_LifeSupportTrackingDisplay.SECSPERDAY - hours * 3600f - minutes * 60f);
             return days.ToString("N0") + "d " +
                 string.Format("{0:00.}", hours) + "h " +
                 string.Format("{0:00.}", minutes) + "m " +
@@ -184,14 +215,14 @@ namespace IFILifeSupport
 
         internal void CheckAlertLevels(double days_rem, ref int LS_ALERT_LEVEL)
         {
-            if (LS_ALERT_LEVEL < 2 && days_rem < 3)
+            if (LS_ALERT_LEVEL < 2 && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime)
             {
                 toolbarControl.SetTexture("IFILS/Textures/IFI_LS_CAU_38", "IFILS/Textures/IFI_LS_CAU_24");
                 LS_ALERT_LEVEL = 2;
                 if (LifeSupportDisplayInfo.WarpCancel && days_rem < HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime && TimeWarp.CurrentRate > 1)
                 {
                     TimeWarp.SetRate(0, false);
-                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than 3 days of Kibbles & Bits remaining", 10f);
+                    ScreenMessages.PostScreenMessage("TimeWarp canceled due to less than " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime + " days of Kibbles & Bits remaining", 10f);
 
                 }
             }
@@ -372,46 +403,31 @@ namespace IFILifeSupport
 
         private void OnGUI()
         {
-            if (HighLogic.LoadedSceneIsGame && !Hide && LifeSupportDisplayInfo.LSDisplayActive && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
+
+            if (HighLogic.LoadedSceneIsGame && !Hide && !RegisterToolbar.GamePaused && LifeSupportDisplayInfo.LSDisplayActive && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
             {
-                if (!RegisterToolbar.initted)
-                {
-                    RegisterToolbar.initted = true;
-
-                    RegisterToolbar.tooltipStyle = new GUIStyle(GUI.skin.GetStyle("label"));
-                    Texture2D texBack = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                    texBack.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, 1f));
-                    texBack.Apply();
-                    RegisterToolbar.tooltipStyle.normal.background = texBack;
-
-                    RegisterToolbar.kspToolTipStyle = new GUIStyle(HighLogic.Skin.GetStyle("label"));
-                    texBack = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                    texBack.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, 1f));
-                    texBack.Apply();
-                    RegisterToolbar.kspToolTipStyle.normal.background = texBack;
-                }
-
                 if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useKSPskin)
                     GUI.skin = HighLogic.Skin;
                 if (!HighLogic.LoadedSceneIsEditor && HighLogic.LoadedSceneIsGame)
                 {
-                    string TITLE = "IFI Life Support Vessel Status Display ";
+                    string TITLE = "IFI Life Support Vessel Status Display";
 
-                    LifeSupportDisplayInfo.statusWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplayInfo.statusWindowPos, LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    Settings.winPos[Settings.activeWin] = ClickThruBlocker.GUILayoutWindow(99988, Settings.winPos[Settings.activeWin], LSFlightStatusWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                 }
                 else
-                    if (HighLogic.LoadedSceneIsEditor)
                 {
-                    string TITLE = "IFI Life Support Vessel Info ";
+                    if (HighLogic.LoadedSceneIsEditor)
+                    {
+                        string TITLE = "IFI Life Support Vessel Info";
 
-                    LifeSupportDisplayInfo.editorInfoWindowPos = ClickThruBlocker.GUILayoutWindow(99988, LifeSupportDisplayInfo.editorInfoWindowPos, LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
-
+                        Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin] = ClickThruBlocker.GUILayoutWindow(999888, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin], LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    }
                 }
                 if (LifeSupportDisplayInfo.LSInfoDisplay)
                 {
-                    string TITLE = "IFI Life Support Information ";
+                    string TITLE = "IFI Life Support Information";
 
-                    LifeSupportDisplayInfo.infoWindowPos = ClickThruBlocker.GUILayoutWindow(99989, LifeSupportDisplayInfo.infoWindowPos, LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
+                    Settings.winPos[(int)Settings.ActiveWin.InfoWin] = ClickThruBlocker.GUILayoutWindow(99989, Settings.winPos[(int)Settings.ActiveWin.InfoWin], LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
 
                 }
                 DrawToolTip();
@@ -426,6 +442,7 @@ namespace IFILifeSupport
             else
                 LS_Status_Cache = new List<LS_Status_Row>();
         }
+
         public void ClearStageSummaryList()
         {
             maxStage = -1;
@@ -434,6 +451,7 @@ namespace IFILifeSupport
             else
                 stageSummaryList = new Dictionary<int, StageSummary>();
         }
+
         internal void ClearStatusWidths()
         {
             for (int i = 0; i < MAX_STATUSES; i++)
@@ -610,14 +628,12 @@ namespace IFILifeSupport
         const int SPACING = 30;
         private void LSEditorInfoWindow(int windowId)
         {
-
             var bold = new GUIStyle(GUI.skin.label);
             bold.fontStyle = FontStyle.Bold;
 
             InitStatusCache();
             ClearStatusWidths();
-            double secsPerDay = 3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
-
+            
             GetWidth("Stage", LOCATION, true, true);
             GetWidth("Crew", CREW, true);
             GetWidth("   Life\nSupport", LSAVAIL, true);
@@ -639,6 +655,7 @@ namespace IFILifeSupport
                 GetWidth("LifeSupport\nDaily Output\nRate", LIFESUPPORT_OUTPUT_RATE, true, false);
 
             }
+
             FinishStatusRow();
 
             for (int i = 0; i <= maxStage; i++)
@@ -657,19 +674,20 @@ namespace IFILifeSupport
                     if (LifeSupportDisplayInfo.ShowRecyclers && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved)
                     {
                         GetWidth(ss.OrganicSlurry.ToString("N2"), SLURRYAVAIL);
-                        GetWidth((secsPerDay * ss.SlurryProcessRate).ToString("N2"), SLURRY_DAYS_TO_PROCESS);
+                        GetWidth((SECSPERDAY * ss.SlurryProcessRate).ToString("N2"), SLURRY_DAYS_TO_PROCESS);
                         if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced)
                         {
-                            GetWidth((secsPerDay * ss.SludgeOutputRate).ToString("N2"), SLUDGE_OUTPUT_RATE);
+                            GetWidth((SECSPERDAY * ss.SludgeOutputRate).ToString("N2"), SLUDGE_OUTPUT_RATE);
                             GetWidth(ss.Sludge.ToString(), SLUDGEAVAIL);
                             if (ss.SludgeProcessRate > 0)
-                                GetWidth((secsPerDay * ss.SludgeProcessRate).ToString("N2"), SLUDGE_PROCESS_RATE);
+                                GetWidth((SECSPERDAY * ss.SludgeProcessRate).ToString("N2"), SLUDGE_PROCESS_RATE);
                             else
                                 GetWidth("n/a", SLUDGE_PROCESS_RATE);
                         }
 
-                        GetWidth((secsPerDay * ss.LifeSupportOutputRate).ToString("n2"), LIFESUPPORT_OUTPUT_RATE);
+                        GetWidth((SECSPERDAY * ss.LifeSupportOutputRate).ToString("n2"), LIFESUPPORT_OUTPUT_RATE);
                     }
+
                     FinishStatusRow();
                 }
             }
@@ -716,7 +734,8 @@ namespace IFILifeSupport
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
 
-            bool b = GUILayout.Toggle(LifeSupportDisplayInfo.Summarize, "Summarize");
+            bool b = GUILayout.Toggle(LifeSupportDisplayInfo.Summarize, "");
+            GUILayout.Label("Summarize");
             if (b != LifeSupportDisplayInfo.Summarize)
             {
                 LifeSupportDisplayInfo.Summarize = b;
@@ -724,21 +743,27 @@ namespace IFILifeSupport
                 ClearStageSummaryList();
                 GetStageSummary();
             }
-            GUILayout.FlexibleSpace();
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
-                b = GUILayout.Toggle(LifeSupportDisplayInfo.ShowRecyclers, "Show Recyclers");
+                GUILayout.Label("   ");
+                b = GUILayout.Toggle(LifeSupportDisplayInfo.ShowRecyclers, "");
+                GUILayout.Label("Show Recyclers");
                 if (b != LifeSupportDisplayInfo.ShowRecyclers)
                 {
                     LifeSupportDisplayInfo.ShowRecyclers = b;
                     Editor.Instance.DefineFilters();
-                    LifeSupportDisplayInfo.ReinitEditorInfoWindowPos();
+                    //LifeSupportDisplayInfo.ReinitEditorInfoWindowPos();
                 }
             }
 
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
+            if (GUI.RepeatButton(new Rect(Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin].width - 23f, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin].height - 23f, 16, 16), "", Settings.Instance.resizeButton))
+            {
+                resizingWindow = true;
+            }
+            ResizeWindow(ref Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin]);
 
             GUI.DragWindow();
         }
@@ -779,7 +804,26 @@ namespace IFILifeSupport
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
+
+            if (GUI.RepeatButton(new Rect(Settings.winPos[(int)Settings.ActiveWin.InfoWin].width - 23f, Settings.winPos[(int)Settings.ActiveWin.InfoWin].height - 23f, 16, 16), "", Settings.Instance.resizeButton))
+            {
+                resizingWindow = true;
+            }
+            ResizeWindow(ref Settings.winPos[(int)Settings.ActiveWin.InfoWin]);
+
             GUI.DragWindow();
+        }
+
+        float calculatedMinWidth = 0f;
+
+        void SumAllWidths()
+        {
+            int numCols = 1 + (!fullDisplay ? DAYS_REM : (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.advanced) ? SLUDGE_DAYS_TO_PROCESS :
+                (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level >= IFILS1.LifeSupportLevel.improved ? SLURRY_DAYS_TO_PROCESS : DAYS_REM));
+            calculatedMinWidth = numCols * 12 + 4;
+            for (int i = 0; i < LS_Status_Width.Length; i++)
+                calculatedMinWidth += LS_Status_Width[i];
+            //Log.Info("SumAllWidths, calculatedMinWidth: " + calculatedMinWidth);
         }
 
         private void LSFlightStatusWindow(int windowId)
@@ -850,8 +894,8 @@ namespace IFILifeSupport
                 FinishStatusRow();
             }
 
+
             GUILayout.BeginVertical();
-            //Log.Info("Displaying headers");
 
             GUILayout.BeginHorizontal();
             for (int i = 0; i < MAX_STATUSES; i++)
@@ -893,26 +937,44 @@ namespace IFILifeSupport
             GUILayout.BeginHorizontal();
 
             var s = new GUIContent("Auto-Cancel Warp on low K & B", "Only for crewed vessels");
-            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, s);
+            // This stupidity is due to a bug in the KSP skin
+            LifeSupportDisplayInfo.WarpCancel = GUILayout.Toggle(LifeSupportDisplayInfo.WarpCancel, "");
+            GUILayout.Label(s);
 
             LifeSupportDisplayInfo.HideUnmanned = GUILayout.Toggle(LifeSupportDisplayInfo.HideUnmanned, "Hide uncrewed vessels");
 
             GUILayout.FlexibleSpace();
+
+
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level > IFILS1.LifeSupportLevel.classic)
             {
 
+                float width = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().useKSPskin ? 23 : 30;
+
+
                 if (fullDisplay)
                 {
-                    if (GUILayout.Button("<<", GUILayout.Width(26), GUILayout.Height(22)))
+                    if (GUI.Button(new Rect(Settings.winPos[Settings.activeWin].width - 50, 3f, width, 15f), new GUIContent("<<")))
                     {
                         fullDisplay = false;
-                        LifeSupportDisplayInfo.ReinitInfoWindowPos();
+                        //LifeSupportDisplayInfo.ReinitInfoWindowPos(fullDisplay);
+                        Settings.Instance.SetActiveWin(
+                            (HighLogic.LoadedScene == GameScenes.SPACECENTER) ?
+                            Settings.ActiveWin.SpaceCenter : Settings.ActiveWin.FlightStatusWin);
+
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button(">>", GUILayout.Width(26), GUILayout.Height(22)))
+                    if (GUI.Button(new Rect(Settings.winPos[Settings.activeWin].width - 50, 3f, width, 15f), new GUIContent(">>")))
+                    {
+                        //LifeSupportDisplayInfo.ReinitInfoWindowPos(fullDisplay);
                         fullDisplay = true;
+                        Settings.Instance.SetActiveWin(
+                            (HighLogic.LoadedScene == GameScenes.SPACECENTER) ?
+                            Settings.ActiveWin.SpaceCenterWide : Settings.ActiveWin.FlightStatusWinWide);
+
+                    }
                 }
             }
             GUILayout.EndHorizontal();
@@ -921,13 +983,39 @@ namespace IFILifeSupport
             {
                 LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
             }
-            if (GUI.Button(new Rect(LifeSupportDisplayInfo.statusWindowPos.width - 24, 3f, 23, 15f), new GUIContent("X")))
+            if (GUI.Button(new Rect(Settings.winPos[Settings.activeWin].width - 24, 3f, 23, 15f), new GUIContent("X")))
             {
                 toolbarControl.SetFalse(true);
             }
+            if (GUI.RepeatButton(new Rect(Settings.winPos[Settings.activeWin].width - 23f, Settings.winPos[Settings.activeWin].height - 23f, 16, 16), "", Settings.Instance.resizeButton))
+            {
+                resizingWindow = true;
+            }
+            ResizeWindow(ref Settings.winPos[Settings.activeWin]);
+
             GUI.DragWindow();
             if (Event.current.type == EventType.Repaint)
                 tooltip = GUI.tooltip;
+        }
+
+        private void ResizeWindow(ref Rect winPos)
+        {
+            if (Input.GetMouseButtonUp(0))
+            {
+                resizingWindow = false;
+            }
+
+            if (resizingWindow)
+            {
+                SumAllWidths();
+                //Log.Info("ResizeWindow, calculatedMinWidth: " + calculatedMinWidth + ", winPos.width: " + winPos.width);
+                float minHeight = HighLogic.LoadedSceneIsEditor ? Settings.EDITOR_WIN_HEIGHT : Settings.WINDOW_HEIGHT;
+
+                winPos.width = Input.mousePosition.x - winPos.x + 10;
+                winPos.width = Mathf.Clamp(winPos.width, calculatedMinWidth, Screen.width);
+                winPos.height = (Screen.height - Input.mousePosition.y) - winPos.y + 10;
+                winPos.height = Mathf.Clamp(winPos.height, minHeight, Screen.height);
+            }
         }
 
         void DrawToolTip()
@@ -951,8 +1039,8 @@ namespace IFILifeSupport
             pos.x = Event.current.mousePosition.x + 10;
             pos.y = Event.current.mousePosition.y + 20;
             Vector2 size = activeSkin.box.CalcSize(new GUIContent(tooltip));
-            pos.width = size.x*multiplier;
-            pos.height = size.y*multiplier;
+            pos.width = size.x * multiplier;
+            pos.height = size.y * multiplier;
 
             GUI.Window(9999345, pos, DrawToolTipWindow, "", activeStyle);
         }

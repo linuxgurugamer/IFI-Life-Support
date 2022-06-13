@@ -59,6 +59,10 @@
     <Reference Include="KSP_Log">
       <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\KSP_Log.dll</HintPath>
     </Reference>
+    <Reference Include="SpaceTuxUtility, Version=1.0.1.3, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>R:\KSP_1.12.3_dev\GameData\SpaceTuxLibrary\Plugins\SpaceTuxUtility.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="ToolbarControl, Version=0.1.6.10, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -67,6 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimatedGenerator.cs" />
+    <Compile Include="AssemblyVersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyVersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="DisplayLSInfoWindow.cs" />
     <Compile Include="Editor.cs" />
@@ -89,6 +98,7 @@
     <Compile Include="EVAPartModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="StockSettings.cs" />
     <Compile Include="StarvingKerbal.cs" />
     <Compile Include="SupportModules.cs" />
     <Compile Include="Util.cs" />

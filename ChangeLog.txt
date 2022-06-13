@@ -171,6 +171,21 @@
 	Changed display frequency range to 15-300
 	Added toggle to hide unmanned vessels in status window
 
+4.0.0.5 
+	Fixed screen message to show correct time when dropping out of warp instead of the hard-coded 3 days (now getting from settings!)
+	changed max value of warp dropout detection from 3 to 30 days
+	Moved window width toggle to top of window
+	Added resizing of windows using icon in lower right corner & saving of window positions for each scene where visible:
+		Editor, Space Center & Flight, for SpaceCenter & Flight, saves seperate positions for the expanded window
+	Added hiding window when game is paused
+	Fixed time calculations to use:
+			FlightGlobals.GetHomeBody().solarDayLength
+		instead of:
+	            3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
+				
+
 TODO
+
+Verify Enhanced Biosystems engineering, shoudl require BOTH, not any
 
 

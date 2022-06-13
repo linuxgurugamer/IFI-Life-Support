@@ -35,21 +35,7 @@ namespace IFILifeSupport
         public static bool LSInfoDisplay = false;
         public static bool Summarize = false;
 
-        public static Rect statusWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
-        public static Rect infoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, 400, 300);
-        public static Rect editorInfoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT / 2);
-
         public static Vector2 infoScrollPos = Vector2.zero;
 
-        public static void ReinitInfoWindowPos()
-        {
-            Log.Info("ReinitInfowindowPos");
-            statusWindowPos = new Rect(statusWindowPos.x, statusWindowPos.y, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
-        }
-        public static void ReinitEditorInfoWindowPos()
-        {
-
-            editorInfoWindowPos = new Rect(editorInfoWindowPos.x, editorInfoWindowPos.y, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
-        }
     }
 }

@@ -295,8 +295,10 @@ namespace IFILifeSupport
                 LS_Use_Per_Minute *= usageAdjustment;
                 report.AppendLine("IntakeAirAvailable, Atmospheric adjustment: " + usageAdjustment);
             }
+            //FlightGlobals.GetHomeBody().solarDayLength/60 
             if (IFI_Crew > 0)
-                days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
+                days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * IFI_LifeSupportTrackingDisplay.MINPERDAY);
+                //days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
             else
                 days_rem = -1;
             report.AppendLine("After Atmo adjust, LS_Use: " + LS_Use_Per_Minute + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time + ", LSAval: " + LSAval); // + ", HoursPerDay: " + HoursPerDay);

@@ -41,7 +41,7 @@ namespace IFILifeSupport
                     lifeSupportStatus = "Active";
                 }
                 double ResourceAval = IFIGetAllResources(Constants.LIFESUPPORT);
-                displayRate = (float)((ResourceAval / LifeSupportRate.GetRatePerMinute())); // / 3600); // 60 / 60);
+                displayRate = (float)((ResourceAval / LifeSupportRate.GetRatePerMinute()));
                 if (displayRate >= 0.5 && displayRate <= 1)
                 {
                     lifeSupportStatus = "CAUTION ";
