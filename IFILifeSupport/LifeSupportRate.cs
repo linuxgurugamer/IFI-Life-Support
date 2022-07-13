@@ -16,7 +16,7 @@ namespace IFILifeSupport
 
         public static double GetRatePerMinute()
         {
-            double ratePerMin = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().RatePerKerbalPerMinute * GetTechRateAdjustment();
+            double ratePerMin = HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().RatePerKerbalPerMinute * GetTechRateAdjustment() ;
             Log.Info("GetRatePerMinute, ratePerMin: " + ratePerMin);
 
             return ratePerMin;
@@ -54,7 +54,7 @@ namespace IFILifeSupport
             if (active.mainBody.ocean && active.altitude < 0.0)
                 return false;
 
-            Debug.Log("BreathableAtmosphere, active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude: " + active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude));
+            Log.Info("BreathableAtmosphere, active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude: " + active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude));
 
             if (active.mainBody.name == FlightGlobals.GetHomeBodyName() &&
                 active.mainBody.atmospherePressureCurve.Evaluate((float)active.altitude) <= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoPressure)

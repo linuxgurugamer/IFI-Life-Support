@@ -79,7 +79,7 @@ namespace IFILifeSupport
                 {
                     IFIResourceAmt += pr.amount;
                 }
-                else if (IIResource == "ElectricCharge")
+                else if (IIResource == Constants.ELECTRIC_CHARGE)
                 {
                     // IFIResElectric += pr.amount;
                 }
@@ -87,8 +87,8 @@ namespace IFILifeSupport
             IFIDebug.IFIMess(" Electric Found " + Convert.ToString(IFIResElectric));
             IFIResourceAmt = action.from.RequestResource(Constants.LIFESUPPORT, IFIResourceAmt);
             IFIResourceAmt = action.to.RequestResource(Constants.LIFESUPPORT, 0.0 - IFIResourceAmt);
-            //IFIResElectric = (action.from.RequestResource("ElectricCharge", IFIResElectric)) - 0.001;
-            //IFIResElectric = action.to.RequestResource("ElectricCharge", 0.0 - IFIResElectric);
+            //IFIResElectric = (action.from.RequestResource(Constants.ELECTRIC_CHARGE, IFIResElectric)) - 0.001;
+            //IFIResElectric = action.to.RequestResource(Constants.ELECTRIC_CHARGE, 0.0 - IFIResElectric);
             IFIDebug.IFIMess("IFI Life Support Message: EVA - Ended - " + action.from.name + " Boarded Vessel - LS Return = " + Convert.ToString(IFIResourceAmt) + " and  Electric" + Convert.ToString(IFIResElectric));
         }
 
@@ -115,9 +115,9 @@ namespace IFILifeSupport
                 }
             }
             catch (Exception ex) { IFIDebug.IFIMess(" IFI Exception +ON EVA RESOURCE TRANSFER+ " + ex.Message); }
-            //IFIResReturn = action.from.RequestResource("ElectricCharge", resourceRequest * 1.5);
+            //IFIResReturn = action.from.RequestResource(Constants.ELECTRIC_CHARGE, resourceRequest * 1.5);
             //IFIResElectric -= IFIResReturn;
-            //IFIResReturn = action.to.RequestResource("ElectricCharge", IFIResElectric);
+            //IFIResReturn = action.to.RequestResource(Constants.ELECTRIC_CHARGE, IFIResElectric);
             //IFIResElectric = resourceRequest * 1.5;
             //IFIResElectric -= IFIResReturn;
             IFIResReturn = 0.0;

@@ -45,7 +45,7 @@ Currently there are several Status LS system can be in:
            CAUTION		- Less than 2 days pod or 1 hour EVA of LS remaining.  Life Support tag for days / hours of LS remaining will read how long LS will last for whole vessel.
            Warning!		- LS or Electric Charge at 0. Kerbals will start dying if immediate action not taken. Life Support tag for days / hours of LS remaining will read 0.
 
-Each unit of LifeSupport should provide 1 Kerbin Day(6 hours) of Life support for 1 Kerbal.
+Each unit of LifeSupport should provide 1 Day (length of day depends on the homeworld) of Life support for 1 Kerbal.
 
 If plugin seems not to be working right you can enable Debugging log entries via the right click menu on any pod (recommended to be left off unless you are experiencing problems as it does spam the log file in this early release. Issues can be report in forum thread or at GitHub.
 
@@ -53,30 +53,3 @@ The Structural Fuselage has LifeSupport resource added to give you a way to carr
 
 =========================================
 
-Working Notes
-The biome bug seem to be kinda fixed but the timewarp one behavior is different but not working as intended.
-
-Life support is going down even if sludge and slurry are properly processed, if you time warp very fast life support is just melting.
-
-I noticed the following as well:
-
-
-The regular greenhouses have been deactivated on all my vessels, I had to turn the light on again.
-
-
-
-The organic slurry doesn't seem to be properly processed when in space, it's going up in the tracking station and in flight when time warping.
-
-To be honest I'm not going to keep testing this mod if the versions you send me contain so many obvious bugs, I didn't test it properly and fully and I found major issues...
-
-
-LS not being used at correct rate in warp - roundoff errors
-
-Unloaded
-LS being processed too fast while unloaded and in warp 	(ie:  greenhouses are processing at 133% efficiency
-
-loaded
-Slurry processed in warp not all returned when in flight scene
-Too much slurry is processed
-
-processing lags while in warp, but catches up within 8 seconds after exiting warp

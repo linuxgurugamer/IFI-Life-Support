@@ -27,10 +27,8 @@ namespace IFILifeSupport
 
         // Following are saved in a file
 
-        //public Rect infoWindowPos = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, 400, 300);
-        //public Rect editorInfoWindowPos = new Rect(180, Screen.height / 2 - EDITOR_WIN_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, EDITOR_WIN_HEIGHT);
 
-        public enum ActiveWin { FlightStatusWin = 0, FlightStatusWinWide = 1, SpaceCenter = 2, SpaceCenterWide = 3, InfoWin = 4, EditorInfoWin = 5 };
+        public enum ActiveWin { FlightStatusWin = 0, FlightStatusWinWide = 1, SpaceCenter = 2, SpaceCenterWide = 3, InfoWin = 4, EditorInfoWin = 5, CalculatorWin = 6 };
         public static int activeWin;
 
         public int NumWins = Enum.GetValues(typeof(ActiveWin)).Length;
@@ -46,6 +44,7 @@ namespace IFILifeSupport
         {
             activeWin = (int)win;
         }
+
         public Settings(string rpath)
         {
             Instance = this;
@@ -67,6 +66,7 @@ namespace IFILifeSupport
             winPos[(int)ActiveWin.SpaceCenterWide] = new Rect(winPos[(int)ActiveWin.SpaceCenterWide].x, winPos[(int)ActiveWin.SpaceCenterWide].y, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
 
             Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin] = new Rect(Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin].x, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin].y, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
+            Settings.winPos[(int)Settings.ActiveWin.CalculatorWin] = new Rect(Settings.winPos[(int)Settings.ActiveWin.CalculatorWin].x, Settings.winPos[(int)Settings.ActiveWin.CalculatorWin].y, 800, 400);
 
         }
         public void SaveData()

@@ -184,9 +184,30 @@
 		instead of:
 	            3600 * (GameSettings.KERBIN_TIME ? 6 : 24);
 				
+4.0.0.6 
+	Added I button (for info) to the editor window
+	Fixed nullref when adding a part to a vessel in the editor, was causing window calcs to be wrong
+	Added Planning Calculator window
+	Added X button to all windows
+	
+	Updated interval for refresh of checking experiment completions from 1 second to 15 seconds in flight
+	Updated interval refresh of checking experiment in editor to 0.25
+	Changed all resource ratios in configs from "Ratio" to either "RatioPerSec" or "RatioPerDay".  This will improve the ease of tuning and debugging, as well as improving the understanding of the ratio settings
+	added new class IFI_ResourceRatio to work with the new ratio setups
+	Added 1.875m round tank
+	Added 5m round tank
+	Updated round tank descriptions with size in the title
+	Fixed the calculation and display of the slurry & sludge rate on unloaded vessels
+	Fixed the unloaded processing of recyclers
+
 
 TODO
 
-Verify Enhanced Biosystems engineering, shoudl require BOTH, not any
+Verify Enhanced Biosystems engineering, should require BOTH, not any
 
+Finish calculator
 
+Add check for:If turning into tourists & K&B is locked, autounlock the K&B is automatically unlocked
+
+Change configs from rate/sec to rate/day & adjust code accordingly
+	Need to write code to load the new fields for input/output resources

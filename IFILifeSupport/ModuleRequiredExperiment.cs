@@ -374,10 +374,10 @@ namespace RequiredExperiments
                         EnableModules();
                         availableAtTime = -1;
                     }
-                    yield return Util. WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 1", 1f); //  HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
+                    yield return Util. WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 1", 15f); //  HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval);
                 }
                 else
-                    yield return Util.WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 2", 0.1f);
+                    yield return Util.WaitForSecondsRealtimeLogged("ModuleRequiredExperiment.Refresh 2", 0.25f);
             }
         }
 

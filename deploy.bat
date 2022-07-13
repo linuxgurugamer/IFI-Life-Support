@@ -4,7 +4,8 @@
 set H=%KSPDIR%
 
 set H=R:\KSP_1.12.3_IFI_US2
-set H=R:\KSP_1.12.3_IFI_JNSQ
+rem set H=R:\KSP_1.12.3_IFI_JNSQ
+
 rem set H=R:\KSP_1.12.3_Career-Dev-JNSQ
 
 set GAMEDIR=IFILS

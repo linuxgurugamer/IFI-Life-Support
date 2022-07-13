@@ -210,6 +210,8 @@ namespace IFILifeSupport
                             //LSAval = 200.0;
                         }
                     }
+
+
                     if (vessel.loaded)
                     {
                         ProcessLoadedVessel(Elapsed_Time, vessel, ref slurryRate, ref sludgeRate);
@@ -218,7 +220,11 @@ namespace IFILifeSupport
                     {
                         ProcessUnloadedVessel(Elapsed_Time, vessel.protoVessel, ref slurryRate, ref sludgeRate);
                     }
+                    //slurryRate *= IFI_LifeSupportTrackingDisplay.RATE_ADJ;
+                    //sludgeRate *= IFI_LifeSupportTrackingDisplay.RATE_ADJ;
 
+                    Log.Info("SECSPERDAY: " + IFI_LifeSupportTrackingDisplay.SECSPERDAY +
+                        ", slurryRate: " + slurryRate + ", sludgeRate: " + sludgeRate);
                     DoDisplayCalcs(vessel, IFI_Crew, IFI_ALT, IFI_Location, Elapsed_Time, days_rem, LSAval, slurryRate, sludgeRate);
 
                 }
@@ -258,12 +264,16 @@ namespace IFILifeSupport
             return IFIResourceAmt;
         }
 
-        static bool ResourceConverterActive(ProtoPartSnapshot pps, int j)
+        static bool ResourceConverterActive(ProtoPartSnapshot pps, int j, out bool uvLightsActivated)
         {
+            Log.Info("ResourceConverterActive: " + pps.modules[j].moduleValues);
             Boolean.TryParse(pps.modules[j].moduleValues.GetValue("isEnabled"), out bool active);
             Boolean.TryParse(pps.modules[j].moduleValues.GetValue("checkForOxygen"), out bool checkForOxygen);
 
             Boolean.TryParse(pps.modules[j].moduleValues.GetValue("IsActivated"), out bool IsActivated);
+            Boolean.TryParse(pps.modules[j].moduleValues.GetValue("UVLightsActivated"), out  uvLightsActivated);
+
+            
 
             if (checkForOxygen && !pps.pVesselRef.vesselRef.mainBody.atmosphereContainsOxygen)
                 return false;
@@ -276,9 +286,9 @@ namespace IFILifeSupport
         {
             StringBuilder report = new StringBuilder();
             report.AppendLine();
-            report.AppendLine("============================");
-            report.AppendLine("LifeSupport Usage Calculation Report");
-            report.AppendLine("============================");
+            report.AppendLine("===============================");
+            report.AppendLine("===LifeSupport Usage Calculation Report");
+            report.AppendLine("===============================");
 
             // 
             // First get the rate per minute, this will be adjusted below to the rate per second
@@ -288,20 +298,20 @@ namespace IFILifeSupport
 
             LSAval = IFIGetAllResources(Constants.LIFESUPPORT, vessel);
 
-            report.AppendLine("Initial IFI_Crew: " + IFI_Crew + ", Elapsed_Time: " + Elapsed_Time + ", LS_Use: " + LS_Use_Per_Minute + ",  LSAval: " + LSAval);
+            report.AppendLine("===Initial IFI_Crew: " + IFI_Crew + ", Elapsed_Time: " + Elapsed_Time + ", LS_Use: " + LS_Use_Per_Minute + ",  LSAval: " + LSAval);
 
             if (LifeSupportRate.IntakeAirAvailable(vessel, out double usageAdjustment))
             {
                 LS_Use_Per_Minute *= usageAdjustment;
-                report.AppendLine("IntakeAirAvailable, Atmospheric adjustment: " + usageAdjustment);
+                report.AppendLine("===IntakeAirAvailable, Atmospheric adjustment: " + usageAdjustment);
             }
             //FlightGlobals.GetHomeBody().solarDayLength/60 
             if (IFI_Crew > 0)
                 days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * IFI_LifeSupportTrackingDisplay.MINPERDAY);
-                //days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
+            //days_rem = LSAval / IFI_Crew / (LS_Use_Per_Minute * 60 * (GameSettings.KERBIN_TIME ? 6 : 24));
             else
                 days_rem = -1;
-            report.AppendLine("After Atmo adjust, LS_Use: " + LS_Use_Per_Minute + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time + ", LSAval: " + LSAval); // + ", HoursPerDay: " + HoursPerDay);
+            report.AppendLine("===After Atmo adjust, LS_Use: " + LS_Use_Per_Minute + ",   IFI_Crew: " + IFI_Crew + ",   Elapsed_Time: " + Elapsed_Time + ", LSAval: " + LSAval); // + ", HoursPerDay: " + HoursPerDay);
             LS_Use_Per_Minute *= IFI_Crew;
 
             //
@@ -312,13 +322,13 @@ namespace IFILifeSupport
             //
             // IF No EC use more LS resources
             //
-            if (IFIGetAllResources("ElectricCharge", vessel) < 0.1)
+            if (IFIGetAllResources(Constants.ELECTRIC_CHARGE, vessel) < 0.1 && !CheatOptions.InfiniteElectricity)
             {
                 LS_Use *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment;
-                report.AppendLine("No EC available, low EC Adjustement: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment);
+                report.AppendLine("===No EC available, low EC Adjustement: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment);
             }
-            report.AppendLine("Final LS_Use_Per_Second: " + LS_Use);
-            report.AppendLine("============================");
+            report.AppendLine("===Final LS_Use_Per_Second: " + LS_Use);
+            report.AppendLine("===============================");
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Debug)
                 Log.Info(report.ToString());
             return LS_Use;
@@ -327,11 +337,14 @@ namespace IFILifeSupport
         void ProcessLoadedVessel(double Elapsed_Time, Vessel vessel, ref double slurryRate, ref double sludgeRate)
         {
             Log.Info("ProcessLoadedVessel, Elapsed_Time: " + Elapsed_Time);
+
             StringBuilder report = new StringBuilder();
             report.AppendLine();
-            report.AppendLine("============================");
-            report.AppendLine("ProcessLoadedVessel Report");
-            report.AppendLine("============================");
+            report.AppendLine("===============================");
+            report.AppendLine("===ProcessLoadedVessel Report");
+            report.AppendLine("===============================");
+            if (Planetarium.TimeScale > 1.1f)
+                report.AppendLine("===Timewarp in progress, current Planetarium.TimeScale: " + Planetarium.TimeScale);
 
             for (int idx2 = 0; idx2 < vessel.parts.Count; idx2++)
             {
@@ -342,12 +355,12 @@ namespace IFILifeSupport
                     if (vessel.parts[idx2].Modules[m].moduleName == "ModuleIFILifeSupport")
                     {
                         ModuleIFILifeSupport m1 = (ModuleIFILifeSupport)tmpPM;
-                        report.AppendLine("Part: " + vessel.parts[idx2].partInfo.title + ", activated: " + m1.IsActivated);
+                        report.AppendLine("===Part: " + vessel.parts[idx2].partInfo.title + ", activated: " + m1.IsActivated);
                         Loaded_Converter_Update(Elapsed_Time, m1, ref report, ref slurryRate, ref sludgeRate);
                     }
                 }
             }
-            report.AppendLine("============================");
+            report.AppendLine("===============================");
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Debug)
                 Log.Info(report.ToString());
             report.Clear();
@@ -379,32 +392,36 @@ namespace IFILifeSupport
                     converter.inputList[i].uvMultipler = 1f;
                     if (converter.UVLightsActivated)
                     {
-                        if (converter.inputList[i].rr.ResourceName == "ElectricCharge")
+                        if (converter.inputList[i].ResourceName == Constants.ELECTRIC_CHARGE)
                             converter.inputList[i].uvMultipler = 1.25f;
                         else
                             converter.inputList[i].uvMultipler = 1.5f;
                     }
-                    inputResource[i] = converter.inputList[i].rr.Ratio * Elapsed_Time * converter.inputList[i].uvMultipler;
+                    inputResource[i] = converter.inputList[i].RatioPerSec * Elapsed_Time * converter.inputList[i].uvMultipler; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                     //usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].rr.ResourceName, inputResource[i], ResourceFlowMode.STAGE_PRIORITY_FLOW, true);
 
-                    converter.part.GetConnectedResourceTotals(converter.inputList[i].resourceId, out usedInputResource[i], out double maxAmt);
-                    usedInputResource[i] = Math.Min(usedInputResource[i], inputResource[i] * converter.inputList[i].uvMultipler);
+                    if (converter.inputList[i].ResourceName == Constants.ELECTRIC_CHARGE && CheatOptions.InfiniteElectricity)
+                        usedInputResource[i] = inputResource[i];
+                    else
+                        converter.part.GetConnectedResourceTotals(converter.inputList[i].resourceId, out usedInputResource[i], out double maxAmt);
+                    usedInputResource[i] = Math.Min(usedInputResource[i], inputResource[i] ); // * IFI_LifeSupportTrackingDisplay.RATE_ADJ);
 
-                    Log.Info("Resource: " + converter.inputList[i].rr.ResourceName +
-                        ", Ratio: " + converter.inputList[i].rr.Ratio +
+                    Log.Info("Resource: " + converter.inputList[i].ResourceName +
+                        ", RatioPerSec: " + converter.inputList[i].RatioPerSec +
+                        ", RatioPerDay: " + converter.inputList[i].RatioPerDay +
                         ", Elapsed_Time: " + Elapsed_Time +
                         ", uvMultiplier: " + converter.inputList[i].uvMultipler +
                         ", inputResource: " + inputResource[i] +
                         ", usedInputResource: " + usedInputResource[i]);
 
                     percentResAvail = Math.Min(percentResAvail, usedInputResource[i] / inputResource[i]);
-                    if (converter.inputList[i].rr.ResourceName == Constants.SLURRY)
+                    if (converter.inputList[i].ResourceName == Constants.SLURRY)
                     {
-                        slurryRate += converter.inputList[i].rr.Ratio * converter.inputList[i].uvMultipler;
+                        slurryRate += converter.inputList[i].RatioPerSec * converter.inputList[i].uvMultipler; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                     }
-                    if (converter.inputList[i].rr.ResourceName == Constants.SLUDGE)
+                    if (converter.inputList[i].ResourceName == Constants.SLUDGE)
                     {
-                        sludgeRate += converter.inputList[i].rr.Ratio * converter.inputList[i].uvMultipler;
+                        sludgeRate += converter.inputList[i].RatioPerSec * converter.inputList[i].uvMultipler; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                     }
                 }
 
@@ -413,15 +430,28 @@ namespace IFILifeSupport
                 //
                 for (int i = 0; i < converter.inputList.Count; i++)
                 {
+                    double out1, outMax1, out2, outMax2;
+                    converter.part.GetConnectedResourceTotals(converter.inputList[i].resourceId, out out1, out outMax1);
 
-                    inputResource[i] = converter.inputList[i].rr.Ratio * Elapsed_Time * percentResAvail * converter.inputList[i].uvMultipler;
-                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].rr.ResourceName, inputResource[i], false);
-                    report.AppendLine("Input: " + converter.inputList[i].rr.ResourceName +
-                                    ", ratio: " + converter.inputList[i].rr.Ratio +
+                    inputResource[i] = converter.inputList[i].RatioPerSec * Elapsed_Time * percentResAvail * converter.inputList[i].uvMultipler; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
+                    usedInputResource[i] = converter.part.RequestResource(converter.inputList[i].ResourceName, inputResource[i], false);
+
+                    converter.part.GetConnectedResourceTotals(converter.inputList[i].resourceId, out out2, out outMax2);
+
+
+                    report.AppendLine("===RequestResource (inputList), ResourceName: " + converter.inputList[i].ResourceName +
+                        ", amt: " + inputResource[i]);
+
+
+                    report.AppendLine("===Input: " + converter.inputList[i].ResourceName +
+                                    ", ratioPerSec: " + converter.inputList[i].RatioPerSec +
+                                    ", ratioPerDay: " + converter.inputList[i].RatioPerDay +
                                     ", percentResAvail: " + percentResAvail +
+                                    ", Elapsed_Time: " + Elapsed_Time +
                                     ", uvMultiplier: " + converter.inputList[i].uvMultipler +
                                     ", amt: " + inputResource[i]);
-                }
+                     report.AppendLine("===ConnectedResourceTotals, " + converter.inputList[i].ResourceName + ", before amt: " + out1 + ", after amt: " + out2);
+               }
 
                 //
                 // And finally, take care of the output from the converter
@@ -443,26 +473,37 @@ namespace IFILifeSupport
                         }
                     }
 
-                    outputResource[i] = converter.outputList[i].Ratio * Elapsed_Time * percentResAvail * uvMultipler;
+                    outputResource[i] = converter.outputList[i].RatioPerSec * Elapsed_Time * percentResAvail * uvMultipler; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                     double resProduced = outputResource[i];
 
-                    report.AppendLine("Output: " + converter.outputList[i].ResourceName);
+                    report.AppendLine("===Output: " + converter.outputList[i].ResourceName);
 
                     //
                     // Fill up current part first, then the rest of the vessel
                     //
                     if (!locked)
                     {
-                        int resourceid = PartResourceLibrary.Instance.GetDefinition(converter.outputList[i].ResourceName).id;
+                          int resourceid = PartResourceLibrary.Instance.GetDefinition(converter.outputList[i].ResourceName).id;
+
+                      double out1, outMax1, out2, outMax2;
+                        converter.part.GetConnectedResourceTotals(resourceid, out out1, out outMax1);
+
+
                         converter.part.GetConnectedResourceTotals(resourceid, out double amount, out double maxAmount, false);
                         resProduced = Math.Min(outputResource[i], maxAmount - amount);
                         converter.part.RequestResource(converter.outputList[i].ResourceName, -resProduced);
-                        report.AppendLine("uvMultiplier: " + uvMultipler +
-                            ", Resource produced: " + resProduced);
+
+                        converter.part.GetConnectedResourceTotals(resourceid, out out2, out outMax2);
+
+                        report.AppendLine("===uvMultiplier: " + uvMultipler + ", Resource produced: " + resProduced);
+
+                        report.AppendLine("===ConnectedResourceTotals, " + converter.outputList[i].ResourceName + ", before amt: " + out1 + ", after amt: " + out2);
+
                     }
                     converter.part.RequestResource(converter.outputList[i].ResourceName, -(outputResource[i] - resProduced), ResourceFlowMode.ALL_VESSEL_BALANCE);
+                    report.AppendLine("===part.RequestResource, ResourceName: " + converter.outputList[i].ResourceName + ", amt: " + -(outputResource[i] - resProduced));
 
-                    report.AppendLine("locked: " + locked + ", avail: " + resProduced + ", Amt to other parts: " + -(outputResource[i] - resProduced));
+                    report.AppendLine("===locked: " + locked + ", avail: " + resProduced + ", Amt to other parts: " + -(outputResource[i] - resProduced));
                 }
             }
             report.AppendLine();
@@ -488,12 +529,14 @@ namespace IFILifeSupport
             internal int index;
             internal Part part;
             internal int moduleIndex;
+            internal bool uvLightsActivated;
 
-            public PartWithIFI(int idx, Part snapshot, int modIndex)
+            public PartWithIFI(int idx, Part snapshot, int modIndex, bool uvLightsOn)
             {
                 index = idx;
                 part = snapshot;
                 moduleIndex = modIndex;
+                uvLightsActivated = uvLightsOn;
             }
 
         }
@@ -535,21 +578,23 @@ namespace IFILifeSupport
         internal class ConverterResources
         {
             internal string resName;
-            internal double ratio;
+            internal double ratioPerSec;
+            internal double ratioPerDay;
             internal bool dumpExcess;
 
             internal ConverterResources() { }
             internal ConverterResources(ConverterResources cr)
             {
                 resName = cr.resName;
-                ratio = cr.ratio;
+                ratioPerSec = cr.ratioPerSec;
+                ratioPerDay = cr.ratioPerDay;
                 dumpExcess = cr.dumpExcess;
             }
         }
 
         void ProcessUnloadedVessel(double Elapsed_Time, ProtoVessel protoVessel, ref double slurryRate, ref double sludgeRate)
         {
-
+            slurryRate = slurryRate = 0;
             Log.Info("ProcessUnloadedVessel, vessel: " + protoVessel.vesselName);
 
             double[] inputResource = new double[10];        // How much is needed for ElapsedTime
@@ -575,10 +620,10 @@ namespace IFILifeSupport
             //
             StringBuilder report = new StringBuilder();
             report.AppendLine();
-            report.AppendLine("============================");
-            report.AppendLine("ProcessUnloadedVessel Report");
-            report.AppendLine("============================");
-            report.AppendLine("Elapsed_Time: " + Elapsed_Time);
+            report.AppendLine("===============================");
+            report.AppendLine("===ProcessUnloadedVessel Report");
+            report.AppendLine("===============================");
+            report.AppendLine("===Elapsed_Time: " + Elapsed_Time);
 
             //
             // Loop through all the parts on the vessel, get all the resources and
@@ -618,9 +663,9 @@ namespace IFILifeSupport
 
                     if (v == "ModuleIFILifeSupport")
                     {
-                        if (ResourceConverterActive(p, modIdx))
+                        if (ResourceConverterActive(p, modIdx, out bool uvLightsActivated))
                         {
-                            moduleLS.Add(new PartWithIFI(partIdx, part, modIdx));
+                            moduleLS.Add(new PartWithIFI(partIdx, part, modIdx, uvLightsActivated));
                         }
                         break;
                     }
@@ -647,37 +692,84 @@ namespace IFILifeSupport
                 ConfigNode[] modules = ifiPart.part.partInfo.partConfig.GetNodes("MODULE");
                 ConfigNode[] inputRes = modules[ifiPart.moduleIndex].GetNodes(ModuleIFILifeSupport.INPUT);
                 ConfigNode[] outputRes = modules[ifiPart.moduleIndex].GetNodes(ModuleIFILifeSupport.OUTPUT);
+                var uvLightsActivated = ifiPart.uvLightsActivated;
+                Log.Info("UVLightsActivated: " + uvLightsActivated);
+                    float uvMultipler = 1f;
+
                 foreach (ConfigNode i in inputRes)
                 {
                     ConverterResources cr = new ConverterResources();
                     cr.resName = i.GetValue("ResourceName");
-                    var ratioStr = i.GetValue("Ratio");
+                    string ratioPerSecStr = null, ratioPerDayStr = null;
+                    if (i.HasValue("RatioPerSec"))
+                    ratioPerSecStr = i.GetValue("RatioPerSec");
+                    if (i.HasValue("RatioPerDay"))
+                         ratioPerDayStr = i.GetValue("RatioPerDay");
 
-                    var uvLightsActivated = bool.Parse(i.GetValue("UVLightsActivated"));
-                    float uvMultipler = 1f;
                     if (uvLightsActivated)
                     {
-                        if (cr.resName == "ElectricCharge")
+                        if (cr.resName == Constants.ELECTRIC_CHARGE)
                             uvMultipler = 1.25f;
                         else
                             uvMultipler = 1.5f;
                     }
 
-                    cr.ratio = Double.Parse(ratioStr) * uvMultipler;
+                    if (ratioPerSecStr != null)
+                    {
+                        cr.ratioPerSec = Double.Parse(ratioPerSecStr) * uvMultipler;
+                        cr.ratioPerDay = cr.ratioPerSec * IFI_LifeSupportTrackingDisplay.SECSPERDAY;
+                    }
+                    if (ratioPerDayStr != null)
+                    {
+                        cr.ratioPerDay = Double.Parse(ratioPerDayStr) * uvMultipler;
+                        cr.ratioPerSec = cr.ratioPerDay / IFI_LifeSupportTrackingDisplay.SECSPERDAY;
+                    }
+
 
                     inputResources.Add(cr);
                     inputResourcesSim.Add(cr);
+
+                    if (cr.resName == Constants.SLURRY)
+                        slurryRate += cr.ratioPerSec;
+                    if (cr.resName == Constants.SLUDGE)
+                        sludgeRate += cr.ratioPerSec;
+
                 }
+                if (uvLightsActivated)
+                {
+                        uvMultipler = 1.5f;
+                }
+
                 foreach (var i in outputRes)
                 {
                     ConverterResources cr = new ConverterResources();
 
                     cr.resName = i.GetValue("ResourceName");
-                    var ratioStr = i.GetValue("Ratio");
-                    cr.ratio = Double.Parse(ratioStr);
-                    var dumpExcessStr = i.GetValue("DumpExcess");
-                    cr.dumpExcess = bool.Parse(dumpExcessStr);
-                    outputResources.Add(cr);
+                    string ratioPerSecStr = null, ratioPerDayStr = null;
+                    if (i.HasValue("RatioPerSec"))
+                        ratioPerSecStr = i.GetValue("RatioPerSec");
+                    if (i.HasValue("RatioPerDay"))
+                        ratioPerDayStr = i.GetValue("RatioPerDay");
+                    if (ratioPerSecStr != null)
+                    {
+                        cr.ratioPerSec = Double.Parse(ratioPerSecStr) * uvMultipler;
+                        cr.ratioPerDay = cr.ratioPerSec * IFI_LifeSupportTrackingDisplay.SECSPERDAY;
+                    }
+                    if (ratioPerDayStr != null)
+                    {
+                        cr.ratioPerDay = Double.Parse(ratioPerDayStr) * uvMultipler;
+                        cr.ratioPerSec = cr.ratioPerDay / IFI_LifeSupportTrackingDisplay.SECSPERDAY;
+                    }
+
+
+                    if (i.HasValue("DumpExcess"))
+                    {
+                        var dumpExcessStr = i.GetValue("DumpExcess");
+                        cr.dumpExcess = bool.Parse(dumpExcessStr);
+                    }
+                    else
+                        cr.dumpExcess = true;
+                        outputResources.Add(cr);
                 }
 
                 //
@@ -689,7 +781,7 @@ namespace IFILifeSupport
                 {
                     if (availPartResource.ContainsKey(inputResources[i].resName))
                     {
-                        inputResourceSim[i] = inputResources[i].ratio * Elapsed_Time;
+                        inputResourceSim[i] = inputResources[i].ratioPerSec * Elapsed_Time; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                         double obtained = 0f;
 
                         int cnt = 1;
@@ -721,7 +813,7 @@ namespace IFILifeSupport
                                 }
                             }
                         }
-                        if (inputResources[i].resName != "ElectricCharge" || !CheatOptions.InfiniteElectricity)
+                        if (inputResources[i].resName != Constants.ELECTRIC_CHARGE || !CheatOptions.InfiniteElectricity)
                             percentResAvail = Math.Min(percentResAvail, obtained / inputResourceSim[i]);
                     }
                 }
@@ -729,15 +821,15 @@ namespace IFILifeSupport
                 //
                 // Now actually do the work, using the percentResAvail
                 //
-                report.AppendLine("percentResAvail: " + percentResAvail);
+                report.AppendLine("===percentResAvail: " + percentResAvail);
                 for (int i = 0; i < inputResources.Count; i++)
                 {
                     if (availPartResource.ContainsKey(inputResources[i].resName))
                     {
-                        inputResource[i] = inputResources[i].ratio * Elapsed_Time * percentResAvail;
+                        inputResource[i] = inputResources[i].ratioPerSec * Elapsed_Time * percentResAvail; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                         double obtained = 0f;
 
-                        report.AppendLine("Input: " + inputResources[i].resName);
+                        report.AppendLine("===Input: " + inputResources[i].resName);
                         int cnt = 1;
                         while (cnt > 0 && obtained < inputResource[i])
                         {
@@ -760,14 +852,14 @@ namespace IFILifeSupport
                                 }
                             }
                         }
-                        if (inputResources[i].resName != "ElectricCharge" || !CheatOptions.InfiniteElectricity)
+                        if (inputResources[i].resName != Constants.ELECTRIC_CHARGE || !CheatOptions.InfiniteElectricity)
                         {
                             usedInputResource[i] = obtained;
                             inputResources = inputResourcesSim;
-                            report.AppendLine("Total: " + obtained);
+                            report.AppendLine("===Total: " + obtained);
                         }
                         else
-                            report.AppendLine("InfiniteElectricity enabled");
+                            report.AppendLine("===InfiniteElectricity enabled");
                     }
                 }
                 report.AppendLine();
@@ -779,8 +871,8 @@ namespace IFILifeSupport
                 //
                 for (int i = 0; i < outputResources.Count; i++)
                 {
-                    report.AppendLine("Output: " + outputResources[i].resName);
-                    outputResource[i] = outputResources[i].ratio * Elapsed_Time * percentResAvail;
+                    report.AppendLine("===Output: " + outputResources[i].resName);
+                    outputResource[i] = outputResources[i].ratioPerSec * Elapsed_Time * percentResAvail; // * IFI_LifeSupportTrackingDisplay.RATE_ADJ;
                     int cnt = 1;
                     while (cnt > 0)
                     {
@@ -811,7 +903,7 @@ namespace IFILifeSupport
 
 
             report.AppendLine();
-            report.AppendLine("============================");
+            report.AppendLine("===============================");
             if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().Debug)
                 Log.Info(report.ToString());
         }

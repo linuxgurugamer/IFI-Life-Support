@@ -57,6 +57,8 @@ namespace IFILifeSupport
         static public bool initted = false;
         static public GUIStyle tooltipStyle;
         static public GUIStyle kspToolTipStyle;
+        static public GUIStyle bold;
+
 
         void OnGUI()
         {
@@ -80,6 +82,9 @@ namespace IFILifeSupport
                 texBack.SetPixel(0, 0, new Color(0.0f, 0.0f, 0.0f, 1f));
                 texBack.Apply();
                 kspToolTipStyle.normal.background = texBack;
+
+                bold = new GUIStyle(GUI.skin.label);
+                bold.fontStyle = FontStyle.Bold;
 
             }
         }

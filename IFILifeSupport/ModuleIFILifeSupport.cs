@@ -49,16 +49,11 @@ namespace IFILifeSupport
 
     }
 
-    public class LocalResourceRatio
-    {
-        public ResourceRatio rr;
-        public int resourceId;
-        public float uvMultipler;
-    }
+
     public class ModuleIFILifeSupport : PartModule, IModuleInfo
     {
-        public List<LocalResourceRatio> inputList;
-        public List<ResourceRatio> outputList;
+        public List<IFI_ResourceRatio> inputList;
+        public List<IFI_ResourceRatio> outputList;
 
         ModuleIFIGreenhousePanel moduleIFIgreenhousePanel;
 
@@ -161,14 +156,11 @@ namespace IFILifeSupport
 
         public override void OnLoad(ConfigNode node)
         {
-            if (Log == null)
+            inputList = new List<IFI_ResourceRatio>();
+            outputList = new List<IFI_ResourceRatio>();
+            if (part == null || part.partInfo == null)
                 return;
-
-            inputList = new List<LocalResourceRatio>();
-            outputList = new List<ResourceRatio>();
-
-            var p = part.partInfo.partConfig.GetNodes("MODULE");
-            foreach (var p1 in p)
+            foreach (var p1 in part.partInfo.partConfig.GetNodes("MODULE"))
             {
                 var name = p1.GetValue("name");
                 if (name == "ModuleIFILifeSupport")
@@ -177,10 +169,10 @@ namespace IFILifeSupport
                     {
                         foreach (ConfigNode dataNode in p1.GetNodes(INPUT))
                         {
-                            LocalResourceRatio lrr = new LocalResourceRatio();
+                            IFI_ResourceRatio lrr = new IFI_ResourceRatio();
 
-                            lrr.rr.Load(dataNode);
-                            lrr.resourceId = PartResourceLibrary.Instance.GetDefinition(lrr.rr.ResourceName).id;
+                            lrr.Load(dataNode);
+                            //lrr.resourceId = PartResourceLibrary.Instance.GetDefinition(lrr.ResourceName).id;
                             inputList.Add(lrr);
                         }
                     }
@@ -189,7 +181,7 @@ namespace IFILifeSupport
                     {
                         foreach (ConfigNode dataNode in p1.GetNodes(OUTPUT))
                         {
-                            ResourceRatio rr = new ResourceRatio();
+                            IFI_ResourceRatio rr = new IFI_ResourceRatio();
                             rr.Load(dataNode);
                             outputList.Add(rr);
                         }
@@ -214,7 +206,8 @@ namespace IFILifeSupport
             lastUpdateTime = Planetarium.GetUniversalTime();
             if (AnimationName != null)
             {
-                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationName: [" + AnimationName + "]");
+                if (Log != null)
+                    Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationName: [" + AnimationName + "]");
 
                 var ma = part.FindModelAnimators(AnimationName);
                 if (ma != null && ma.Length > 0)
@@ -224,14 +217,16 @@ namespace IFILifeSupport
 
                 if (BioAnimate != null)
                 {
-                    Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
+                    if (Log != null)
+                        Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", " + AnimationName + " found, stopping animation");
                     BioAnimate[AnimationName].speed = 0;
                     lastTime = BioAnimate[AnimationName].time = 0;
                 }
             }
             if (AnimationLights != null)
             {
-                Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationLights: [" + AnimationLights + "]");
+                if (Log != null)
+                    Log.Info("ModuleIFILifeSupport.Start, Part: " + this.part.partInfo.title + ", AnimationLights: [" + AnimationLights + "]");
 
                 var ma = part.FindModelAnimators(AnimationLights);
                 if (ma != null && ma.Length > 0)
@@ -244,7 +239,7 @@ namespace IFILifeSupport
                     Lights[AnimationLights].speed = 0;
                 }
             }
-            
+
         }
 
         double lastUpdateTime;
@@ -314,7 +309,7 @@ namespace IFILifeSupport
                 {
                     curSpeed += RampSpeed;
                     BioAnimate[AnimationName].speed = curSpeed;
-                    
+
                 }
                 if (endSpeed <= 0 && curSpeed > endSpeed)
                 {
@@ -335,7 +330,7 @@ namespace IFILifeSupport
         }
 
 
-#region info
+        #region info
         const string MODULETITLE = "IFI Life Support";
         string info = "";
         void AddToInfo(string s)
@@ -350,20 +345,20 @@ namespace IFILifeSupport
         }
 
 
-        string ResourceRatioToString(double Ratio)
+        string ResourceRatioToString(double RatioPerSec, double RatioPerDay)
         {
             StringBuilder stringBuilder = StringBuilderCache.Acquire(256);
-            if (Ratio < 0.0001)
+            if (RatioPerSec < 0.0001)
             {
-                stringBuilder.AppendFormat("{0:0.00}/day", Ratio * (double)KSPUtil.dateTimeFormatter.Day);
+                stringBuilder.AppendFormat("{0:0.00}/day", RatioPerDay);
             }
-            else if (Ratio < 0.01)
+            else if (RatioPerSec < 0.01)
             {
-                stringBuilder.AppendFormat("{0:0.00}/hr", Ratio * (double)KSPUtil.dateTimeFormatter.Hour);
+                stringBuilder.AppendFormat("{0:0.00}/hr", RatioPerSec * (double)KSPUtil.dateTimeFormatter.Hour);
             }
             else
             {
-                stringBuilder.AppendFormat("{0:0.00}/sec", Ratio);
+                stringBuilder.AppendFormat("{0:0.00}/sec", RatioPerSec);
             }
             return stringBuilder.ToString();
         }
@@ -376,13 +371,13 @@ namespace IFILifeSupport
             if (inputList != null)
                 for (int i = 0; i < this.inputList.Count; i++)
                 {
-                    AddToInfo("     " + inputList[i].rr.ResourceName + ": " + ResourceRatioToString(inputList[i].rr.Ratio));
+                    AddToInfo("     " + inputList[i].ResourceName + ": " + ResourceRatioToString(inputList[i].RatioPerSec, inputList[i].RatioPerDay));
                 }
             AddToInfo("Outputs:");
             if (outputList != null)
                 for (int i = 0; i < this.outputList.Count; i++)
                 {
-                    AddToInfo("     " + outputList[i].ResourceName + ": " + ResourceRatioToString(outputList[i].Ratio) + ", DumpExcess : " + outputList[i].DumpExcess);
+                    AddToInfo("     " + outputList[i].ResourceName + ": " + ResourceRatioToString(outputList[i].RatioPerSec, outputList[i].RatioPerDay) + ", DumpExcess : " + outputList[i].DumpExcess);
                 }
 
             return info;
@@ -394,6 +389,6 @@ namespace IFILifeSupport
         public Callback<Rect> GetDrawModulePanelCallback() { return null; }
 
         public string GetPrimaryField() { return "Missing LS"; }
-#endregion
+        #endregion
     }
 }

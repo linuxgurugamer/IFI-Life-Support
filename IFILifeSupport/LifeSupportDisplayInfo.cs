@@ -34,6 +34,7 @@ namespace IFILifeSupport
         public static bool LSDisplayActive = false;
         public static bool LSInfoDisplay = false;
         public static bool Summarize = false;
+        public static bool displayCalculator = false;
 
         public static Vector2 infoScrollPos = Vector2.zero;
 

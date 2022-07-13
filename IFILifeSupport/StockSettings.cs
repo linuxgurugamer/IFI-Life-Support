@@ -85,8 +85,8 @@ namespace IFILifeSupport
         public bool selectionMade = false;
 
 
-
-        public enum LifeSupportLevel { none, classic, improved, advanced, extreme };
+        public enum LifeSupportLevel { none = 0, classic = 1, improved = 2, advanced = 3, extreme = 4};
+        public static string[] LevelString = { "", "Classic", "Improved", "Advanced", "Extreme" };
         public LifeSupportLevel Level
         {
             get

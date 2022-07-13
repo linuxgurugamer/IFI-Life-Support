@@ -116,7 +116,7 @@ namespace IFILifeSupport
 
                 double ResourceAval = IFIGetAllResources(Constants.LIFESUPPORT);
 
-                if (IFIGetAllResources("ElectricCharge") < 0.1)
+                if (IFIGetAllResources(Constants.ELECTRIC_CHARGE) < 0.1 && !CheatOptions.InfiniteElectricity)
                 {
                     LS_RR *= HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment; // 1.2;
                 }

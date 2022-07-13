@@ -77,8 +77,42 @@ namespace IFILifeSupport
 
         public static WaitForSecondsRealtime WaitForSecondsRealtimeLogged(string caller, float seconds)
         {
-            Log.Info("WaitForSecondsRealtimeLogged: From: " + caller + " for: " + seconds);
+            if (seconds > 1)
+                Log.Info("WaitForSecondsRealtimeLogged: From: " + caller + " for: " + seconds);
             return new WaitForSecondsRealtime(seconds);
         }
+
+
+        internal static string lblGreenColor = "00ff00";
+        internal static string lblDrkGreenColor = "ff9d00";
+        internal static string lblBlueColor = "3DB1FF";
+        internal static string lblYellowColor = "FFD966";
+        internal static string lblRedColor = "f90000";
+
+        public static string Colorized(string color, string txt)
+        {
+            return String.Format("<color=#{0}>{1}</color>", color, txt);
+        }
+        public static void GetColorized(int i, ref string txt)
+        {
+            switch (i)
+            {
+                case IFI_LifeSupportTrackingDisplay.SLURRYAVAIL:
+                case IFI_LifeSupportTrackingDisplay.SLURRYCONVRATE:
+                case IFI_LifeSupportTrackingDisplay.SLURRY_DAYS_TO_PROCESS:
+                    txt = Colorized(lblGreenColor, txt);
+                    break;
+                case IFI_LifeSupportTrackingDisplay.SLUDGEAVAIL:
+                case IFI_LifeSupportTrackingDisplay.SLUDGECONVRATE:
+                case IFI_LifeSupportTrackingDisplay.SLUDGE_DAYS_TO_PROCESS:
+                case IFI_LifeSupportTrackingDisplay.SLUDGE_OUTPUT_RATE:
+                    txt = Colorized(lblDrkGreenColor, txt);
+                    break;
+                case IFI_LifeSupportTrackingDisplay.LIFESUPPORT_OUTPUT_RATE:
+                    txt = Colorized(lblBlueColor, txt);
+                    break;
+            }
+        }
+
     }
 }
