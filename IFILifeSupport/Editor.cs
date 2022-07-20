@@ -16,9 +16,9 @@ namespace IFILifeSupport
     {
         static public Editor Instance;
 
-        private Dictionary<AvailablePart, PartInfo> partInfos = new Dictionary<AvailablePart, PartInfo>();
-        private static UrlDir.UrlConfig[] configs = null;
+        //private static UrlDir.UrlConfig[] configs = null;
 
+#if false
         internal static SortedList<string, IFI_Generator> allResProcessors = new SortedList<string, IFI_Generator>();
         internal static SortedList<string, IFI_Generator> usefulResProcessors = new SortedList<string, IFI_Generator>();
         string[] resources = new string[] { Constants.SLUDGE, Constants.LIFESUPPORT, Constants.SLURRY };
@@ -103,7 +103,7 @@ namespace IFILifeSupport
 #endif
             return loadedParts;
         }
-
+#endif
         static internal bool PartShouldBeHidden(AvailablePart part)
         {
             return PartShouldBeHidden(part, out ConfigNode n);
@@ -165,8 +165,8 @@ namespace IFILifeSupport
             Log.Info("DefineFilters");
 #if false
             return;
-            if (configs == null)
-                configs = GameDatabase.Instance.GetConfigs("PART");
+            //if (configs == null)
+            //    configs = GameDatabase.Instance.GetConfigs("PART");
 
             //ConfigNode n;
 
@@ -182,9 +182,12 @@ namespace IFILifeSupport
         {
             //if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level == IFILS1.LifeSupportLevel.extreme)
             //    return;
-            if (configs == null)
-                configs = GameDatabase.Instance.GetConfigs("PART");
-            List<AvailablePart> loadedParts = GetPartsList();
+            //if (configs == null)
+            //    configs = GameDatabase.Instance.GetConfigs("PART");
+            //List<AvailablePart> loadedParts =
+#if false
+            GetPartsList();
+#endif
         }
 
         public void Start()

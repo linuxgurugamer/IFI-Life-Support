@@ -122,8 +122,8 @@ namespace IFILifeSupport
 
                     // Get totals for all specified processors
 
-                    Log.Info("usefulResProcessors.Count: " + usefulResProcessors.Count);
-                    foreach (var p in usefulResProcessors)
+                    Log.Info("usefulResProcessors.Count: " + IFI_Parts.usefulResProcessors.Count);
+                    foreach (var p in IFI_Parts.usefulResProcessors)
                     {
                         var processor = p.Value;
                         if (processor.consumesSlurry)
@@ -159,7 +159,7 @@ namespace IFILifeSupport
                     double createdLS2 = 0f;
 
                     // Now get a total of all the modules that have an input of Sludge
-                    foreach (var p in usefulResProcessors)
+                    foreach (var p in IFI_Parts.usefulResProcessors)
                     {
                         var processor = p.Value;
 
@@ -194,7 +194,7 @@ namespace IFILifeSupport
                     double inputLqdO2 = 0, outputLqdO2 = 0, inputFilteredO2 = 0, createdLS3 = 0, inputSludge2 = 0;
                     outputFilteredO2 = 0;
 
-                    foreach (var p in usefulResProcessors)
+                    foreach (var p in IFI_Parts.usefulResProcessors)
                     {
                         var processor = p.Value;
 
@@ -259,14 +259,19 @@ namespace IFILifeSupport
                         GUILayout.Label("vvvvv " + IFILS1.LevelString[(int)curLevel] + " vvvvv");
 
                     // only show those parts which have slurry, sludge or livesupport in the resource list
-                    foreach (var p in usefulResProcessors)
+                    foreach (var p in IFI_Parts.usefulResProcessors)
                     {
                         var processor = p.Value;
                         if (p.Value.level > curLevel)
                         {
-                            GUILayout.Label("^^^^^ " + IFILS1.LevelString[(int)curLevel] + " ^^^^^");
+                            if (curLevel >= HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level)
+                                break;
+
+                                GUILayout.Label("^^^^^ " + IFILS1.LevelString[(int)curLevel] + " ^^^^^");
                             curLevel = p.Value.level;
-                            GUILayout.Label("vvvvv " + IFILS1.LevelString[(int)curLevel] + " vvvvv");
+                                GUILayout.Label("vvvvv " + IFILS1.LevelString[(int)curLevel] + " vvvvv");
+                            using (new GUILayout.HorizontalScope())
+                                GUILayout.Space(10);
                         }
                         //if (processor.resList.resources.Contains(r.Value.resname))
 
@@ -350,8 +355,6 @@ namespace IFILifeSupport
 
                     using (new GUILayout.HorizontalScope())
                         GUILayout.Label("^^^^^ " + IFILS1.LevelString[(int)curLevel] + " ^^^^^");
-                    using (new GUILayout.HorizontalScope())
-                        GUILayout.Space(10);
 
                     GUILayout.EndScrollView();
                 }
@@ -366,11 +369,13 @@ namespace IFILifeSupport
                         GUILayout.Label("Slurry: " + dailyUsage);
                     using (new GUILayout.HorizontalScope())
                         GUILayout.Label("Sludge: " + actualOutputSludge.ToString("F1"));
-                    using (new GUILayout.HorizontalScope())
-                        GUILayout.Label("Filtered O2: " + outputFilteredO2.ToString("F1"));
-                    using (new GUILayout.HorizontalScope())
-                        GUILayout.Label("Liquid O2: " + outputLiquidO2.ToString("F1"));
-
+                    if (HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level == IFILS1.LifeSupportLevel.extreme)
+                    {
+                        using (new GUILayout.HorizontalScope())
+                            GUILayout.Label("Filtered O2: " + outputFilteredO2.ToString("F1"));
+                        using (new GUILayout.HorizontalScope())
+                            GUILayout.Label("Liquid O2: " + outputLiquidO2.ToString("F1"));
+                    }
 
 
                     GUILayout.Space(20);
@@ -404,7 +409,6 @@ namespace IFILifeSupport
 
             if (resizingWindow)
             {
-                //SumAllWidths();
                 //Log.Info("ResizeWindow, calculatedMinWidth: " + calculatedMinWidth + ", winPos.width: " + winPos.width);
                 float minHeight = HighLogic.LoadedSceneIsEditor ? Settings.EDITOR_WIN_HEIGHT : Settings.WINDOW_HEIGHT;
                 float calculatedMinWidth = 800f;

@@ -66,7 +66,7 @@ namespace IFILifeSupport
 
             float rand;
             //int CUR_CWLS = IFICWLS;
-           
+
             rand = UnityEngine.Random.Range(0.0f, 1f);
             if (CUR_CWLS > rand)
             {
@@ -115,7 +115,7 @@ namespace IFILifeSupport
 
         }
 
-        public static void CrewTest(int REASON, Part p, double deathChance           )
+        public static void CrewTest(Vessel v, int REASON, Part p, double deathChance)
         {
             float rand;
             ProtoCrewMember iCrew;
@@ -137,6 +137,8 @@ namespace IFILifeSupport
                 }
                 else
                 {
+                    if (UnLockLockedLSTanks(v))
+                        return;
                     sk = new StarvingKerbal(iCrew.name, iCrew.trait);
                     Log.Info("Old experienceTrait: " + iCrew.trait);
                     LifeSupportUsageUpdate.starvingKerbals.Add(sk.name, sk);
@@ -198,7 +200,35 @@ namespace IFILifeSupport
             }
         }
 
-        public static void CrewTestProto(int REASON, ProtoPartSnapshot p, double deathChance)
+        static bool UnLockLockedLSTanks(Vessel vessel)
+        {
+            for (int i = 0; i < vessel.Parts.Count; i++)
+            {
+                var p = vessel.Parts[i];
+                foreach (var r in p.Resources)
+                {
+                    if (r.resourceName == Constants.LIFESUPPORT)
+                    {
+                        if (r.flowState == false)
+                        {
+                            if (r.amount > 0)
+                            {
+                                r.flowState = true;
+
+                                MessageSystem.Message m = new MessageSystem.Message("Kibbles & Bits Tank", "Unlocked a Kibbles & Bits tank on " + vessel.vesselName, MessageSystemButton.MessageButtonColor.ORANGE, MessageSystemButton.ButtonIcons.ALERT);
+                                MessageSystem.Instance.AddMessage(m);
+                                ScreenMessages.PostScreenMessage("Unlocked a Kibbles & Bits tank due to no available Kibbles & Bits on " + vessel.vesselName, 10f);
+
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static void CrewTestProto(Vessel v, int REASON, ProtoPartSnapshot p, double deathChance)
         {
             float rand;
 

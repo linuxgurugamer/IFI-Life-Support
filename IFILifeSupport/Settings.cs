@@ -28,7 +28,7 @@ namespace IFILifeSupport
         // Following are saved in a file
 
 
-        public enum ActiveWin { FlightStatusWin = 0, FlightStatusWinWide = 1, SpaceCenter = 2, SpaceCenterWide = 3, InfoWin = 4, EditorInfoWin = 5, CalculatorWin = 6 };
+        public enum ActiveWin { FlightStatusWin = 0, FlightStatusWinWide = 1, SpaceCenter = 2, SpaceCenterWide = 3, HelpWin = 4, EditorInfoWin = 5, CalculatorWin = 6 };
         public static int activeWin;
 
         public int NumWins = Enum.GetValues(typeof(ActiveWin)).Length;
@@ -45,6 +45,7 @@ namespace IFILifeSupport
             activeWin = (int)win;
         }
 
+        internal const  float HELPWIN_MINWIDTH = 500;
         public Settings(string rpath)
         {
             Instance = this;
@@ -53,8 +54,8 @@ namespace IFILifeSupport
             {
                 winPos[i] = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH_DEFAULT, WINDOW_HEIGHT);
             }
-            winPos[(int)ActiveWin.InfoWin] = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, 400, 300);
-            //InitWinPos();
+            winPos[(int)ActiveWin.HelpWin] = new Rect(180, Screen.height / 2 - WINDOW_HEIGHT / 2, HELPWIN_MINWIDTH, 300);
+
             Settings.Instance.LoadData();
         }
 
@@ -82,18 +83,6 @@ namespace IFILifeSupport
                 configFileNode.AddValue("winPos_" + i + "_width", winPos[i].width);
                 configFileNode.AddValue("winPos_" + i + "_height", winPos[i].height);
             }
-
-#if false
-            configFileNode.AddValue("infoWindowPos_x", infoWindowPos.x);
-            configFileNode.AddValue("infoWindowPos_y", infoWindowPos.y);
-            configFileNode.AddValue("infoWindowPos_width", infoWindowPos.width);
-            configFileNode.AddValue("infoWindowPos_height", infoWindowPos.height);
-            configFileNode.AddValue("editorInfoWindowPos_x", editorInfoWindowPos.x);
-            configFileNode.AddValue("editorInfoWindowPos_y", editorInfoWindowPos.y);
-            configFileNode.AddValue("editorInfoWindowPos_width", editorInfoWindowPos.width);
-            configFileNode.AddValue("editorInfoWindowPos_height", editorInfoWindowPos.height);
-#endif
-
 
             configFile.AddNode(configFileNode);
 
@@ -124,18 +113,6 @@ namespace IFILifeSupport
                             winPos[i].width = configFileNode.SafeLoad("winPos_" + i + "_width", winPos[i].width);
                             winPos[i].height = configFileNode.SafeLoad("winPos_" + i + "_height", winPos[i].height);
                         }
-
-#if false
-                        infoWindowPos.x = configFileNode.SafeLoad("infoWindowPos_x", infoWindowPos.x);
-                        infoWindowPos.y = configFileNode.SafeLoad("infoWindowPos_y", infoWindowPos.y);
-                        infoWindowPos.width = configFileNode.SafeLoad("infoWindowPos_width", infoWindowPos.width);
-                        infoWindowPos.height = configFileNode.SafeLoad("infoWindowPos_height", infoWindowPos.height);
-
-                        editorInfoWindowPos.x = configFileNode.SafeLoad("editorInfoWindowPos_x", editorInfoWindowPos.x);
-                        editorInfoWindowPos.y = configFileNode.SafeLoad("editorInfoWindowPos_y", editorInfoWindowPos.y);
-                        editorInfoWindowPos.width = configFileNode.SafeLoad("editorInfoWindowPos_width", editorInfoWindowPos.width);
-                        editorInfoWindowPos.height = configFileNode.SafeLoad("editorInfoWindowPos_height", editorInfoWindowPos.height);
-#endif
                     }
                 }
             }

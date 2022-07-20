@@ -30,21 +30,6 @@ namespace IFILifeSupport
 
         [GameParameters.CustomParameterUI("Classic Life Support",
             toolTip = "Basic life support, no recycling of any kind.")]
-#if false
-        public bool classic = true;
-        bool oldClassic = false;
-
-        public bool improved = false;
-        bool oldImproved = false;
-
-        public bool advanced = false;
-        bool oldAdvanced = false;
-
-        public bool extreme = false;
-        bool oldExtreme = false;
-
-        public bool showInResourcePanel = false;
-#else
         public bool classic = true;
         bool oldClassic = false;
 
@@ -60,17 +45,14 @@ namespace IFILifeSupport
         public bool advanced = false;
         bool oldAdvanced = false;
 
-
         [GameParameters.CustomParameterUI("Extreme Life Support",
             toolTip = "BioReactor available to create new LifeSupport")]
         public bool extreme = false;
         bool oldExtreme = false;
 
-
         [GameParameters.CustomParameterUI("Display Organic Slurry & Sludge in resource panel",
             toolTip = "If enabled, then the Organic Slurry and Sludge (if applicable) will be shown in the resource panels of parts")]
         public bool showInResourcePanel = false;
-#endif
 
         [GameParameters.CustomIntParameterUI("Update Frequency (secs)", minValue = 15, maxValue = 300)]
         public int refreshInterval = 15;
@@ -80,12 +62,13 @@ namespace IFILifeSupport
         [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 15, maxValue = 300)]
         public int displayRefreshInterval = 15;
 
-        [GameParameters.CustomParameterUI("Initted",
-    toolTip = "Set to false to have the selection window show up at the Space Center")]
+        [GameParameters.CustomParameterUI("Selection Made",
+            toolTip = "Set to false to have the selection window show up at the Space Center")]
         public bool selectionMade = false;
 
 
-        public enum LifeSupportLevel { none = 0, classic = 1, improved = 2, advanced = 3, extreme = 4};
+        // general is used on the help window
+        public enum LifeSupportLevel { none = 0, classic = 1, improved = 2, advanced = 3, extreme = 4, general = 10}; 
         public static string[] LevelString = { "", "Classic", "Improved", "Advanced", "Extreme" };
         public LifeSupportLevel Level
         {
@@ -132,12 +115,6 @@ namespace IFILifeSupport
                     break;
             }
 
-#if false
-            classic = true;
-            improved = false;
-            advanced = false;
-            extreme = false;
-#endif
             oldAdvanced = advanced;
             oldImproved = improved;
             oldClassic = classic;
@@ -175,7 +152,7 @@ namespace IFILifeSupport
         {
             if (useKSPskin != oldUseKspSkin)
             {
-                Settings.winPos[(int)Settings.ActiveWin.InfoWin].height = 100;
+                Settings.winPos[(int)Settings.ActiveWin.HelpWin].height = 100;
                 oldUseKspSkin = useKSPskin;
             }
             return true;
@@ -212,11 +189,6 @@ namespace IFILifeSupport
         public override int SectionOrder { get { return 2; } }
         public override bool HasPresets { get { return true; } }
 
-#if false
-        [GameParameters.CustomParameterUI("Mod Enabled?",
-            toolTip = "Changing this requires restarting the game")]
-        public bool enabled = true;
-#endif
         //
         // Constants first, then variables.  Constants are the "normal" settings
         // defined here since this is the only place they are used

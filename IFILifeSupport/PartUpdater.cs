@@ -23,6 +23,10 @@ namespace IFILifeSupport
             DontDestroyOnLoad(this);
         }
 
+        void Start()
+        {
+            IFI_Parts.GetPartsList();
+        }
         void Destroy()
         {
             GameEvents.OnGameSettingsApplied.Remove(OnGameSettingsApplied);

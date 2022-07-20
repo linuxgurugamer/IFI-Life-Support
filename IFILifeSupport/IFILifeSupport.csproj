@@ -77,6 +77,8 @@
       <DependentUpon>AssemblyVersion.tt</DependentUpon>
     </Compile>
     <Compile Include="Calculator.cs" />
+    <Compile Include="HelpWindow.cs" />
+    <Compile Include="IFI_Parts.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DisplayLSInfoWindow.cs" />
     <Compile Include="Editor.cs" />

@@ -55,18 +55,6 @@ namespace IFILifeSupport
             double amount, maxAmount;
             v.rootPart.GetConnectedResourceTotals(GetResourceID(resourceName), ResourceFlowMode.ALL_VESSEL,  out amount, out maxAmount);
             return amount;
-#if false
-            PartResourceDefinition resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
-            double amount = 0;
-            foreach (Part mypart in v.parts)
-            {
-                if (mypart.Resources.Contains(resourceName))
-                {
-                    amount += GetResourceAmount(mypart, resourceName);
-                }
-            }
-            return amount;
-#endif
         }
 
         public static WaitForSeconds WaitForSecondsLogged(string caller, float seconds)

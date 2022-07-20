@@ -931,7 +931,7 @@ namespace IFILifeSupport
                         int IFIcrew = p.protoModuleCrew.Count;
                         if (IFIcrew > 0)
                         {
-                            StarvingKerbal.CrewTest(0, p, 0.1f);
+                            StarvingKerbal.CrewTest(vessel, 0, p, 0.1f);
                         }
 
                     }
@@ -944,7 +944,7 @@ namespace IFILifeSupport
                         int IFIcrew = p.protoModuleCrew.Count;
                         if (IFIcrew > 0)
                         {
-                            StarvingKerbal.CrewTestProto(0, p, 0.1f);
+                            StarvingKerbal.CrewTestProto(vessel, 0, p, 0.1f);
                         }
 
                     }

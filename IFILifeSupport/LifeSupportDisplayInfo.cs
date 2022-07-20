@@ -32,7 +32,7 @@ namespace IFILifeSupport
         public static bool HideUnmanned = true;
         public static bool ShowRecyclers = true;
         public static bool LSDisplayActive = false;
-        public static bool LSInfoDisplay = false;
+        //public static bool LSInfoDisplay = false;
         public static bool Summarize = false;
         public static bool displayCalculator = false;
 

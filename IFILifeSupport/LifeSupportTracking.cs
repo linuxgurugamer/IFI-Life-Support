@@ -433,13 +433,6 @@ namespace IFILifeSupport
                         Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin] = ClickThruBlocker.GUILayoutWindow(editorWinID, Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin], LSEditorInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
                     }
                 }
-                if (LifeSupportDisplayInfo.LSInfoDisplay)
-                {
-                    string TITLE = "IFI Life Support Information";
-
-                    Settings.winPos[(int)Settings.ActiveWin.InfoWin] = ClickThruBlocker.GUILayoutWindow(infoWinId, Settings.winPos[(int)Settings.ActiveWin.InfoWin], LSInfoWindow, TITLE); //, LifeSupportDisplay.layoutOptions);
-
-                }
 
                 DrawToolTip();
 
@@ -604,7 +597,7 @@ namespace IFILifeSupport
                             //
                             //if (m1.inputList == null)
                             //{
-                                m1.OnLoad(part.partInfo.partConfig);
+                            m1.OnLoad(part.partInfo.partConfig);
                             //}
 
                             for (int i = 0; i < m1.inputList.Count; i++)
@@ -659,32 +652,6 @@ namespace IFILifeSupport
             }
         }
 
-#if false
-        string Colorized(string color, string txt)
-        {
-            return String.Format("<color=#{0}>{1}</color>", color, txt);
-        }
-        void GetColorized(int i, ref string txt)
-        {
-            switch (i)
-            {
-                case SLURRYAVAIL:
-                case SLURRYCONVRATE:
-                case SLURRY_DAYS_TO_PROCESS:
-                    txt = Colorized(lblGreenColor, txt);
-                    break;
-                case SLUDGEAVAIL:
-                case SLUDGECONVRATE:
-                case SLUDGE_DAYS_TO_PROCESS:
-                case SLUDGE_OUTPUT_RATE:
-                    txt = Colorized(lblDrkGreenColor, txt);
-                    break;
-                case LIFESUPPORT_OUTPUT_RATE:
-                    txt = Colorized(lblBlueColor, txt);
-                    break;
-            }
-        }
-#endif
         const int SPACING = 30;
 
         private void LSEditorInfoWindow(int windowId)
@@ -697,7 +664,8 @@ namespace IFILifeSupport
 
             if (GUI.Button(new Rect(3, 3f, 20, 15f), new GUIContent("I")))
             {
-                LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
+                HelpWindow.InstantiateHelpWindow();
+                //LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
             }
 
             if (GUI.Button(new Rect(30, 3f, 20, 15f), new GUIContent("C")))
@@ -838,56 +806,6 @@ namespace IFILifeSupport
                 resizingWindow = true;
             }
             ResizeWindow(ref Settings.winPos[(int)Settings.ActiveWin.EditorInfoWin]);
-
-            GUI.DragWindow();
-        }
-
-
-        void AppendLine(ref StringBuilder data, string str)
-        {
-            data.Append(str + "\n");
-        }
-
-        private void LSInfoWindow(int windowId)
-        {
-            if (GUI.Button(new Rect(Settings.winPos[(int)Settings.ActiveWin.InfoWin].width - 24, 3f, 23, 15f), new GUIContent("X")))
-                LifeSupportDisplayInfo.LSInfoDisplay = false;
-
-            StringBuilder data = new StringBuilder();
-
-            var s = HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level.ToString();
-            AppendLine(ref data, "Level: " + char.ToUpper(s[0]) + s.Substring(1));
-            AppendLine(ref data, "Update Frequency (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().RefreshInterval.ToString());
-            AppendLine(ref data, "Auto Warp Cancellation lead time (days): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().warpCancellationLeadTime);
-            AppendLine(ref data, "\nLS rate per Kerbal per day: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lsRatePerDay);
-            AppendLine(ref data, "Breathable Atmo Pressure: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoPressure.ToString("N2"));
-            AppendLine(ref data, "Min Intake Air Atmo Pressure: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().intakeAirAtmoPressure.ToString("N3"));
-            AppendLine(ref data, "Breathable Homeworld Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableHomeworldAtmoAdjustment.ToString("N2"));
-            AppendLine(ref data, "\nKerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().kerbalsCanDie.ToString());
-            AppendLine(ref data, "EVA Kerbals can die: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().EVAkerbalsCanDie.ToString());
-            AppendLine(ref data, "Inactive time before dying (secs): " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().InactiveTimeBeforeDeathSecs.ToString());
-
-            AppendLine(ref data, "\nFollowing adjustments are multiplied to the LS Rate when applicable\n");
-            AppendLine(ref data, "Breathable Atmo Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().breathableAtmoAdjustment.ToString("N2"));
-            AppendLine(ref data, "No EC Adj: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS2>().lowEcAdjustment.ToString("N2"));
-
-            GUILayout.BeginVertical();
-            GUILayout.TextArea(data.ToString());
-
-            GUILayout.Space(20);
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Close"))
-                LifeSupportDisplayInfo.LSInfoDisplay = false;
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-
-            if (GUI.RepeatButton(new Rect(Settings.winPos[(int)Settings.ActiveWin.InfoWin].width - 23f, Settings.winPos[(int)Settings.ActiveWin.InfoWin].height - 23f, 16, 16), "", Settings.Instance.resizeButton))
-            {
-                resizingWindow = true;
-            }
-            ResizeWindow(ref Settings.winPos[(int)Settings.ActiveWin.InfoWin]);
 
             GUI.DragWindow();
         }
@@ -1064,7 +982,8 @@ namespace IFILifeSupport
             GUILayout.EndVertical();
             if (GUI.Button(new Rect(3, 3f, 20, 15f), new GUIContent("I")))
             {
-                LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
+                HelpWindow.InstantiateHelpWindow();
+                //LifeSupportDisplayInfo.LSInfoDisplay = !LifeSupportDisplayInfo.LSInfoDisplay;
             }
             if (GUI.Button(new Rect(Settings.winPos[Settings.activeWin].width - 24, 3f, 23, 15f), new GUIContent("X")))
             {
@@ -1081,6 +1000,7 @@ namespace IFILifeSupport
                 tooltip = GUI.tooltip;
         }
 
+
         private void ResizeWindow(ref Rect winPos)
         {
             if (Input.GetMouseButtonUp(0))
@@ -1088,10 +1008,10 @@ namespace IFILifeSupport
                 resizingWindow = false;
             }
 
-            if (resizingWindow)
+            if (resizingWindow )
             {
                 SumAllWidths();
-                //Log.Info("ResizeWindow, calculatedMinWidth: " + calculatedMinWidth + ", winPos.width: " + winPos.width);
+                Log.Info("ResizeWindow ref, calculatedMinWidth: " + calculatedMinWidth + ", winPos.width: " + winPos.width);
                 float minHeight = HighLogic.LoadedSceneIsEditor ? Settings.EDITOR_WIN_HEIGHT : Settings.WINDOW_HEIGHT;
 
                 winPos.width = Input.mousePosition.x - winPos.x + 10;

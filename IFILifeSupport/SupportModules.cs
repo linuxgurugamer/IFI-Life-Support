@@ -17,22 +17,6 @@ namespace IFILifeSupport
 
 
         internal string info = "";
-#if false
-        public override string GetInfo()
-        {
-            string info2 = info;
-            foreach (PartResource partResource in part.Resources)
-            {
-                if (partResource.resourceName == Constants.LIFESUPPORT)
-                    info2 += "\nLife Support: " + partResource.amount  + " / " + partResource.maxAmount;
-                if (partResource.resourceName == Constants.SLURRY)
-                    info2 += "\nSlurry: " + partResource.amount  + " / " + partResource.maxAmount ;
-                if (partResource.resourceName == Constants.SLURRY)
-                    info2 += "\nSludge: " + partResource.amount  + " / " + partResource.maxAmount ;
-            }
-            return info2;
-        }
-#endif
         bool initted = false;
         void LateUpdate()
         {
