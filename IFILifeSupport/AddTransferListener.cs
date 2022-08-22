@@ -31,6 +31,7 @@ namespace IFILifeSupport
         void OnDestroy()
         {
             Log.Info("Transfer.OnDestroy");
+            onTransferSpawn.Remove(OnTransferSpawned);
         }
         void DisplayTransferInfo(UIPartActionResourceTransfer t, bool descend = false)
         {

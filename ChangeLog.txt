@@ -208,7 +208,13 @@
 	Added code to unlock a locked LS tank (with K&B in it) if no unlocked K&B found (for loaded ships).  Locked tanks are ignored for shps on rails
 	Added tabs to the help window for the different part levels
 
+4.0.0.8 (RC 2)
+	Fixed prompt when disabling (was showing KEI )
+	Fixed a number of memory leaks where events were being used and not released
+
 TODO
+
+Configure new parts from JadeOfMaar
 
 Verify Enhanced Biosystems engineering, should require BOTH, not any
 

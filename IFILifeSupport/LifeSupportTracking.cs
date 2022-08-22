@@ -272,6 +272,9 @@ namespace IFILifeSupport
             GameEvents.onVesselRecoveryProcessingComplete.Remove(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Remove(OnVesselRecoveryRequested);
             GameEvents.onCrewBoardVessel.Remove(onCrewBoardVessel);
+            GameEvents.onHideUI.Remove(OnHideUI);
+            GameEvents.onShowUI.Remove(OnShowUI);
+            GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
 
             Instance = null;
         }

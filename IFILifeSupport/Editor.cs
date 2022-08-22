@@ -209,7 +209,7 @@ namespace IFILifeSupport
             GameEvents.StageManager.OnGUIStageRemoved.Add(OnStagingAddedRemoved);
         }
 
-        void Destroy()
+        void OnDestroy()
         {
             Log.Info("Editor.Destroy");
             GameEvents.onEditorPartPlaced.Remove(onEditorPartPlaced);

@@ -33,7 +33,7 @@ namespace IFILifeSupport
     // [KSPAddon(KSPAddon.Startup.MainMenu, true)]
 
     [KSPAddon(KSPAddon.Startup.Instantly, false)]
-    public class ADDEVAS : UnityEngine.MonoBehaviour
+    public class ADDEVAS : MonoBehaviour
     {
         public void Awake()
         {
@@ -54,14 +54,16 @@ namespace IFILifeSupport
                 //list.Insert(1, loader);
 
                 Debug.Log(" IFI Preload LS EVA Actions Set ++++ ");
-                GameEvents.onCrewOnEva.Remove(OnCrewOnEva11);
                 GameEvents.onCrewOnEva.Add(OnCrewOnEva11);
-                GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel);
                 GameEvents.onCrewBoardVessel.Add(OnCrewBoardVessel);
             }
             
         }
-
+        void OnDestroy()
+        {
+            GameEvents.onCrewBoardVessel.Remove(OnCrewBoardVessel);
+            GameEvents.onCrewOnEva.Remove(OnCrewOnEva11);
+        }
 
 
         private void OnCrewBoardVessel(GameEvents.FromToAction<Part, Part> action)

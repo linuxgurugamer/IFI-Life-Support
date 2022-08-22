@@ -29,7 +29,7 @@ namespace IFILifeSupport
         bool hardLevel = false;
 
 
-        string abbr;
+        //string abbr;
 
         bool visible = false;
 
@@ -44,8 +44,8 @@ namespace IFILifeSupport
                 return;
             visible = !(HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().selectionMade);
 
-            HomeBody = FlightGlobals.GetHomeBody();
-            abbr = HomeBody.name.Substring(0, 1) + "EI";
+            //HomeBody = FlightGlobals.GetHomeBody();
+            //abbr = HomeBody.name.Substring(0, 1) + "EI";
 
             winId = GUIUtility.GetControlID(FocusType.Passive);
             winRect.width = 600;
@@ -205,7 +205,7 @@ namespace IFILifeSupport
                 if (classicMode | improvedMode | advancedMode || extremeMode)
                     active = true;
                 GUI.enabled = (active & (classicMode | improvedMode | advancedMode | extremeMode)) || !active;
-                if (GUILayout.Button(active ? "Confirm" : "Confirm " + abbr + " is disabled", GUILayout.Width(180)))
+                if (GUILayout.Button(active ? "Confirm" : "Confirm IFI Life Support is disabled", GUILayout.Width(180)))
                 {
                     visible = false;
                     HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active = active;
