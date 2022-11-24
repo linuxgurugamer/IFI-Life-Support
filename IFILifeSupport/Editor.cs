@@ -129,7 +129,7 @@ namespace IFILifeSupport
                 string s = node.GetValue("name");
                 if (s != null)
                 {
-                    Log.Info("Part: " + part.name + ",   node name: " + s);
+                    //Log.Info("Part: " + part.name + ",   node name: " + s);
                     n = node;
 
                     bool b = false;
@@ -145,8 +145,8 @@ namespace IFILifeSupport
                         b = true;
                     if (b)
                     {
-                        Log.Info("Part: " + part.name + " should be hidden, current level: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level +
-                            ", node name: " + s);
+                        //Log.Info("Part: " + part.name + " should be hidden, current level: " + HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().Level +
+                        //    ", node name: " + s);
 
                         return true;
                     }

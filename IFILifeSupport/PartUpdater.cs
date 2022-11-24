@@ -48,7 +48,7 @@ namespace IFILifeSupport
                 ConfigNode node;
                 if (Editor.PartShouldBeHidden(p, out node))
                 {
-                    Log.Info("Hiding name: " + p.name + ",   " + p.TechRequired);
+                    //Log.Info("Hiding name: " + p.name + ",   " + p.TechRequired);
                     p.TechRequired = "none";
                     p.TechHidden = true;
                 }
@@ -60,7 +60,7 @@ namespace IFILifeSupport
 
                         p.TechRequired = techRequired;
                         p.TechHidden = false;
-                        Log.Info("Restoring name: " + p.name + ",   " + p.TechRequired);
+                        //Log.Info("Restoring name: " + p.name + ",   " + p.TechRequired);
                     }
                 }
             }

@@ -42,13 +42,11 @@ namespace IFILifeSupport
                 Log.Info("SupportModules.OnDestroy");
             if (initted && HighLogic.LoadedSceneIsEditor)
             {
-                Log.Info("IFI_Resources.OnDestory");
+                Log.Info("IFI_Resources.OnDestroy");
                 initted = false;
             }
-            else
-            {
+            if (!HighLogic.LoadedSceneIsEditor && HighLogic.CurrentGame!= null && HighLogic.CurrentGame.Parameters.CustomParams<IFILS1>().active)
                 GameEvents.onPartResourceFlowModeChange.Remove(onPartResourceFlowModeChange);
-            }
         }
 
 

@@ -58,8 +58,11 @@ namespace IFILifeSupport
         ModuleIFIGreenhousePanel moduleIFIgreenhousePanel;
 
         [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
-        public string ConverterName = "converter";        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
-        public bool requiresAllInputs = true;
+        public string ConverterName = "converter";
+
+        [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
+        public bool requiresAllInputs = true;
+
         [KSPField(isPersistant = false, guiActive = false, guiActiveUnfocused = false)]
         public bool isAlwaysActive = false;
 

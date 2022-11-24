@@ -208,9 +208,19 @@
 	Added code to unlock a locked LS tank (with K&B in it) if no unlocked K&B found (for loaded ships).  Locked tanks are ignored for shps on rails
 	Added tabs to the help window for the different part levels
 
-4.0.0.8 (RC 2)
+4.0.0.8 release
 	Fixed prompt when disabling (was showing KEI )
 	Fixed a number of memory leaks where events were being used and not released
+
+4.0.0.10
+	Fixed  nullref caused when mod was not enabled
+	Added saving of ProtoCrewMember.KerbalType as well as the trait
+	Changed IFIMess calls to Log.Warning, removed IFIMess() 
+	Made messaging of kerbalsl being turned to tourist and restored to active duty consistent
+	Changed minimum update frequency from 15 to 5 seconds
+	Fixed tourists not being reset back to Kerbals when LS restored
+
+	
 
 TODO
 

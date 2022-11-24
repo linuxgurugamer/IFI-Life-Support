@@ -77,7 +77,7 @@ namespace IFILifeSupport
             }
             catch (Exception ex)
             {
-                IFIDebug.IFIMess("IFI Exception Searching for Command Parts  " + ex.Message);
+                Log.Warning("IFI Exception Searching for Command Parts  " + ex.Message);
             }
 
 #if !DEBUG
@@ -103,7 +103,7 @@ namespace IFILifeSupport
             }
             if (!HasMod)
             {
-                 IFIDebug.IFIMess("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
+                 Log.Warning("IFI Attempting to add LS Module to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("MODULE");
                 IFIMOD.AddValue("name", "IFILifeSupport");
                 CrewPart.AddNode(IFIMOD);
@@ -122,7 +122,7 @@ namespace IFILifeSupport
             }
             if (!HasMod)
             {
-                IFIDebug.IFIMess("IFI Attempting to add LS Resorce to part: " + CrewPart.GetValue("name"));
+                Log.Warning("IFI Attempting to add LS Resorce to part: " + CrewPart.GetValue("name"));
                 ConfigNode IFIMOD = new ConfigNode("RESOURCE");
                 IFIMOD.AddValue("name", Constants.LIFESUPPORT);
                 double MaxLS = 4 * crewCount;

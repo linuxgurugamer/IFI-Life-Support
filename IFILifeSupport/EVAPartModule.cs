@@ -30,8 +30,8 @@ namespace IFILifeSupport
             Vessel active = this.part.vessel;
             if (active.isEVA == true)
             {
-                IFIDebug.IFIMess("IFILifeSupportEVA.OnUpdate, active.mainBody.name: " + active.mainBody.name +
-                    ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
+                //Log.Warning("IFILifeSupportEVA.OnUpdate, active.mainBody.name: " + active.mainBody.name +
+                //    ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
                 if (LifeSupportRate.BreathableAtmosphere(active))
                 {
                     lifeSupportStatus = "Visor";
@@ -78,7 +78,7 @@ namespace IFILifeSupport
                 Log.Info("this.part.Resources is null");
                 return 0;
             }
-            Log.Info("IFIGetAllResources, resource: " + IFIResource);
+            //Log.Info("IFIGetAllResources, resource: " + IFIResource);
             double IFIResourceAmt = 0.0;
             for (int i = 0; i < part.Resources.Count; i++)
             //foreach (PartResource pr in this.part.Resources)

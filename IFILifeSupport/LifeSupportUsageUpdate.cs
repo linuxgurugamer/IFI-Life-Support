@@ -24,6 +24,7 @@ namespace IFILifeSupport
 
         public static Dictionary<string, StarvingKerbal> starvingKerbals = new Dictionary<string, StarvingKerbal>();
 
+
         public void Awake()
         {
             Instance = this;
@@ -108,7 +109,7 @@ namespace IFILifeSupport
                     GetCrewInfo(vessel, out IFI_Crew, out IFI_ALT, out IFI_Location);
                     double LS_Needed =
                          LS_Use = CalcLS(vessel, IFI_Crew, Elapsed_Time, out LSAval, out days_rem);
-
+                    Log.Info("LS_Needed: "+ LS_Needed + ", LS_Use: " + LS_Use);
                     if (IFI_Crew > 0.0)
                     {
                         //
@@ -150,6 +151,8 @@ namespace IFILifeSupport
                             Log.Info("NewSlurry: " + NewSlurry);
                             if (LS_Use <= 0)
                                 IFI_Check_Kerbals(vessel);
+                            else
+                                IFI_ResetKerbals(vessel);
 
                         }
                         else
@@ -198,10 +201,12 @@ namespace IFILifeSupport
                                     break;
                             }
                             Log.Info("Left Over NewSlurry: " + NewSlurry);
-
-                            if (LS_Needed == LS_Use)
+                            Log.Info("LS_Needed: " + LS_Needed + ", LS_Use: " + LS_Use);
+                            //if ( LS_Needed > LS_Use)
+                            if (LS_Use < 0)
                                 IFI_Check_Kerbals(vessel);
-
+                            else
+                                IFI_ResetKerbals(vessel);
                         }
 
 
@@ -908,6 +913,49 @@ namespace IFILifeSupport
                 Log.Info(report.ToString());
         }
 
+        private void IFI_ResetKerbals(Vessel vessel)
+        {
+            Log.Info("IFI_ResetKerbals");
+            if (vessel.vesselType == VesselType.EVA)
+            {
+                try
+                {
+                    StarvingKerbal.ResetCrewEVA(vessel);
+                }
+                catch (Exception ex) { Log.Warning("Vessel IFI Exception ++Finding Kerbals++ eva " + ex.Message); }
+            }
+            else
+            {
+               
+                if (vessel.loaded)
+                {
+                    for (int idx = 0; idx < vessel.parts.Count; idx++)
+                    {
+                        Part p = vessel.parts[idx];
+                        int IFIcrew = p.protoModuleCrew.Count;
+                        Log.Info("vessel.name: " + vessel.vesselName +
+                            ", part: " + p.partInfo.title + ", p.protoModuleCrew.Count: " + p.protoModuleCrew.Count);
+                        if (IFIcrew > 0)
+                        {
+                            StarvingKerbal.ResetCrew(vessel, p);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int idx = 0; idx < vessel.protoVessel.protoPartSnapshots.Count; idx++)
+                    {
+                        ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[idx];
+                        int IFIcrew = p.protoModuleCrew.Count;
+                        if (IFIcrew > 0)
+                        {
+                            StarvingKerbal.ResetCrew(vessel.protoVessel, p);
+                        }
+                    }
+
+                }
+            }
+        }
 
 
         private void IFI_Check_Kerbals(Vessel vessel) // Find All Kerbals Hiding on Vessel 
@@ -919,7 +967,7 @@ namespace IFILifeSupport
                 {
                     StarvingKerbal.CrewTestEVA(vessel, 0.2f);
                 }
-                catch (Exception ex) { IFIDebug.IFIMess("Vessel IFI Exception ++Finding Kerbals++ eva " + ex.Message); }
+                catch (Exception ex) { Log.Warning("Vessel IFI Exception ++Finding Kerbals++ eva " + ex.Message); }
             }
             else
             {
@@ -946,7 +994,6 @@ namespace IFILifeSupport
                         {
                             StarvingKerbal.CrewTestProto(vessel, 0, p, 0.1f);
                         }
-
                     }
                 }
             }
@@ -971,7 +1018,7 @@ namespace IFILifeSupport
             if (v.Parts.Count == 1 && CREWHOLD == 1 && RescueTest == 29)
             {
                 // Add Resources to Rescue Contract POD 1 time
-                IFIDebug.IFIMess("#### IFI LIfeSupport #### Rescue POD Found with No LS Resource TAG Flagging --" + Convert.ToString(RescueTest));
+                Log.Warning("#### IFI LIfeSupport #### Rescue POD Found with No LS Resource TAG Flagging --" + Convert.ToString(RescueTest));
                 ProtoPartSnapshot p = v.protoVessel.protoPartSnapshots[0];
                 for (int resIdx = 0; resIdx < p.resources.Count; resIdx++)
                 {
@@ -1032,6 +1079,8 @@ namespace IFILifeSupport
 
         void InitDisplayData()
         {
+            if (IFI_LifeSupportTrackingDisplay.Toolbar == null || IFI_LifeSupportTrackingDisplay.Instance == null)
+                return;
             IFI_LifeSupportTrackingDisplay.Toolbar.SetTexture("IFILS/Textures/IFI_LS_GRN_38", "IFILS/Textures/IFI_LS_GRN_24");
             IFI_LifeSupportTrackingDisplay.Instance.LS_Status_Hold = new string[FlightGlobals.Vessels.Count(), IFI_LifeSupportTrackingDisplay.MAX_STATUSES];
             IFI_LifeSupportTrackingDisplay.Instance.ClearStatusWidths();
@@ -1040,12 +1089,12 @@ namespace IFILifeSupport
 
         void DoDisplayCalcs(Vessel vessel, int IFI_Crew, double IFI_ALT, string IFI_Location, double Elapsed_Time, double days_rem, double LSAval, double slurryRate, double sludgeRate)
         {
-            Log.Info("Found Vessel: " + vessel.vesselName);//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
+            //Log.Info("Found Vessel: " + vessel.vesselName);//float distance = (float)Vector3d.Distance(vessel.GetWorldPos3D(), FlightGlobals.ActiveVessel.GetWorldPos3D());
 
             //IFI_Resources.UpdateDisplayValues(vessel);
 
-            IFIDebug.IFIMess("IFI_LIFESUPPORT_TRACKING.Life_Support_Update, IFI_Location: " + IFI_Location +
-                ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   IFI_ALT: " + IFI_ALT);
+            //Log.Warning("IFI_LIFESUPPORT_TRACKING.Life_Support_Update, IFI_Location: " + IFI_Location +
+            //    ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   IFI_ALT: " + IFI_ALT);
             double SlurryAvail = IFIGetAllResources(Constants.SLURRY, vessel);
             double SludgeAvail = IFIGetAllResources(Constants.SLUDGE, vessel);
 

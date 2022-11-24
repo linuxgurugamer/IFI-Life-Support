@@ -3,10 +3,14 @@
 
 set H=%KSPDIR%
 
-set H=R:\KSP_1.12.3_IFI_US2
+rem set H=R:\KSP_1.12.3_IFI_US2
 rem set H=R:\KSP_1.12.3_IFI_JNSQ
 
 rem set H=R:\KSP_1.12.3_Career-Dev-JNSQ
+
+rem set H=R:\KSP_1.12.3_Career-MissionController-JNSQ
+rem set H=R:\KSP_1.12.4_MissionCtlrParallax
+
 
 set GAMEDIR=IFILS
 set GAMEDATA="GameData"

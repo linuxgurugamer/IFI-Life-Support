@@ -114,11 +114,9 @@ namespace IFILifeSupport
             GameEvents.onVesselRecoveryProcessingComplete.Add(onVesselRecoveryProcessingComplete);
             GameEvents.OnVesselRecoveryRequested.Add(OnVesselRecoveryRequested);
             GameEvents.onCrewBoardVessel.Add(onCrewBoardVessel);
-
-            GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
-
             GameEvents.onHideUI.Add(OnHideUI);
             GameEvents.onShowUI.Add(OnShowUI);
+            GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
         }
 
         public void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> eData)
@@ -303,10 +301,13 @@ namespace IFILifeSupport
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + c.name);
                         toDelete.Add(c.name);
-                        c.type = ProtoCrewMember.KerbalType.Crew;
+
+                        StarvingKerbal.RestoreKerbalToActive(sk, c, "one");
+#if false
+                        c.type = sk.type;
                         KerbalRoster.SetExperienceTrait(c, sk.trait);
                         ScreenMessages.PostScreenMessage(c.name + " restored to active status", 5);
-
+#endif
                     }
                 }
             }
@@ -320,10 +321,13 @@ namespace IFILifeSupport
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + c.name);
                         toDelete.Add(c.name);
-                        c.type = ProtoCrewMember.KerbalType.Crew;
+
+                        StarvingKerbal.RestoreKerbalToActive(sk, c, "two");
+#if false
+                        c.type = sk.type;
                         KerbalRoster.SetExperienceTrait(c, sk.trait);
                         ScreenMessages.PostScreenMessage(c.name + " restored to active status", 5);
-
+#endif
                     }
                 }
             }
@@ -344,10 +348,13 @@ namespace IFILifeSupport
                         // Found a starving kerbal in the Crew building
                         Log.Info("Found starving kerbal: " + kerbal.name);
                         toDelete.Add(kerbal.name);
-                        kerbal.type = ProtoCrewMember.KerbalType.Crew;
+
+                        StarvingKerbal.RestoreKerbalToActive(sk, kerbal, "three");
+#if false
+                        kerbal.type = sk.type;
                         KerbalRoster.SetExperienceTrait(kerbal, sk.trait);
                         ScreenMessages.PostScreenMessage(kerbal.name + " restored to active status", 5);
-
+#endif
                     }
                 }
             }

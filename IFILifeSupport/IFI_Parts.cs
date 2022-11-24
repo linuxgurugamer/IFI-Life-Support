@@ -78,7 +78,7 @@ namespace IFILifeSupport
                 loadedParts.Remove(flag);
             }
 
-#if DEBUG
+#if false
             Log.Info("GetPartsList, List of IFI parts & resource usage");
             foreach (var a in allResProcessors)
             {

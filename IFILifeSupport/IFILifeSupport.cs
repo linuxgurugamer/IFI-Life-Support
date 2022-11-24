@@ -101,7 +101,7 @@ namespace IFILifeSupport
                 Vessel active = this.part.vessel;
                 double LS_RR = LifeSupportRate.GetRatePerMinute();
 
-                IFIDebug.IFIMess("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
+                Log.Warning("IFILifeSupport.OnUpdate, active.mainBody.name: " + active.mainBody.name +
                     ",  FlightGlobals.GetHomeBodyName(): " + FlightGlobals.GetHomeBodyName() + ",   active.altitude: " + active.altitude);
 
                 if (LifeSupportRate.IntakeAirAvailable(active, out double usageAdjustment))
@@ -167,7 +167,7 @@ namespace IFILifeSupport
                     if (IFIcrew > 0) KerbalCount += IFIcrew;
                 }
             }
-            catch (Exception ex) { IFIDebug.IFIMess("Vessel IFI Exception ++Finding Kerbals++MainLSMod " + ex.Message); }
+            catch (Exception ex) { Log.Warning("Vessel IFI Exception ++Finding Kerbals++MainLSMod " + ex.Message); }
             return KerbalCount;
         }
 

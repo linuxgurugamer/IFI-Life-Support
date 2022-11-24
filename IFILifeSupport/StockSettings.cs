@@ -54,13 +54,13 @@ namespace IFILifeSupport
             toolTip = "If enabled, then the Organic Slurry and Sludge (if applicable) will be shown in the resource panels of parts")]
         public bool showInResourcePanel = false;
 
-        [GameParameters.CustomIntParameterUI("Update Frequency (secs)", minValue = 15, maxValue = 300)]
-        public int refreshInterval = 15;
+        [GameParameters.CustomIntParameterUI("Update Frequency (secs)", minValue = 5, maxValue = 300)]
+        public int refreshInterval = 5;
 
         public float RefreshInterval { get { return TimeWarp.CurrentRate * refreshInterval; } }
 
-        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 15, maxValue = 300)]
-        public int displayRefreshInterval = 15;
+        [GameParameters.CustomIntParameterUI("Display Update Frequency (secs)", minValue = 5, maxValue = 300)]
+        public int displayRefreshInterval = 5;
 
         [GameParameters.CustomParameterUI("Selection Made",
             toolTip = "Set to false to have the selection window show up at the Space Center")]
@@ -280,8 +280,11 @@ namespace IFILifeSupport
         public int InactiveTimeBeforeDeathSecs { get { return inactiveTimeBeforeDeath * 3600; } }
         [GameParameters.CustomParameterUI("Debug mode",
             toolTip = "Writes reports to the log file ")]
+#if DEBUG
+        public bool Debug = true;
+#else
         public bool Debug = false;
-
+#endif
 
 
         void SetValues(double mult)

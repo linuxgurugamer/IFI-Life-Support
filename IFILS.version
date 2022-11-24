@@ -1,7 +1,7 @@
 {
   "NAME": "IFILS",
-  	"URL": "http://ksp.spacetux.net/avc/IFILS",
-    "DOWNLOAD": "https://github.com/linuxgurugamer/IFI-Life-Support/releases",
+  "URL": "http://ksp.spacetux.net/avc/IFILS",
+  "DOWNLOAD": "https://github.com/linuxgurugamer/IFI-Life-Support/releases",
   "GITHUB": {
     "USERNAME": "linuxgurugamer",
     "REPOSITORY": "IFILS"
@@ -10,12 +10,12 @@
     "MAJOR": 4,
     "MINOR": 0,
     "PATCH": 0,
-    "BUILD": 8
+    "BUILD": 10
   },
   "KSP_VERSION": {
     "MAJOR": 1,
     "MINOR": 12,
-    "PATCH": 3
+    "PATCH": 4
   },
   "KSP_VERSION_MIN": {
     "MAJOR": 1,
