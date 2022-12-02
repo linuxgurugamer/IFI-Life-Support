@@ -220,6 +220,8 @@
 	Changed minimum update frequency from 15 to 5 seconds
 	Fixed tourists not being reset back to Kerbals when LS restored
 
+4.0.0.11
+	Fixed path for loading images (broken by new launcher)
 	
 
 TODO

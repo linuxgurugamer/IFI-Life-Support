@@ -93,8 +93,8 @@ namespace IFILifeSupport
         {
             Log.Info("GetToggleButtonStyle, styleName: " + styleName);
 
-            ToolbarControl.LoadImageFromFile(ref Settings.Instance.styleOff, "GameData/IFILS/PluginData/textures/" + styleName + "_off");
-            ToolbarControl.LoadImageFromFile(ref Settings.Instance.styleOn, "GameData/IFILS/PluginData/textures/" + styleName + "_on");
+            ToolbarControl.LoadImageFromFile(ref Settings.Instance.styleOff, KSPUtil.ApplicationRootPath + "GameData/IFILS/PluginData/textures/" + styleName + "_off");
+            ToolbarControl.LoadImageFromFile(ref Settings.Instance.styleOn, KSPUtil.ApplicationRootPath + "GameData/IFILS/PluginData/textures/" + styleName + "_on");
 
             Settings.Instance.myStyle.name = styleName + "Button";
             Settings.Instance.myStyle.padding = new RectOffset() { left = 0, right = 0, top = 0, bottom = 0 };
