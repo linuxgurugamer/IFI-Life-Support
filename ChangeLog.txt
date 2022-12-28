@@ -223,6 +223,9 @@
 4.0.0.11
 	Fixed path for loading images (broken by new launcher)
 	
+4.0.0.12
+	Updated Entry cost, cost, mass & amount of storage for the 5 round tanks
+	Update spreadsheet in docs with round tank values on new page
 
 TODO
 
