@@ -227,6 +227,10 @@
 	Updated Entry cost, cost, mass & amount of storage for the 5 round tanks
 	Update spreadsheet in docs with round tank values on new page
 
+4.0.1
+	Thanks to github user @nan0bug00 for this:
+		Added configs for SSPX and Benjee10_MMSEV Greenhouses
+
 TODO
 
 Configure new parts from JadeOfMaar
