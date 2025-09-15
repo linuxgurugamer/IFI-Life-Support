@@ -231,9 +231,12 @@
 	Thanks to github user @nan0bug00 for this:
 		Added configs for SSPX and Benjee10_MMSEV Greenhouses
 
+4.0.1.1
+	Updated version file to use github for new version info
+
 TODO
 
-Configure new parts from JadeOfMaar
+Configure new parts from JadeOfMaar - DONE
 
 Verify Enhanced Biosystems engineering, should require BOTH, not any
 
